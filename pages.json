@@ -1,0 +1,66 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/meal/meal",
+			"style": {
+				"navigationBarTitleText": "点餐",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/meal/meal-add",
+			"style": {
+				"navigationBarTitleText": "新增点餐"
+			}
+		},
+		{
+			"path": "pages/dishes/dishes",
+			"style": {
+				"navigationBarTitleText": "菜品"
+			}
+		},
+		{
+			"path": "pages/my/my",
+			"style": {
+				"navigationBarTitleText": "我的"
+			}
+		},
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8",
+		"enablePullDownRefresh": false,
+		"onReachBottomDistance": 10
+	},
+	"uniIdRouter": {},
+	"tabBar": {
+		"color": "#7A7E83",
+		"selectedColor": "#007AFF",
+		"borderStyle": "black",
+		"backgroundColor": "#FFFFFF",
+		"list": [{
+			"pagePath": "pages/meal/meal",
+			"iconPath": "static/tabbar/meal_unselect.png",
+			"selectedIconPath": "static/tabbar/meal_selected.png",
+			"text": "点餐"
+		}, {
+			"pagePath": "pages/dishes/dishes",
+			"iconPath": "static/tabbar/dishes_unselect.png",
+			"selectedIconPath": "static/tabbar/dishes_selected.png",
+			"text": "菜品"
+		}, {
+			"pagePath": "pages/my/my",
+			"iconPath": "static/tabbar/my_unselect.png",
+			"selectedIconPath": "static/tabbar/my_selected.png",
+			"text": "我的"
+		}]
+	}
+}

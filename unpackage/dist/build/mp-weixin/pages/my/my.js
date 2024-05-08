@@ -1,0 +1,1 @@
+"use strict";const e=require("../../common/vendor.js"),n={__name:"my",setup(n){function o(){e.index.removeStorageSync("iwtoken"),e.index.reLaunch({url:"/pages/login/login"})}return(n,r)=>({a:e.o(o)})}};wx.createPage(n);

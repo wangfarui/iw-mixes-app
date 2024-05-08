@@ -1,0 +1,44 @@
+{
+  "pages": [
+    "pages/meal/meal",
+    "pages/meal/meal-add",
+    "pages/dishes/dishes",
+    "pages/my/my",
+    "pages/login/login"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8",
+    "enablePullDownRefresh": false,
+    "onReachBottomDistance": 10
+  },
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#007AFF",
+    "borderStyle": "black",
+    "backgroundColor": "#FFFFFF",
+    "list": [
+      {
+        "pagePath": "pages/meal/meal",
+        "iconPath": "static/tabbar/meal_unselect.png",
+        "selectedIconPath": "static/tabbar/meal_selected.png",
+        "text": "点餐"
+      },
+      {
+        "pagePath": "pages/dishes/dishes",
+        "iconPath": "static/tabbar/dishes_unselect.png",
+        "selectedIconPath": "static/tabbar/dishes_selected.png",
+        "text": "菜品"
+      },
+      {
+        "pagePath": "pages/my/my",
+        "iconPath": "static/tabbar/my_unselect.png",
+        "selectedIconPath": "static/tabbar/my_selected.png",
+        "text": "我的"
+      }
+    ]
+  },
+  "usingComponents": {}
+}

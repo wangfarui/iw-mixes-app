@@ -1,0 +1,1 @@
+"use strict";const e=require("../common/vendor.js"),s=e.defineStore("login",(()=>{const s=e.reactive({username:"",password:"",isRemeber:!1});return{loginForm:s,saveAccount:function(e){console.log(e),s.username=e.username,s.password=e.password,s.isRemeber=!0},clearAccount:function(){s.username="",s.password="",s.isRemeber=!1}}}));exports.useLoginStore=s;
