@@ -8745,20 +8745,20 @@ const pages = [
   {
     path: "pages/meal/meal",
     style: {
-      navigationBarTitleText: "点餐",
+      navigationBarTitleText: "用餐记录",
       enablePullDownRefresh: true
-    }
-  },
-  {
-    path: "pages/meal/meal-add",
-    style: {
-      navigationBarTitleText: "新增点餐"
     }
   },
   {
     path: "pages/dishes/dishes",
     style: {
-      navigationBarTitleText: "菜品"
+      navigationBarTitleText: "点餐"
+    }
+  },
+  {
+    path: "pages/meal/meal-detail",
+    style: {
+      navigationBarTitleText: "用餐详情"
     }
   },
   {
@@ -8771,6 +8771,18 @@ const pages = [
     path: "pages/login/login",
     style: {
       navigationBarTitleText: "登录"
+    }
+  },
+  {
+    path: "pages/dishes/dishes-detail",
+    style: {
+      navigationBarTitleText: "菜品详情"
+    }
+  },
+  {
+    path: "pages/dishes/cart-confirm",
+    style: {
+      navigationBarTitleText: "确认订单"
     }
   }
 ];
@@ -8793,13 +8805,13 @@ const tabBar = {
       pagePath: "pages/meal/meal",
       iconPath: "static/tabbar/meal_unselect.png",
       selectedIconPath: "static/tabbar/meal_selected.png",
-      text: "点餐"
+      text: "用餐记录"
     },
     {
       pagePath: "pages/dishes/dishes",
       iconPath: "static/tabbar/dishes_unselect.png",
       selectedIconPath: "static/tabbar/dishes_selected.png",
-      text: "菜品"
+      text: "点餐"
     },
     {
       pagePath: "pages/my/my",
@@ -11522,7 +11534,6 @@ exports.initVueI18n = initVueI18n;
 exports.n = n$1;
 exports.o = o$1;
 exports.onLoad = onLoad;
-exports.onMounted = onMounted;
 exports.onPullDownRefresh = onPullDownRefresh;
 exports.onReachBottom = onReachBottom;
 exports.onShow = onShow;
@@ -11533,3 +11544,4 @@ exports.resolveComponent = resolveComponent;
 exports.s = s$1;
 exports.sr = sr;
 exports.t = t$1;
+exports.unref = unref;

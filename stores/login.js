@@ -9,7 +9,6 @@ export const useLoginStore = defineStore('login', () => {
     })
 	
 	function saveAccount(account) {
-		console.log(account);
 		loginForm.username = account.username
 		loginForm.password = account.password
 		loginForm.isRemeber = true

@@ -31,7 +31,6 @@ const _sfc_main = {
     function isRemeberChange(e) {
       const values = e.detail.value;
       if (values.includes("isRemeber")) {
-        console.log("remeber true");
         loginForm.isRemeber = true;
       } else {
         loginForm.isRemeber = false;
@@ -59,7 +58,6 @@ const _sfc_main = {
         const userInfo = res.data;
         common_vendor.index.setStorageSync("iwtoken", userInfo.tokenValue);
         if (loginForm.isRemeber) {
-          console.log("保存");
           loginStore.saveAccount(loginForm);
         } else {
           loginStore.clearAccount();

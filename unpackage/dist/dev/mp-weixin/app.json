@@ -1,10 +1,12 @@
 {
   "pages": [
     "pages/meal/meal",
-    "pages/meal/meal-add",
     "pages/dishes/dishes",
+    "pages/meal/meal-detail",
     "pages/my/my",
-    "pages/login/login"
+    "pages/login/login",
+    "pages/dishes/dishes-detail",
+    "pages/dishes/cart-confirm"
   ],
   "window": {
     "navigationBarTextStyle": "black",
@@ -24,13 +26,13 @@
         "pagePath": "pages/meal/meal",
         "iconPath": "static/tabbar/meal_unselect.png",
         "selectedIconPath": "static/tabbar/meal_selected.png",
-        "text": "点餐"
+        "text": "用餐记录"
       },
       {
         "pagePath": "pages/dishes/dishes",
         "iconPath": "static/tabbar/dishes_unselect.png",
         "selectedIconPath": "static/tabbar/dishes_selected.png",
-        "text": "菜品"
+        "text": "点餐"
       },
       {
         "pagePath": "pages/my/my",

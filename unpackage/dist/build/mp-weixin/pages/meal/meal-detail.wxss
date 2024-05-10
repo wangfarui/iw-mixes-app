@@ -1,0 +1,1 @@
+.dishesName{font-weight:400;font-size:18px;margin:10px 0}.container{padding:10px;min-height:100vh;display:flex;flex-direction:column}.content{flex:1}.footer{position:-webkit-sticky;position:sticky;bottom:0;padding:10px;background-color:#f0f0f0}

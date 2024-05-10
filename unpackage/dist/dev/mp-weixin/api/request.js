@@ -1,10 +1,9 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
-const baseUrl = "https://api.itwray.com/iw-eat";
+const baseUrl = "http://localhost:18003/iw-eat";
 const token_key = "iwtoken";
 const http = (url, method, data) => {
   const iwtoken = common_vendor.index.getStorageSync(token_key);
-  console.log("iwtoken" + iwtoken);
   if (!iwtoken && !url.includes("login")) {
     common_vendor.index.reLaunch({
       url: "/pages/login/login"
@@ -20,8 +19,6 @@ const http = (url, method, data) => {
         "iwtoken": iwtoken
       },
       success: (res) => {
-        console.log("统一响应");
-        console.log(res.data);
         const result = res.data;
         if (result == void 0) {
           common_vendor.index.showToast({
@@ -47,8 +44,6 @@ const http = (url, method, data) => {
         resolve(result);
       },
       fail: (res) => {
-        console.log("请求失败");
-        console.log(res);
         reject(res);
       }
     });
@@ -58,6 +53,14 @@ class Request {
   async get(url) {
     try {
       const response = await http(url, "get", {});
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async delete(url) {
+    try {
+      const response = await http(url, "delete", {});
       return response;
     } catch (error) {
       throw error;

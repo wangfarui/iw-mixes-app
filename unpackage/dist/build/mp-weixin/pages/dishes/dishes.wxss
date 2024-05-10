@@ -1,0 +1,1 @@
+.goods-carts{display:flex;flex-direction:column;position:fixed;left:0;right:0;bottom:0}.demo-uni-row{margin-bottom:10px}.category-name{padding:10px;cursor:pointer}.dishes{font-size:14px;font-weight:400}.dishesName{font-weight:bolder;font-size:18px}

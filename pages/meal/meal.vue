@@ -1,20 +1,17 @@
 <template>
 	<view>
-		<view class="container">
-			<button type="primary" @click="handleMealAdd">点餐</button>
-		</view>
 		<view>
-			<uni-section title="点餐记录" type="line">
+			<!-- <uni-section title="点餐记录" type="line"> -->
 				<uni-list>
-					<uni-list-item v-for="item in page.list" :key="item.id" :ellipsis="0" title="测试标题"
-						@click="associativeClick(item)" clickable>
+					<uni-list-item v-for="item in page.list" :key="item.id"
+						@click="handleMealClick(item)" clickable>
 						<template v-slot:body>
 							<view class="item">
 								<uni-row class="demo-uni-row">
-									<view>用餐日期：{{item.mealDate}}</view>
+									<view>用餐日期：{{isToday(item.mealDate) ? '今天' : item.mealDate}}</view>
 								</uni-row>
 								<uni-row>
-									<view>用餐时间：{{item.mealTime}}</view>
+									<view>用餐时间：{{item.mealTimeDesc}}</view>
 								</uni-row>
 								<uni-row>
 									<view>用餐人数：{{item.diners}}</view>
@@ -26,7 +23,7 @@
 						</template>
 					</uni-list-item>
 				</uni-list>
-			</uni-section>
+			<!-- </uni-section> -->
 			<view>
 				<uni-load-more :status="mealListStatus" />
 			</view>
@@ -51,13 +48,13 @@
 	const page = reactive({
 		dto: {
 			currentPage: 1,
-			pageSize: 5
+			pageSize: 10
 		},
 		list: []
 	})
 
 	onShow(() => {
-		searchPage()
+		initPage()
 	})
 
 	function searchPage() {
@@ -65,13 +62,12 @@
 		http.post('/meal/page', page.dto)
 			.then(res => {
 				const data = res.data
-				if (data.records && data.records.length > 0) {
+				if (data.records && data.records.length == page.dto.pageSize) {
 					mealListStatus.value = 'more'
 				} else {
 					mealListStatus.value = 'noMore'
 				}
 				page.list = [...page.list, ...data.records]
-				console.log(page.list);
 			})
 			.catch(error => {
 				mealListStatus.value = 'more'
@@ -81,16 +77,32 @@
 			});
 
 	}
-
-	function associativeClick(item) {
-		console.log(item);
+	
+	function isToday(dateString) {
+	  const today = new Date();
+	  const date = new Date(dateString);
+	 
+	  return (
+	    date.getDate() === today.getDate() &&
+	    date.getMonth() === today.getMonth() &&
+	    date.getFullYear() === today.getFullYear()
+	  );
 	}
-
-	onPullDownRefresh(() => {
-		console.log('refresh');
+	
+	function handleMealClick(item) {
+		uni.navigateTo({
+			url: '/pages/meal/meal-detail?id=' + item.id
+		});
+	}
+	
+	function initPage() {
 		page.dto.currentPage = 1
 		page.list = []
 		searchPage()
+	}
+
+	onPullDownRefresh(() => {
+		initPage()
 	})
 
 	// 上拉加载更多
@@ -98,13 +110,6 @@
 		page.dto.currentPage++
 		searchPage()
 	})
-
-	function handleMealAdd() {
-		// mealStore.initFormData()
-		uni.navigateTo({
-			url: '/pages/meal/meal-add'
-		});
-	}
 </script>
 
 <style>

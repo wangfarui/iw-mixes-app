@@ -1,4 +1,10 @@
 {
-  "navigationBarTitleText": "菜品",
-  "usingComponents": {}
+  "navigationBarTitleText": "点餐",
+  "usingComponents": {
+    "uni-col": "../../uni_modules/uni-row/components/uni-col/uni-col",
+    "uni-icons": "../../uni_modules/uni-icons/components/uni-icons/uni-icons",
+    "uni-row": "../../uni_modules/uni-row/components/uni-row/uni-row",
+    "uni-load-more": "../../uni_modules/uni-load-more/components/uni-load-more/uni-load-more",
+    "cart": "./cart"
+  }
 }

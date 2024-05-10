@@ -7,7 +7,6 @@ const useLoginStore = common_vendor.defineStore("login", () => {
     isRemeber: false
   });
   function saveAccount(account) {
-    console.log(account);
     loginForm.username = account.username;
     loginForm.password = account.password;
     loginForm.isRemeber = true;
