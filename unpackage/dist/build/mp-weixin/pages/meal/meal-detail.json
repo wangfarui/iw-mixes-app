@@ -1,9 +1,0 @@
-{
-  "navigationBarTitleText": "用餐详情",
-  "usingComponents": {
-    "uni-row": "../../uni_modules/uni-row/components/uni-row/uni-row",
-    "uni-section": "../../uni_modules/uni-section/components/uni-section/uni-section",
-    "uni-popup-dialog": "../../uni_modules/uni-popup/components/uni-popup-dialog/uni-popup-dialog",
-    "uni-popup": "../../uni_modules/uni-popup/components/uni-popup/uni-popup"
-  }
-}

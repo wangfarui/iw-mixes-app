@@ -1,8 +1,8 @@
 <template>
 	<view class="container">
 		<view class="content">
-			<uni-section class="mb-10" title="基础信息" titleFontSize="16px">
-				<view>
+			<uni-section class="mb-10" title="基础信息" titleFontSize="18px">
+				<view style="font-size: 16px;">
 					<uni-row>
 						<view>用餐日期：{{mealDetail.mealDate}}</view>
 					</uni-row>
@@ -17,8 +17,8 @@
 					</uni-row>
 				</view>
 			</uni-section>
-			<uni-section class="mb-10" title="菜品信息">
-				<view>
+			<uni-section class="mb-10" title="菜品信息" titleFontSize="18px">
+				<view style="font-size: 16px;">
 					<view v-if="mealDetail.mealMenuList && mealDetail.mealMenuList.length > 0">
 						<view v-for="(dish, index) in mealDetail.mealMenuList" :key="dish.id"
 							@click="intoDishDetail(dish.dishesId)">
@@ -29,6 +29,23 @@
 					</view>
 					<view v-else>
 						没有点菜哦~只能下单全看备注吃啥了
+					</view>
+				</view>
+			</uni-section>
+			<uni-section v-if="mealDetail.mealMenuList && mealDetail.mealMenuList.length > 0" class="mb-10"
+				title="所需食材" titleFontSize="18px">
+				<view style="font-size: 16px;margin-bottom: 10px;">
+					需要采购的食材:
+					<view v-for="(item, index) in dishesMaterialDetail.needPurchaseMaterialList" :key="index">
+							<view class="col material-key" style="flex: 1;">
+								{{item.materialName}}<text class="material-value">{{item.materialDosages.join('，')}}</text>
+							</view>
+					</view>
+				</view>
+				<view style="font-size: 16px;">
+					常用食材:
+					<view v-for="(item, index) in dishesMaterialDetail.commonMaterialList" :key="index">
+						<text>{{item}}</text>
 					</view>
 				</view>
 			</uni-section>
@@ -59,12 +76,17 @@
 	import http from '@/api/request.js'
 
 	const mealDetail = ref({})
+	const dishesMaterialDetail = ref({})
 	const alertDialog = ref(null)
 
 	onLoad((option) => {
 		http.get('/meal/detail?id=' + option.id)
 			.then(res => {
 				mealDetail.value = res.data
+			})
+		http.get('/meal/dishes/materialDetail?id=' + option.id)
+			.then(res => {
+				dishesMaterialDetail.value = res.data
 			})
 	})
 
@@ -92,7 +114,7 @@
 	.dishesName {
 		font-weight: normal;
 		font-size: 18px;
-		margin: 10px 0;
+		margin-bottom: 10px;
 	}
 
 	.container {
@@ -111,5 +133,15 @@
 		bottom: 0;
 		padding: 10px;
 		background-color: #f0f0f0;
+	}
+	
+	.material-key {
+		flex: 1;
+		display: flex;
+		align-items: center;
+	}
+	
+	.material-key .material-value {
+		margin-left: auto;
 	}
 </style>

@@ -1,1 +1,0 @@
-.container{min-height:100vh;display:flex;flex-direction:column}.content{flex:1}.footer{position:-webkit-sticky;position:sticky;bottom:0;padding:10px;background-color:#f0f0f0}.mb-10{font-size:14px}

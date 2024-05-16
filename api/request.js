@@ -1,5 +1,5 @@
-// const baseUrl = 'http://localhost:18003/iw-eat'
-const baseUrl = 'https://api.itwray.com/iw-eat'
+const baseUrl = 'http://localhost:18003/iw-eat'
+// const baseUrl = 'https://api.itwray.com/iw-eat'
 
 const token_key = 'iwtoken'
 

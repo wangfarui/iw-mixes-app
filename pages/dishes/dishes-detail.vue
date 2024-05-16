@@ -19,7 +19,7 @@
 			</uni-row>
 		</view>
 
-		<uni-section class="mb-10" title="基础信息" type="circle" titleFontSize="18px">
+		<uni-section title="基础信息" type="circle" titleFontSize="18px">
 			<view class="container-item">
 				<uni-row>
 					<view style="line-height: 5vh;">
@@ -39,19 +39,35 @@
 			</view class="container-item">
 		</uni-section>
 
-		<uni-section class="mb-10" title="所需食材" type="circle" titleFontSize="18px">
+		<uni-section title="所需食材" type="circle" titleFontSize="18px">
 			<view class="container-item">
-				菜米油盐酱醋
+				<view v-for="(item, index) in dishDetail.dishesMaterialList" :key="index" class="dishes-material-item">
+					<view class="row" style="margin-bottom: 10px;">
+						<view class="col material-key" style="flex: 1;">
+							{{item.materialName}}<text class="material-value">{{item.materialDosage}}</text>
+						</view>
+					</view>
+				</view>
 			</view>
 		</uni-section>
 
-		<uni-section class="mb-10" title="制作方法" type="circle" titleFontSize="18px">
-			<view class="container-item">
-				<view>1. 第一步...</view>
-				<view>2. 第二步...</view>
-				<view>3. 第三步...</view>
-			</view>
-		</uni-section>
+		<view style="padding-bottom: 6vh;">
+			<uni-section title="制作方法" type="circle" titleFontSize="18px">
+				<view class="container-item">
+					<view v-for="(item, index) in dishDetail.dishesCreationMethodList" :key="index" class=".dishes-creation-method-item">
+						<view class="row" style="font-size: 17px;">
+								步骤 {{ index + 1 }}
+						</view>
+						<view v-if="item.stepImage" style="margin-bottom: 10px;">
+							<image :src="item.stepImage" mode="heightFix"  />
+						</view>
+						<view style="font-size: 14px;">
+							{{item.stepContent}}
+						</view>
+					</view>
+				</view>
+			</uni-section>
+		</view>
 
 		<view v-if="isEditOperate">
 			<Cart />
@@ -93,10 +109,6 @@
 		margin-bottom: 10px;
 	}
 
-	.mb-10 {
-		margin-bottom: 10px;
-	}
-
 	.add-card {
 		-webkit-tap-highlight-color: transparent;
 		background-color: yellow;
@@ -113,5 +125,28 @@
 		position: relative;
 		text-align: center;
 		text-decoration: none;
+	}
+
+	.dishes-material-item {
+		margin: 10px 0;
+		border-bottom: 2px dashed #999999;
+	}
+	
+	.dishes-creation-method-item {
+		margin: 15px 0;
+	}
+
+	.material-key {
+		flex: 1;
+		display: flex;
+		align-items: center;
+	}
+
+	.material-key .material-value {
+		margin-left: auto;
+	}
+	
+	.uni-section .uni-section-header {
+		
 	}
 </style>
