@@ -1,0 +1,16 @@
+# 工程目录
+unpackage
+dist
+
+# 操作系统
+.DS_Store
+
+# 编辑器
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
