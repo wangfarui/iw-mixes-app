@@ -37,6 +37,9 @@
 			<view class="container-item">
 				价格: ¥<text style="font-size: 16px;font-weight: bolder;">{{ dishDetail.prices }}</text>
 			</view class="container-item">
+			<view class="container-item">
+				备注：{{dishDetail.remark}}
+			</view>
 		</uni-section>
 
 		<uni-section title="所需食材" type="circle" titleFontSize="18px">
