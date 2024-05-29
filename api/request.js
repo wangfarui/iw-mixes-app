@@ -1,10 +1,9 @@
-const baseUrl = 'http://localhost:18003/iw-eat'
-// const baseUrl = 'https://api.itwray.com/iw-eat'
 
-const token_key = 'iwtoken'
+import {baseUrl, token_key, getTokenValue, tokenHeader} from './env.js'
+
 
 const http = (url, method, data) => {
-	const iwtoken = uni.getStorageSync(token_key)
+	const iwtoken = getTokenValue()
 	if (!iwtoken && !url.includes('login')) {
 		uni.reLaunch({
 			url: '/pages/login/login'
@@ -17,7 +16,7 @@ const http = (url, method, data) => {
 			method: method,
 			data: data,
 			header: {
-				'iwtoken': iwtoken
+				...tokenHeader()
 			},
 			success: (res) => {
 				const result = res.data;

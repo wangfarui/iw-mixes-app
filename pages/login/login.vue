@@ -81,6 +81,7 @@
 			.then(res => {
 				const userInfo = res.data
 				uni.setStorageSync('iwtoken', userInfo.tokenValue)
+				uni.setStorageSync('userInfo', userInfo)
 
 				if (loginForm.isRemeber) {
 					loginStore.saveAccount(loginForm)
