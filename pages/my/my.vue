@@ -123,6 +123,7 @@
 						})
 						.then(res => {
 							userInfo.value.avatar = avatarUrl;
+							uni.setStorageSync('userInfo', userInfo.value)
 						})
 				}
 			},
