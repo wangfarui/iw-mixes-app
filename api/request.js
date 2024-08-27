@@ -25,13 +25,19 @@ const http = (url, method, data) => {
 						icon: 'exception',
 						title: '数据加载异常'
 					});
+					reject(new Error('数据加载异常'));
 					return
 				}
 				if (result.code == 401) {
+					uni.showToast({
+						icon: 'exception',
+						title: '登录状态失效，请重新登录'
+					});
 					uni.removeStorageSync(token_key)
 					uni.reLaunch({
 						url: '/pages/login/login'
 					});
+					reject(new Error('未授权，请登录'));
 					return
 				}
 				if (result.code != 200) {
@@ -39,12 +45,14 @@ const http = (url, method, data) => {
 						icon: 'none',
 						title: result.message
 					});
+					reject(new Error(result.message));
 					return
 				}
 				resolve(result);
 			},
-			fail: (res) => {
-				reject(res);
+			fail: (err) => {
+				console.log(err);
+				reject(err);
 			}
 		});
 	});

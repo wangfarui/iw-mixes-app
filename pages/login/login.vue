@@ -77,7 +77,7 @@
 			title: '登录中'
 		});
 
-		http.post('/login/doLogin', loginForm)
+		http.post('/auth-service/login/password', loginForm)
 			.then(res => {
 				const userInfo = res.data
 				uni.setStorageSync('iwtoken', userInfo.tokenValue)

@@ -1,5 +1,5 @@
-export const baseUrl = 'http://localhost:18003/iw-eat'
-// export const baseUrl = 'https://api.itwray.com/iw-eat'
+export const baseUrl = 'http://localhost:18000'
+// export const baseUrl = 'https://api.itwray.com'
 
 export const token_key = 'iwtoken'
 
