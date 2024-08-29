@@ -151,7 +151,7 @@
 				initFormData()
 				cartStore.initCart()
 				uni.switchTab({
-					url: '/pages/meal/meal'
+					url: '/pages/menu/menu'
 				});
 			})
 	}
