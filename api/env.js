@@ -8,5 +8,7 @@ export const getTokenValue = () => {
 }
 
 export const tokenHeader = () => {
-	return {'iwtoken': getTokenValue()}
+	return {
+		'iwtoken': getTokenValue()
+	}
 }

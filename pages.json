@@ -61,6 +61,12 @@
 				"navigationBarTitleText": "记账记录",
 				"enablePullDownRefresh": true
 			}
+		},
+		{
+			"path": "pages/bookkeeping/bookkeeping-detail",
+			"style": {
+				"navigationBarTitleText": "详情"
+			}
 		}
 	],
 	"globalStyle": {

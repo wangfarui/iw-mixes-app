@@ -3,7 +3,7 @@
 		<view>
 			<!-- <uni-section title="点餐记录" type="line"> -->
 			<uni-list>
-				<uni-list-item v-for="item in page.list" :key="item.id" @click="handleMealClick(item)" clickable>
+				<uni-list-item v-for="item in page.list" :key="item.id" @click="handleRecordClick(item)" clickable>
 					<template v-slot:body>
 						<view style="width: 100%;">
 							<uni-row>
@@ -44,7 +44,7 @@
 	const page = reactive({
 		dto: {
 			currentPage: 1,
-			pageSize: 10
+			pageSize: 20
 		},
 		list: []
 	})
@@ -81,8 +81,10 @@
 
 	}
 
-	function handleMealClick(item) {
-		console.log("记录:" + item);
+	function handleRecordClick(item) {
+		uni.navigateTo({
+			url: '/pages/bookkeeping/bookkeeping-detail?id=' + item.id
+		});
 	}
 
 	function initPage() {
