@@ -54,23 +54,31 @@
 		</view>
 		<view>
 			<uni-section title="今日记录" type="line">
-				<uni-list>
-					<uni-list-item v-for="(item, index) in toDayRecords" :key="item.id">
-						<template v-slot:body>
-							<view style="width: 100%;">
-								<uni-row>
-									<uni-col :span="18">{{formatSourceText(item)}}</uni-col>
-									<uni-col :span="6">
-										<view style="text-align: right;">{{item.recordCategory == '1' ? '-' : ''}}{{item.amount}}元</view>
-									</uni-col>
-								</uni-row>
-								<uni-row>
-									<view>{{item.recordTime}}</view>
-								</uni-row>
-							</view>
-						</template>
-					</uni-list-item>
-				</uni-list>
+				<template v-slot:right>
+					今日总消费：{{toDayConsume}} 元
+				</template>
+				<view>
+					<uni-list>
+						<uni-list-item v-for="(item, index) in toDayRecords" :key="item.id">
+							<template v-slot:body>
+								<view style="width: 100%;">
+									<uni-row>
+										<uni-col :span="18">{{formatSourceText(item)}}</uni-col>
+										<uni-col :span="6">
+											<view style="text-align: right;">
+												{{item.recordCategory == '1' ? '-' : ''}}{{item.amount}}元
+											</view>
+										</uni-col>
+									</uni-row>
+									<uni-row>
+										<view>{{item.recordTime}}</view>
+									</uni-row>
+								</view>
+							</template>
+						</uni-list-item>
+					</uni-list>
+				</view>
+
 			</uni-section>
 		</view>
 	</view>
@@ -132,13 +140,21 @@
 			},
 		]
 	})
-	
+
 	const toDayRecords = ref([])
+
+	const toDayConsume = ref(0)
 
 	onShow(() => {
 		http.post('/bookkeeping-service/records/list', {})
 			.then(res => {
 				toDayRecords.value = res.data
+				if (res.data != null) {
+					toDayConsume.value = res.data.reduce((sum, item) => {
+						// 先将金额放大100倍，避免小数运算精度问题，然后相加，最后再除以100
+						return Math.round((sum + item.amount) * 100) / 100;
+					}, 0);
+				}
 			})
 	})
 
@@ -147,7 +163,7 @@
 	}
 
 	function classifyChange(e) {
-		console.log("e:", e);
+
 	}
 
 	function saveRecord() {
@@ -166,7 +182,7 @@
 				});
 			})
 	}
-	
+
 	function formatSourceText(item) {
 		if (item.recordSource != '') {
 			return item.recordSource;
