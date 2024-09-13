@@ -8,7 +8,10 @@
 				{{ userInfo.name }}
 			</view>
 			<view class="logout-button-container">
-				<button @click="logout">退出登录</button>
+				<button @click="refreshCache">刷新缓存</button>
+			</view>
+			<view class="logout-button-container">
+				<button @click="clickLogout">退出登录</button>
 			</view>
 		</view>
 
@@ -37,6 +40,10 @@
 		tokenHeader
 	} from '@/api/env.js'
 	import http from '@/api/request.js'
+	import {
+		logout,
+		refreshDictCache
+	} from "@/api/login.js";
 
 	const userInfo = ref({})
 
@@ -54,10 +61,17 @@
 			url: '/pages/my/edit-avatar'
 		});
 	}
+	
+	// 刷新缓存数据
+	function refreshCache() {
+		// 刷新字典缓存
+		refreshDictCache()
+	}
 
-	function logout() {
+	function clickLogout() {
 		uni.removeStorageSync('iwtoken')
 		uni.removeStorageSync('userInfo')
+		logout()
 		uni.reLaunch({
 			url: '/pages/login/login'
 		});

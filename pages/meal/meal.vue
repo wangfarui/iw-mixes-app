@@ -11,7 +11,7 @@
 									<view>用餐日期：{{isToday(item.mealDate) ? '今天' : item.mealDate}}</view>
 								</uni-row>
 								<uni-row>
-									<view>用餐时间：{{item.mealTimeDesc}}</view>
+									<view>用餐时间：{{dictStore.getDictNameByCode(dictStore.dictTypeEnum.EAT_MEAL_TIME, item.mealTime)}}</view>
 								</uni-row>
 								<uni-row>
 									<view>用餐人数：{{item.diners}}</view>
@@ -42,6 +42,11 @@
 		onShow
 	} from '@dcloudio/uni-app'
 	import http from '@/api/request.js'
+	import {
+		useDictStore
+	} from "@/stores/dict.ts";
+
+	const dictStore = useDictStore()
 
 	const mealListStatus = ref('more')
 

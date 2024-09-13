@@ -39,8 +39,15 @@
 			</uni-section>
 			<uni-section title="分类" type="line">
 				<view class="example-body">
-					<uni-data-select v-model="formData.recordType" :localdata="classify.range"
+					<uni-data-select v-model="formData.recordType"
+						:localdata="dictStore.getDictDataWithDataSelectCode(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TYPE)"
 						@change="classifyChange"></uni-data-select>
+				</view>
+			</uni-section>
+			<uni-section title="标签" type="line">
+				<view class="example-body">
+					<uni-data-checkbox multiple v-model="formData.recordTags" 
+					:localdata="dictStore.getDictDataWithDataSelectId(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG)"></uni-data-checkbox>
 				</view>
 			</uni-section>
 			<uni-section title="备注" type="line">
@@ -91,61 +98,46 @@
 		reactive
 	} from 'vue'
 
+	import http from '@/api/request.js'
+	
 	import {
 		onShow
 	} from '@dcloudio/uni-app'
 
 	import {
-		baseUrl
-	} from '@/api/env.js'
-	import http from '@/api/request.js'
+		useDictStore
+	} from "@/stores/dict.ts";
+
+	const dictStore = useDictStore()
 
 	const items = ['支出', '收入']
 
-	const formData = ref({
-		recordDate: '',
-		recordCategory: 1,
-		recordSource: '',
-		amount: '',
-		recordType: '',
-		remark: ''
-	})
+	const formData = ref({})
 
 	const current = ref(0)
-
-	const classify = reactive({
-		range: [{
-				value: 1,
-				text: "餐饮美食"
-			},
-			{
-				value: 2,
-				text: "日用百货"
-			},
-			{
-				value: 3,
-				text: "交通出行"
-			},
-			{
-				value: 4,
-				text: "充值缴费"
-			},
-			{
-				value: 5,
-				text: "生活服务"
-			},
-			{
-				value: 6,
-				text: "其他"
-			},
-		]
-	})
 
 	const toDayRecords = ref([])
 
 	const toDayConsume = ref(0)
 
 	onShow(() => {
+		initFormData()
+		loadTodayConsume()
+	})
+
+	function initFormData() {
+		formData.value = {
+			recordDate: '',
+			recordCategory: 1,
+			recordSource: '',
+			amount: '',
+			recordType: '',
+			remark: '',
+			recordTags: []
+		}
+	}
+
+	function loadTodayConsume() {
 		http.post('/bookkeeping-service/records/list', {})
 			.then(res => {
 				toDayRecords.value = res.data
@@ -156,7 +148,7 @@
 					}, 0);
 				}
 			})
-	})
+	}
 
 	function onClickItem(e) {
 		formData.value.recordCategory = e.currentIndex + 1
@@ -177,9 +169,12 @@
 
 		http.post('/bookkeeping-service/records/add', formData.value)
 			.then(res => {
-				uni.redirectTo({
-					url: '/pages/bookkeeping/bookkeeping-records'
-				});
+				uni.showToast({
+					icon: 'success',
+					title: `保存成功`
+				})
+				initFormData()
+				loadTodayConsume()
 			})
 	}
 

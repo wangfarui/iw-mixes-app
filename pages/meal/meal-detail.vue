@@ -7,7 +7,7 @@
 						<view>用餐日期：{{mealDetail.mealDate}}</view>
 					</uni-row>
 					<uni-row>
-						<view>用餐时间：{{mealDetail.mealTimeDesc}}</view>
+						<view>用餐时间：{{dictStore.getDictNameByCode(dictStore.dictTypeEnum.EAT_MEAL_TIME, mealDetail.mealTime)}}</view>
 					</uni-row>
 					<uni-row>
 						<view>用餐人数：{{mealDetail.diners}}</view>
@@ -74,6 +74,11 @@
 		onLoad
 	} from '@dcloudio/uni-app'
 	import http from '@/api/request.js'
+	import {
+		useDictStore
+	} from "@/stores/dict.ts";
+	
+	const dictStore = useDictStore()
 
 	const mealDetail = ref({})
 	const dishesMaterialDetail = ref({})

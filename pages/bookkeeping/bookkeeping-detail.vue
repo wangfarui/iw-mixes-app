@@ -20,9 +20,16 @@
 
 		<uni-row>
 			<uni-col :span="8">分类</uni-col>
-			<uni-col :span="16">
-				<uni-data-select v-model="recordDetail.recordType" :localdata="classify.range" />
-			</uni-col>
+			<uni-col :span="16">{{dictStore.getDictNameByCode(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TYPE, recordDetail.recordType)}}</uni-col>
+		</uni-row>
+		
+		<uni-row>
+			<uni-col :span="4">标签</uni-col>
+			<uni-row>
+				<uni-tag v-for="item in recordDetail.recordTags" :circle="true"
+				:text="dictStore.getDictNameById(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG, item)" 
+				type="primary" size="small" style="margin-right: 5px;" />
+			</uni-row>
 		</uni-row>
 
 		<uni-row>
@@ -60,6 +67,12 @@
 		baseUrl
 	} from '@/api/env.js'
 	import http from '@/api/request.js'
+	
+	import {
+		useDictStore
+	} from "@/stores/dict.ts";
+	
+	const dictStore = useDictStore()
 
 	const recordDetail = ref({})
 	const alertDialog = ref(null);
@@ -98,7 +111,7 @@
 				recordDetail.value = res.data
 			})
 	})
-
+	
 	function deleteRecord() {
 		http.delete('/bookkeeping-service/records/delete?id=' + recordDetail.value.id)
 			.then(res => {

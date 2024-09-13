@@ -7,7 +7,7 @@
 						<uni-datetime-picker type="date" return-type="string" v-model="formData.mealDate" />
 					</uni-forms-item>
 					<uni-forms-item label="用餐时间" required>
-						<uni-data-checkbox v-model="formData.mealTime" :localdata="mealTimeArray" />
+						<uni-data-checkbox v-model="formData.mealTime" :localdata="dictStore.getDictDataWithDataSelectCode(dictStore.dictTypeEnum.EAT_MEAL_TIME)" />
 					</uni-forms-item>
 					<uni-forms-item label="用餐人数">
 						<uni-easyinput type="number" v-model="formData.diners" placeholder="请输入用餐人数" />
@@ -81,32 +81,22 @@
 		useCartStore
 	} from '@/stores/cart'
 	import http from '@/api/request.js'
-
+	import {
+		useDictStore
+	} from "@/stores/dict.ts";
+	
+	const dictStore = useDictStore()
 	const cartStore = useCartStore()
 
 	const formData = ref({})
 
 	initFormData()
 
-	const mealTimeArray = ref([{
-		text: '任意时间',
-		value: 0
-	}, {
-		text: '早餐',
-		value: 1
-	}, {
-		text: '午餐',
-		value: 2
-	}, {
-		text: '晚餐',
-		value: 3
-	}])
-
 	function initFormData() {
 		formData.value = {
 			"mealDate": new Date(),
 			"mealTime": 0,
-			"diners": '2',
+			"diners": '1',
 			"remark": '',
 			"mealMenuList": []
 		}

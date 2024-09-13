@@ -24,16 +24,26 @@
 		ref,
 		reactive
 	} from 'vue';
-	import http from '@/api/request.js'
+
+	import {
+		login,
+		refreshDictCache
+	} from "@/api/login.js";
+
 	import {
 		useLoginStore
 	} from "@/stores/login.js";
+	import {
+		useDictStore
+	} from "@/stores/dict.ts";
+	
 	import {
 		onLoad
 	} from '@dcloudio/uni-app'
 
 
 	const loginStore = useLoginStore()
+	const dictStore = useDictStore()
 
 	const loginForm = reactive({
 		username: '',
@@ -77,8 +87,7 @@
 			title: '登录中'
 		});
 
-		http.post('/auth-service/login/password', loginForm)
-			.then(res => {
+		login(loginForm).then(res => {
 				const userInfo = res.data
 				uni.setStorageSync('iwtoken', userInfo.tokenValue)
 				uni.setStorageSync('userInfo', userInfo)
@@ -88,6 +97,9 @@
 				} else {
 					loginStore.clearAccount()
 				}
+
+				// 3. 记载字典缓存
+				refreshDictCache()
 
 				uni.switchTab({
 					url: '/pages/menu/menu'
