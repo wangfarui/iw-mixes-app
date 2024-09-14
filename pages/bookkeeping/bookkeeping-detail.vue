@@ -77,34 +77,6 @@
 	const recordDetail = ref({})
 	const alertDialog = ref(null);
 
-	const classify = reactive({
-		range: [{
-				value: 1,
-				text: "餐饮美食"
-			},
-			{
-				value: 2,
-				text: "日用百货"
-			},
-			{
-				value: 3,
-				text: "交通出行"
-			},
-			{
-				value: 4,
-				text: "充值缴费"
-			},
-			{
-				value: 5,
-				text: "生活服务"
-			},
-			{
-				value: 6,
-				text: "其他"
-			},
-		]
-	})
-
 	onLoad((option) => {
 		http.get('/bookkeeping-service/records/detail?id=' + option.id)
 			.then(res => {
@@ -115,9 +87,7 @@
 	function deleteRecord() {
 		http.delete('/bookkeeping-service/records/delete?id=' + recordDetail.value.id)
 			.then(res => {
-				uni.redirectTo({
-					url: '/pages/bookkeeping/bookkeeping-records'
-				});
+				uni.navigateBack({});
 			})
 		alertDialog.value.close();
 	}

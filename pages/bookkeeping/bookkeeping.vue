@@ -144,6 +144,9 @@
 				if (res.data != null) {
 					toDayConsume.value = res.data.reduce((sum, item) => {
 						// 先将金额放大100倍，避免小数运算精度问题，然后相加，最后再除以100
+						if (item.recordCategory == 2) {
+							return Math.round((sum - item.amount) * 100) / 100;
+						}
 						return Math.round((sum + item.amount) * 100) / 100;
 					}, 0);
 				}
