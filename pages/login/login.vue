@@ -98,7 +98,7 @@
 					loginStore.clearAccount()
 				}
 
-				// 3. 记载字典缓存
+				// 3. 加载字典缓存
 				refreshDictCache()
 
 				uni.switchTab({

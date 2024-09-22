@@ -85,6 +85,15 @@ class Request {
 			throw error;
 		}
 	}
+	
+	async put(url, data) {
+		try {
+			const response = await http(url, 'put', data);
+			return response;
+		} catch (error) {
+			throw error;
+		}
+	}
 }
 
 export default new Request();

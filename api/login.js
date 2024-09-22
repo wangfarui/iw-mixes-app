@@ -2,7 +2,6 @@ import http from '@/api/request.js'
 import {
 	useDictStore
 } from "@/stores/dict.ts";
-const dictStore = useDictStore()
 
 // 登录
 export const login = (user) => {
@@ -21,6 +20,8 @@ export const getAllDictList = () => {
 
 // 刷新字典缓存
 export const refreshDictCache = () => {
+	const dictStore = useDictStore()
+	
 	// 加载字典类型
 	getDictTypeList().then(data => {
 		dictStore.setDictTypeArray(data.data)
