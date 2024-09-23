@@ -46,8 +46,6 @@
 		} = e.detail
 		const obj = list[index]
 		
-		console.log(obj);
-
 		uni.navigateTo({
 			url: obj.path
 		})
