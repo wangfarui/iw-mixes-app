@@ -115,7 +115,7 @@
 
 	function uploadFile(filePath) {
 		uni.uploadFile({
-			url: baseUrl + '/file/upload',
+			url: baseUrl + '/auth-service/file/upload',
 			filePath: filePath,
 			name: 'file', // 文件参数名，根据你的接口设置
 			header: {
@@ -123,7 +123,6 @@
 				...tokenHeader()
 			},
 			success: (uploadFileRes) => {
-				console.log('上传成功', uploadFileRes);
 				if (uploadFileRes.statusCode !== 200 || JSON.parse(uploadFileRes.data).code !== 200) {
 					uni.showToast({
 						icon: 'error',
@@ -132,7 +131,7 @@
 				} else {
 					// 调用更新用户头像接口
 					let avatarUrl = JSON.parse(uploadFileRes.data).data.fileUrl
-					http.post('/user/editAvatar', {
+					http.post('/auth-service/user/editAvatar', {
 							'avatar': avatarUrl
 						})
 						.then(res => {
