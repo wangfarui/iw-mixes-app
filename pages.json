@@ -1,7 +1,7 @@
 {
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
-			"path": "pages/menu/menu",
+			"path": "pages/menu",
 			"style": {
 				"navigationBarTitleText": "菜单"
 			}
@@ -13,46 +13,52 @@
 			}
 		},
 		{
-			"path": "pages/login/login",
+			"path": "pages/login",
 			"style": {
 				"navigationBarTitleText": "登录"
 			}
 		},
 		{
-			"path": "pages/dishes/dishes",
+			"path": "pages/eat/recipe/index",
+			"style": {
+				"navigationBarTitleText": "食谱"
+			}
+		},
+		{
+			"path": "pages/eat/dishes/index",
 			"style": {
 				"navigationBarTitleText": "点餐"
 			}
 		},
 		{
-			"path": "pages/meal/meal",
+			"path": "pages/eat/dishes/dishes-detail",
+			"style": {
+				"navigationBarTitleText": "菜品详情"
+			}
+		},
+		{
+			"path": "pages/eat/dishes/cart-confirm",
+			"style": {
+				"navigationBarTitleText": "确认订单"
+			}
+		},
+		{
+			"path": "pages/eat/meal/index",
 			"style": {
 				"navigationBarTitleText": "用餐记录",
 				"enablePullDownRefresh": true
 			}
 		},
 		{
-			"path": "pages/bookkeeping/bookkeeping",
-			"style": {
-				"navigationBarTitleText": "记账"
-			}
-		},
-		{
-			"path": "pages/meal/meal-detail",
+			"path": "pages/eat/meal/meal-detail",
 			"style": {
 				"navigationBarTitleText": "用餐详情"
 			}
 		},
 		{
-			"path": "pages/dishes/dishes-detail",
+			"path": "pages/bookkeeping/bookkeeping-action",
 			"style": {
-				"navigationBarTitleText": "菜品详情"
-			}
-		},
-		{
-			"path": "pages/dishes/cart-confirm",
-			"style": {
-				"navigationBarTitleText": "确认订单"
+				"navigationBarTitleText": "记账"
 			}
 		},
 		{
@@ -65,7 +71,13 @@
 		{
 			"path": "pages/bookkeeping/bookkeeping-detail",
 			"style": {
-				"navigationBarTitleText": "详情"
+				"navigationBarTitleText": "记录详情"
+			}
+		},
+		{
+			"path": "pages/bookkeeping/bookkeeping-statistics",
+			"style": {
+				"navigationBarTitleText": "收支分析"
 			}
 		}
 	],
@@ -84,7 +96,7 @@
 		"borderStyle": "black",
 		"backgroundColor": "#FFFFFF",
 		"list": [{
-			"pagePath": "pages/menu/menu",
+			"pagePath": "pages/menu",
 			"iconPath": "static/tabbar/menu_unselect.png",
 			"selectedIconPath": "static/tabbar/menu_selected.png",
 			"text": "菜单"

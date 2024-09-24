@@ -102,7 +102,7 @@
 				refreshDictCache()
 
 				uni.switchTab({
-					url: '/pages/menu/menu'
+					url: '/pages/menu'
 				})
 			})
 			.finally(() => {

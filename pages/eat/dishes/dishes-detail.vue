@@ -88,7 +88,7 @@
 	import {
 		useCartStore
 	} from '@/stores/cart'
-	import Cart from '@/pages/dishes/cart.vue'
+	import Cart from '@/pages/eat/dishes/cart.vue'
 	import http from '@/api/request.js'
 
 	const cartStore = useCartStore()
