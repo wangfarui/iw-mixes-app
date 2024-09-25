@@ -73,7 +73,7 @@
 		uni.removeStorageSync('userInfo')
 		logout()
 		uni.reLaunch({
-			url: '/pages/login/login'
+			url: '/pages/login'
 		});
 	}
 

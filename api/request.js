@@ -6,7 +6,7 @@ const http = (url, method, data) => {
 	const iwtoken = getTokenValue()
 	if (!iwtoken && !url.includes('login')) {
 		uni.reLaunch({
-			url: '/pages/login/login'
+			url: '/pages/login'
 		});
 		return
 	}
@@ -35,7 +35,7 @@ const http = (url, method, data) => {
 					});
 					uni.removeStorageSync(token_key)
 					uni.reLaunch({
-						url: '/pages/login/login'
+						url: '/pages/login'
 					});
 					reject(new Error('未授权，请登录'));
 					return
