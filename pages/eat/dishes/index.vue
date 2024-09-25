@@ -1,3 +1,4 @@
+<!-- 点餐 -->
 <template>
 	<view class="container">
 		<uni-row class="demo-uni-row">
@@ -20,13 +21,13 @@
 					<view v-if="dishesPage.list.length > 0">
 						<view v-for="dish in dishesPage.list" :key="dish.id" @click="intoDishDetail(dish.id)">
 							<uni-row class="demo-uni-row">
-								<uni-col :span="12">
+								<uni-col :span="14">
 									<view>
 										<image :src="dish.dishesImage" :alt="dish.dishesName"
-											style="width: 20vh;height: 20vh;" />
+											style="width: 20vh;height: 20vh;border-radius: 10%;" />
 									</view>
 								</uni-col>
-								<uni-col :span="12">
+								<uni-col :span="10">
 									<view class='dishes'>
 										<p class='dishesName'>{{ dish.dishesName }}</p>
 										<p>难度系数: {{ dish.difficultyFactor }}</p>
@@ -78,6 +79,9 @@
 		useCartStore
 	} from '@/stores/cart'
 	import {
+		useDictStore
+	} from "@/stores/dict.ts"
+	import {
 		onPullDownRefresh,
 		onReachBottom,
 		onLoad
@@ -85,10 +89,16 @@
 	import Cart from '@/pages/eat/dishes/cart.vue'
 	import http from '@/api/request.js'
 
-	const categories = ref([])
+	const categories = ref([{
+		dishesType: 0,
+		name: '全部',
+		selected: true
+	}])
 	const dishesListStatus = ref('more')
 	const triggered = ref(false)
 	const cartStore = useCartStore()
+	const dictStore = useDictStore()
+
 	const dishesPage = reactive({
 		pageParam: {
 			currentPage: 1,
@@ -104,29 +114,6 @@
 		contentnomore: "没有更多菜品了"
 	}
 
-	// Simulated API data
-	categories.value = [{
-			dishesType: 0,
-			name: '全部',
-			selected: true
-		},
-		{
-			dishesType: 1,
-			name: '荤菜',
-			selected: false
-		},
-		{
-			dishesType: 2,
-			name: '素菜',
-			selected: false
-		},
-		{
-			dishesType: 3,
-			name: '荤素搭配',
-			selected: false
-		}
-	]
-
 	const categoryStyle = (category) => {
 		return {
 			marginBottom: '10px',
@@ -136,6 +123,14 @@
 	}
 
 	onLoad(() => {
+		const dishesTypes = dictStore.getDictDataArray(dictStore.dictTypeEnum.EAT_DISHES_TYPE)
+		dishesTypes.forEach(type => {
+			categories.value.push({
+				dishesType: type.dictCode,
+				name: type.dictName,
+				selected: false
+			})
+		})
 		selectCategory(0)
 	})
 

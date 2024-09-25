@@ -1,3 +1,4 @@
+<!-- 收支分析 -->
 <template>
 	收支分析
 </template>
