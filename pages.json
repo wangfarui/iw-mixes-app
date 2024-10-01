@@ -79,6 +79,31 @@
 			"style": {
 				"navigationBarTitleText": "收支分析"
 			}
+		},
+		{
+			"path": "pages/points/points-action",
+			"style": {
+				"navigationBarTitleText": "新增积分"
+			}
+		},
+		{
+			"path": "pages/points/points-records",
+			"style": {
+				"navigationBarTitleText": "积分记录",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/points/points-statistics",
+			"style": {
+				"navigationBarTitleText": "积分分析"
+			}
+		},
+		{
+			"path": "pages/points/points-detail",
+			"style": {
+				"navigationBarTitleText": "记录详情"
+			}
 		}
 	],
 	"globalStyle": {

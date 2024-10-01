@@ -129,7 +129,7 @@
 	function initFormData() {
 		formData.value = {
 			recordDate: '',
-			recordCategory: 1,
+			recordCategory: current.value + 1,
 			recordSource: '',
 			amount: '',
 			recordType: '',
@@ -155,7 +155,8 @@
 	}
 
 	function onClickItem(e) {
-		formData.value.recordCategory = e.currentIndex + 1
+		current.value = e.currentIndex
+		formData.value.recordCategory = current.value + 1
 	}
 
 	function classifyChange(e) {

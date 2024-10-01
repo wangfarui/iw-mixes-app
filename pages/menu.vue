@@ -56,6 +56,25 @@
 					path: '/pages/bookkeeping/bookkeeping-statistics'
 				}
 			],
+		},
+		{
+			title: '积分服务',
+			components: [{
+					url: '/static/menus/points-action.png',
+					text: '新增积分',
+					path: '/pages/points/points-action'
+				},
+				{
+					url: '/static/menus/points-records.png',
+					text: '积分记录',
+					path: '/pages/points/points-records'
+				},
+				{
+					url: '/static/menus/points-statistics.png',
+					text: '积分分析',
+					path: '/pages/points/points-statistics'
+				}
+			],
 		}
 	]
 
