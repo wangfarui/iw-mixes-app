@@ -104,6 +104,18 @@
 			"style": {
 				"navigationBarTitleText": "记录详情"
 			}
+		},
+		{
+			"path": "pages/points/points-task",
+			"style": {
+				"navigationBarTitleText": "积分任务"
+			}
+		},
+		{
+			"path": "pages/points/points-task-add",
+			"style": {
+				"navigationBarTitleText": "新建积分任务"
+			}
 		}
 	],
 	"globalStyle": {

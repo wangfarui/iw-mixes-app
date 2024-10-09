@@ -73,6 +73,11 @@
 					url: '/static/menus/points-statistics.png',
 					text: '积分分析',
 					path: '/pages/points/points-statistics'
+				},
+				{
+					url: '/static/menus/points-task.png',
+					text: '积分任务',
+					path: '/pages/points/points-task'
 				}
 			],
 		}
