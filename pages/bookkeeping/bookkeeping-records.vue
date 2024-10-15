@@ -101,6 +101,7 @@
 			http.post('/bookkeeping-service/records/statistics', page.dto)
 				.then(res => {
 					page.statistics = res.data
+					resolve(true)
 				})
 		});
 	}
@@ -119,6 +120,7 @@
 						mealListStatus.value = 'noMore'
 					}
 					page.list = [...page.list, ...data.records]
+					resolve(true)
 				})
 				.catch(error => {
 					mealListStatus.value = 'more'
