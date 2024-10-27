@@ -37,6 +37,17 @@
 						</uni-col>
 					</uni-row>
 				</view>
+				<view v-if="formData.recordCategory === 2" class="example-body" style="margin: 10px 0;">
+					<uni-row>
+						<uni-col :span="6">
+							<p style="font-size: 16px;">激励记录:</p>
+						</uni-col>
+						<uni-col :span="18">
+							<switch :checked="isExcitationRecord" @change="switchExcitationRecord"
+								style="transform:scale(0.8)" />
+						</uni-col>
+					</uni-row>
+				</view>
 			</uni-section>
 			<uni-section title="分类" type="line">
 				<view class="example-body">
@@ -47,8 +58,8 @@
 			</uni-section>
 			<uni-section title="标签" type="line">
 				<view class="example-body">
-					<uni-data-checkbox multiple v-model="formData.recordTags" 
-					:localdata="dictStore.getDictDataWithDataSelectId(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG)"></uni-data-checkbox>
+					<uni-data-checkbox multiple v-model="formData.recordTags"
+						:localdata="dictStore.getDictDataWithDataSelectId(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG)"></uni-data-checkbox>
 				</view>
 			</uni-section>
 			<uni-section title="备注" type="line">
@@ -100,7 +111,7 @@
 	} from 'vue'
 
 	import http from '@/api/request.js'
-	
+
 	import {
 		onShow
 	} from '@dcloudio/uni-app'
@@ -121,12 +132,15 @@
 
 	const toDayConsume = ref(0)
 
+	const isExcitationRecord = ref(false)
+
 	onShow(() => {
 		initFormData()
 		loadTodayConsume()
 	})
 
 	function initFormData() {
+		isExcitationRecord.value = false
 		formData.value = {
 			recordDate: '',
 			recordCategory: current.value + 1,
@@ -154,6 +168,10 @@
 			})
 	}
 
+	function switchExcitationRecord() {
+		isExcitationRecord.value = !isExcitationRecord.value
+	}
+
 	function onClickItem(e) {
 		current.value = e.currentIndex
 		formData.value.recordCategory = current.value + 1
@@ -170,6 +188,10 @@
 				title: `记账金额不能为空`
 			})
 			return
+		}
+
+		if (isExcitationRecord.value) {
+			formData.value.isExcitationRecord = 1
 		}
 
 		http.post('/bookkeeping-service/records/add', formData.value)

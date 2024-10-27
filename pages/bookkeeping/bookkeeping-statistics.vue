@@ -298,7 +298,6 @@
 	function renderChart() {
 		const option = {
 			series: [{
-				name: '图表',
 				type: 'pie',
 				data: categoryDataRef.value.chartList,
 				radius: '80%',
