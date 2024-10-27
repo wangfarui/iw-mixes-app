@@ -1,5 +1,6 @@
 <template>
-	<view>
+	<view class="login-container">
+		<view class="logo">IW服务平台</view> 
 		<uni-forms ref="valiForm" :modelValue="loginForm">
 			<uni-forms-item label="用户名" required name="username">
 				<uni-easyinput v-model="loginForm.username" placeholder="请输入用户名" />
@@ -36,7 +37,7 @@
 	import {
 		useDictStore
 	} from "@/stores/dict.ts";
-	
+
 	import {
 		onLoad
 	} from '@dcloudio/uni-app'
@@ -112,5 +113,24 @@
 </script>
 
 <style>
-
+	.login-container {
+		position: absolute;
+		top: 40%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		/* 使容器垂直居中 */
+		width: 100%;
+		max-width: 400px;
+		/* 控制登录表单的最大宽度 */
+		padding: 20px;
+		box-sizing: border-box;
+	}
+	
+	.logo {
+		font-size: 24px;
+		font-weight: bold;
+		color: #333; /* 文字颜色，可以根据需要调整 */
+		margin-bottom: 20px; /* Logo和表单之间的距离 */
+		text-align: center;
+	}
 </style>
