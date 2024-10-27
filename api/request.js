@@ -51,7 +51,10 @@ const http = (url, method, data) => {
 				resolve(result);
 			},
 			fail: (err) => {
-				console.log(err);
+				uni.showToast({
+					icon: 'error',
+					title: '请求异常'
+				});
 				reject(err);
 			}
 		});
