@@ -297,6 +297,11 @@
 
 	function renderChart() {
 		const option = {
+			legend: {
+				orient: 'vertical',
+				left: 'left',
+				// 图例默认开启交互
+			},
 			series: [{
 				type: 'pie',
 				data: categoryDataRef.value.chartList,
