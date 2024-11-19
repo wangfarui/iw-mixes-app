@@ -26,8 +26,9 @@
 					<switch :checked="compareLastMonth" @change="switchLastMonth" style="transform:scale(0.5)" />
 				</view>
 				<view>
-					<view v-for="item in limitedCategoryList()" style="margin: 5px 20px;padding-bottom: 5px;">
-						<uni-row :key="item.id" @click="clickCategoryRow(item)">
+					<view v-for="item in limitedCategoryList()" style="margin: 5px 20px;padding-bottom: 5px;"
+						@click="clickCategoryRow(item.recordType)">
+						<uni-row :key="item.id">
 							<uni-col :span="18">
 								<view>
 									<text class="normal-font-size">{{item.recordTypeName}}</text>
@@ -165,6 +166,13 @@
 	}, {
 		deep: true
 	});
+	
+	// 点击分类 进入记账记录页面
+	function clickCategoryRow(recordType) {
+		uni.navigateTo({
+			url: '/pages/bookkeeping/bookkeeping-records?recordType=' + recordType + "&recordDate=" + currentMonth.value
+		})
+	}
 
 	// 切换分类列表的展开和收起状态
 	function toggleExpandCategory() {

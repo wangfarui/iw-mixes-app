@@ -16,7 +16,7 @@
 			</view>
 		</view>
 		<view class="container">
-			<uni-datetime-picker v-model="page.range" type="daterange" start-placeholder="记账开始日期"
+			<uni-datetime-picker v-model="pageRange" type="daterange" start-placeholder="记账开始日期"
 				end-placeholder="记账结束日期" @change="changeRange" />
 			<view style="padding-top: 10px;">
 				<uni-row>
@@ -108,9 +108,12 @@
 	import {
 		onPullDownRefresh,
 		onReachBottom,
-		onShow
+		onShow,
+		onLoad,
+		onReady
 	} from '@dcloudio/uni-app'
 	import http from '@/api/request.js'
+	import {getMonthStartAndEnd, formatDate} from'@/stores/date-utils.js'
 	import {
 		useDictStore
 	} from "@/stores/dict.ts";
@@ -125,7 +128,8 @@
 	const selectedButtonCode = ref(-1)
 	const filterDialog = ref(null);
 	const selectedCategoryCode = ref(0)
-
+	
+	const pageRange = ref(['', ''])
 	const page = reactive({
 		dto: {
 			recordStartDate: '', // 记账记录开始时间
@@ -134,13 +138,34 @@
 			currentPage: 1,
 			pageSize: 20
 		},
-		range: ['', ''],
 		list: [],
 		statistics: {}
+	})
+	
+	onLoad((option) => {
+		if (option.recordDate) {
+			const [year, month] = option.recordDate.split("-").map(Number);
+			const {firstDay, lastDay} = getMonthStartAndEnd(new Date(year, month, 1))
+			pageRange.value[0] = firstDay
+			pageRange.value[1] = lastDay
+		}
+		if (option.recordType) {
+			selectedButtonCode.value = option.recordType
+		}
 	})
 
 	onShow(() => {
 		initPage()
+	})
+	
+	onReady(() => {
+		if (pageRange.value[0] != '') {
+			const firstDate = new Date(pageRange.value[0]);
+			const lastDate = new Date(pageRange.value[1]);
+			pageRange.value = [formatDate(firstDate), formatDate(lastDate)]
+		}
+		
+		selectedButtonCode.value = selectedButtonCode.value - 1 + 1
 	})
 
 	function computeRecodTypeArray() {
@@ -191,7 +216,7 @@
 	 */
 	function changeRange(arr) {
 		if (arr == undefined || arr.length == 0) {
-			page.range = ['', '']
+			pageRange.value = ['', '']
 			showCurrentMonth.value = true
 		} else {
 			showCurrentMonth.value = false
@@ -247,8 +272,8 @@
 	 * 查询数据
 	 */
 	function searchData() {
-		page.dto.recordStartDate = page.range[0]
-		page.dto.recordEndDate = page.range[1]
+		page.dto.recordStartDate = pageRange.value[0]
+		page.dto.recordEndDate = pageRange.value[1]
 		page.dto.recordType = selectedButtonCode.value == -1 ? '' : selectedButtonCode.value
 		mealListStatus.value = 'loading'
 		Promise.all([searchStatistics(), searchPage()])

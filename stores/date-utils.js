@@ -17,3 +17,24 @@ export const isToday = (dateString) => {
 		date.getFullYear() === today.getFullYear()
 	);
 }
+
+
+// 获取指定日期的第一天和最后一天(字符串yyyy-MM-dd)。 date 要是new Date对象
+export const getMonthStartAndEnd = (date) => {
+  // 获取该月的第一天
+  const firstDay = new Date(date.getFullYear(), date.getMonth() - 1, 1);
+  
+  // 获取该月的最后一天
+  const lastDay = new Date(date.getFullYear(), date.getMonth(), 0);
+  
+  return {
+    firstDay: formatDate(firstDay), // 转为 YYYY-MM-DD 格式
+    lastDay: formatDate(lastDay),
+  };
+}
+
+export const formatDate = (date) => {
+	return `${date.getFullYear()}-${(date.getMonth() + 1)
+  .toString()
+  .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`
+}
