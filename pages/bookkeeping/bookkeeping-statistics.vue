@@ -27,7 +27,7 @@
 				</view>
 				<view>
 					<view v-for="item in limitedCategoryList()" style="margin: 5px 20px;padding-bottom: 5px;">
-						<uni-row :key="item.id">
+						<uni-row :key="item.id" @click="clickCategoryRow(item)">
 							<uni-col :span="18">
 								<view>
 									<text class="normal-font-size">{{item.recordTypeName}}</text>
