@@ -3,13 +3,13 @@ import {baseUrl, token_key, getTokenValue, tokenHeader} from './env.js'
 
 
 const http = (url, method, data) => {
-	const iwtoken = getTokenValue()
-	if (!iwtoken && !url.includes('login')) {
-		uni.reLaunch({
-			url: '/pages/login'
-		});
-		return
-	}
+	// const iwtoken = getTokenValue()
+	// if (!iwtoken && !url.includes('login') && !url.includes('verificationCode')) {
+	// 	uni.reLaunch({
+	// 		url: '/pages/login'
+	// 	});
+	// 	return
+	// }
 	return new Promise((resolve, reject) => {
 		uni.request({
 			url: baseUrl + url,

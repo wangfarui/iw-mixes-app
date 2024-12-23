@@ -1,6 +1,7 @@
 import {ref, reactive} from 'vue'
 import { defineStore } from 'pinia'
 
+// 废弃
 export const useLoginStore = defineStore('login', () => {
     const loginForm = reactive({
         username: '',
