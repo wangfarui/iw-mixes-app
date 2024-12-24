@@ -4,13 +4,18 @@ import {
 } from "@/stores/dict.ts";
 
 // 账号密码登录
-export const loginByPasswordApi = (user) => {
-    return http.post('/auth-service/login/password', user);
+export const loginByPasswordApi = (loginForm) => {
+    return http.post('/auth-service/login/password', loginForm);
 }
 
 // 账号密码登录
-export const loginByVerificationCodeApi = (user) => {
-    return http.post('/auth-service/login/verificationCode', user);
+export const loginByVerificationCodeApi = (loginForm) => {
+    return http.post('/auth-service/login/verificationCode', loginForm);
+}
+
+// 账号注册并登录
+export const registerAndLoginApi = (loginForm) => {
+    return http.post('/auth-service/register/form', loginForm);
 }
 
 
@@ -19,7 +24,7 @@ export const getVerificationCodeApi = (phoneNumber) => {
     return http.get('/auth-service/register/getVerificationCode?phoneNumber=' + phoneNumber);
 }
 
-// 用户根据操作行为获取验证码
+// 用户根据操作行为获取验证码（例如验证码登录）
 export const getVerificationCodeByActionApi = (action) => {
     return http.get('/auth-service/user/verificationCode?action=' + action);
 }

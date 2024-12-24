@@ -56,6 +56,7 @@
 	import {
 		loginByPasswordApi,
 		loginByVerificationCodeApi,
+		registerAndLoginApi,
 		refreshDictCache,
 		getVerificationCodeApi,
 		getVerificationCodeByActionApi
@@ -173,12 +174,25 @@
 			}).finally(() => {
 				uni.hideLoading();
 			})
-		} else {
+		} else if (loginWay.value == '2') {
 			loginForm.phoneNumber = loginForm.account
 			loginByVerificationCodeApi(loginForm).then(res => {
 				loginSuccessAfter(res)
 			}).finally(() => {
 				uni.hideLoading();
+			})
+		} else if (loginWay.value == '3') {
+			loginForm.phoneNumber = loginForm.account
+			registerAndLoginApi(loginForm).then(res => {
+				loginSuccessAfter(res)
+			}).finally(() => {
+				uni.hideLoading();
+			})
+		} else {
+			uni.hideLoading();
+			uni.showToast({
+				icon: 'error',
+				title: `无法识别的操作`
 			})
 		}
 		
