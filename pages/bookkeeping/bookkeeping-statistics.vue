@@ -244,7 +244,7 @@
 		const date = new Date();
 		let year = date.getFullYear();
 		let month = date.getMonth() + 1;
-		return `${year}-${month}`;
+		return `${year}-${month < 10 ? '0' + month : month}`;
 	}
 
 	function loadTotalStatisticsData() {
