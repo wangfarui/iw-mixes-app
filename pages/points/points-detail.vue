@@ -55,14 +55,14 @@
 	const alertDialog = ref(null);
 
 	onLoad((option) => {
-		http.get('/points-service/records/detail?id=' + option.id)
+		http.get('/points-service/pointsRecords/detail?id=' + option.id)
 			.then(res => {
 				recordDetail.value = res.data
 			})
 	})
 	
 	function deleteRecord() {
-		http.delete('/points-service/records/delete?id=' + recordDetail.value.id)
+		http.delete('/points-service/pointsRecords/delete?id=' + recordDetail.value.id)
 			.then(res => {
 				uni.navigateBack({});
 			})

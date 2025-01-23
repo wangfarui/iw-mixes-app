@@ -103,7 +103,7 @@
 	 */
 	function searchStatistics() {
 		return new Promise((resolve) => {
-			http.post('/points-service/records/statistics', page.dto)
+			http.post('/points-service/pointsRecords/statistics', page.dto)
 				.then(res => {
 					page.statistics = res.data
 				})
@@ -115,7 +115,7 @@
 	 */
 	function searchPage() {
 		return new Promise((resolve) => {
-			http.post('/points-service/records/page', page.dto)
+			http.post('/points-service/pointsRecords/page', page.dto)
 				.then(res => {
 					const data = res.data
 					if (data.records && data.records.length == page.dto.pageSize) {

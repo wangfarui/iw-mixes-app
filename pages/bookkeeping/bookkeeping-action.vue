@@ -153,7 +153,7 @@
 	}
 
 	function loadTodayConsume() {
-		http.post('/bookkeeping-service/records/list', {})
+		http.post('/bookkeeping-service/bookkeepingRecords/list', {})
 			.then(res => {
 				toDayRecords.value = res.data
 				if (res.data != null) {
@@ -194,7 +194,7 @@
 			formData.value.isExcitationRecord = 1
 		}
 
-		http.post('/bookkeeping-service/records/add', formData.value)
+		http.post('/bookkeeping-service/bookkeepingRecords/add', formData.value)
 			.then(res => {
 				uni.showToast({
 					icon: 'success',

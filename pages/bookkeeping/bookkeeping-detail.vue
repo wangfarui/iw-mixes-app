@@ -78,14 +78,14 @@
 	const alertDialog = ref(null);
 
 	onLoad((option) => {
-		http.get('/bookkeeping-service/records/detail?id=' + option.id)
+		http.get('/bookkeeping-service/bookkeepingRecords/detail?id=' + option.id)
 			.then(res => {
 				recordDetail.value = res.data
 			})
 	})
 	
 	function deleteRecord() {
-		http.delete('/bookkeeping-service/records/delete?id=' + recordDetail.value.id)
+		http.delete('/bookkeeping-service/bookkeepingRecords/delete?id=' + recordDetail.value.id)
 			.then(res => {
 				uni.navigateBack({});
 			})
