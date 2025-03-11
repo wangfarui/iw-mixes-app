@@ -8,7 +8,7 @@ export const loginByPasswordApi = (loginForm) => {
     return http.post('/auth-service/login/password', loginForm);
 }
 
-// 账号密码登录
+// 验证码登录
 export const loginByVerificationCodeApi = (loginForm) => {
     return http.post('/auth-service/login/verificationCode', loginForm);
 }
@@ -18,7 +18,6 @@ export const registerAndLoginApi = (loginForm) => {
     return http.post('/auth-service/register/form', loginForm);
 }
 
-
 // 注册获取验证码
 export const getVerificationCodeApi = (phoneNumber) => {
     return http.get('/auth-service/register/getVerificationCode?phoneNumber=' + phoneNumber);
@@ -26,7 +25,7 @@ export const getVerificationCodeApi = (phoneNumber) => {
 
 // 用户根据操作行为获取验证码（例如验证码登录）
 export const getVerificationCodeByActionApi = (action) => {
-    return http.get('/auth-service/user/verificationCode?action=' + action);
+    return http.get('/auth-service/user/getVerificationCode?action=' + action);
 }
 
 // 修改密码
