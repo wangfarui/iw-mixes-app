@@ -48,6 +48,17 @@
 						</uni-col>
 					</uni-row>
 				</view>
+				<view v-if="formData.recordCategory === 1" class="example-body" style="margin: 10px 0;">
+					<uni-row>
+						<uni-col :span="6">
+							<p style="font-size: 16px;">不计入统计:</p>
+						</uni-col>
+						<uni-col :span="18">
+							<switch :checked="isNotStatistics" @change="switchNotStatistics"
+								style="transform:scale(0.8)" />
+						</uni-col>
+					</uni-row>
+				</view>
 			</uni-section>
 			<uni-section title="分类" type="line">
 				<view class="example-body">
@@ -134,6 +145,8 @@
 
 	const isExcitationRecord = ref(false)
 
+	const isNotStatistics = ref(false)
+
 	onShow(() => {
 		initFormData()
 		loadTodayConsume()
@@ -148,7 +161,8 @@
 			amount: '',
 			recordType: '',
 			remark: '',
-			recordTags: []
+			recordTags: [],
+			isStatistics: ''
 		}
 	}
 
@@ -172,6 +186,10 @@
 		isExcitationRecord.value = !isExcitationRecord.value
 	}
 
+	function switchNotStatistics() {
+		isNotStatistics.value = !isNotStatistics.value
+	}
+
 	function onClickItem(e) {
 		current.value = e.currentIndex
 		formData.value.recordCategory = current.value + 1
@@ -193,6 +211,7 @@
 		if (isExcitationRecord.value) {
 			formData.value.isExcitationRecord = 1
 		}
+		formData.value.isStatistics = isNotStatistics.value ? 0 : 1
 
 		http.post('/bookkeeping-service/bookkeepingRecords/add', formData.value)
 			.then(res => {

@@ -21,9 +21,15 @@
 		<uni-section title="支出分类" type="line">
 			<view style="width:100%; height:750rpx"><l-echart ref="chartRef"></l-echart></view>
 			<view>
-				<view style="color: #bfbfbf; font-size: 12px;text-align: end;">
-					对比上月
-					<switch :checked="compareLastMonth" @change="switchLastMonth" style="transform:scale(0.5)" />
+				<view class="switch-container" style="color: #bfbfbf; font-size: 12px;">
+					<view style="text-align: start;">
+						忽略不计入统计的账单
+						<switch :checked="ignoreNotStatistics" @change="switchIgnoreStatistics" style="transform:scale(0.7)" />
+					</view>
+					<view style="text-align: end;">
+						对比上月
+						<switch :checked="compareLastMonth" @change="switchLastMonth" style="transform:scale(0.7)" />
+					</view>
 				</view>
 				<view>
 					<view v-for="item in limitedCategoryList()" style="margin: 5px 20px;padding-bottom: 5px;"
@@ -119,6 +125,8 @@
 
 	const echarts = require('../../uni_modules/lime-echart/static/echarts.min');
 
+	// 忽略不计入统计数据
+	const ignoreNotStatistics = ref(false)
 	// 对比上月
 	const compareLastMonth = ref(false)
 	// 记载过上个月数据
@@ -206,6 +214,14 @@
 		uni.navigateTo({
 			url: '/pages/bookkeeping/bookkeeping-detail?id=' + item.id
 		});
+	}
+	
+	function switchIgnoreStatistics() {
+		ignoreNotStatistics.value = !ignoreNotStatistics.value
+		
+		statistics.pageDto.isSearchAll = ignoreNotStatistics.value ? 0 : 1
+		
+		searchData()
 	}
 
 	function switchLastMonth() {
@@ -337,5 +353,12 @@
 <style>
 	.normal-font-size {
 		font-size: 14px;
+	}
+	
+	.switch-container {
+	  display: flex;
+	  justify-content: space-between;
+	  align-items: center;
+	  padding: 10rpx 20rpx;
 	}
 </style>
