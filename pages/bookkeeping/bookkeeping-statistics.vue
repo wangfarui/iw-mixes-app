@@ -24,7 +24,8 @@
 				<view class="switch-container" style="color: #bfbfbf; font-size: 12px;">
 					<view style="text-align: start;">
 						忽略不计入统计的账单
-						<switch :checked="ignoreNotStatistics" @change="switchIgnoreStatistics" style="transform:scale(0.7)" />
+						<switch :checked="ignoreNotStatistics" @change="switchIgnoreStatistics"
+							style="transform:scale(0.7)" />
 					</view>
 					<view style="text-align: end;">
 						对比上月
@@ -174,11 +175,13 @@
 	}, {
 		deep: true
 	});
-	
+
 	// 点击分类 进入记账记录页面
 	function clickCategoryRow(recordType) {
 		uni.navigateTo({
-			url: '/pages/bookkeeping/bookkeeping-records?recordType=' + recordType + "&recordDate=" + currentMonth.value
+			url: '/pages/bookkeeping/bookkeeping-records?recordType=' + recordType +
+				"&recordDate=" + currentMonth.value +
+				"&ignoreNotStatistics=" + ignoreNotStatistics.value
 		})
 	}
 
@@ -215,12 +218,12 @@
 			url: '/pages/bookkeeping/bookkeeping-detail?id=' + item.id
 		});
 	}
-	
+
 	function switchIgnoreStatistics() {
 		ignoreNotStatistics.value = !ignoreNotStatistics.value
-		
+
 		statistics.pageDto.isSearchAll = ignoreNotStatistics.value ? 0 : 1
-		
+
 		searchData()
 	}
 
@@ -354,11 +357,11 @@
 	.normal-font-size {
 		font-size: 14px;
 	}
-	
+
 	.switch-container {
-	  display: flex;
-	  justify-content: space-between;
-	  align-items: center;
-	  padding: 10rpx 20rpx;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 10rpx 20rpx;
 	}
 </style>
