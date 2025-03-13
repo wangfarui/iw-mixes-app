@@ -64,16 +64,27 @@
 					<text class="popup-title">筛选条件</text>
 				</view>
 				<view class="popup-body">
+					<!-- 过滤不计入统计的账单 -->
+					<view class="filter-item">
+						<view class="switch-container" style="color: #bfbfbf; font-size: 12px;">
+							<view style="text-align: start;">
+								<text class="filter-label">过滤不计入统计的账单：</text>
+							</view>
+							<view style="text-align: end;">
+								<switch :checked="ignoreNotStatistics" @change="switchIgnoreStatistics" style="transform:scale(0.7)" />
+							</view>
+						</view>
+					</view>
 					<!-- 金额范围输入 -->
 					<view class="filter-item">
 						<text class="filter-label">金额范围：</text>
 						<uni-row>
 							<uni-col :span="10">
-								<input class="filter-input" placeholder="最低金额" type="number" />
+								<input class="filter-input" v-model="page.dto.mixAmount" placeholder="最低金额" type="number" />
 							</uni-col>
 							<uni-col :span="4" style="text-align: center;">-</uni-col>
 							<uni-col :span="10">
-								<input class="filter-input" placeholder="最高金额" type="number" />
+								<input class="filter-input" v-model="page.dto.maxAmount" placeholder="最高金额" type="number" />
 							</uni-col>
 						</uni-row>
 					</view>
@@ -92,7 +103,7 @@
 				</view>
 				<!-- 底部按钮 -->
 				<view class="popup-footer">
-					<button class="cancel-button" @click="cancelFilter">取消</button>
+					<button class="cancel-button" @click="resetFilter">重置</button>
 					<button class="confirm-button" @click="applyFilter">确定</button>
 				</view>
 			</view>
@@ -128,6 +139,8 @@
 	const selectedButtonCode = ref(-1)
 	const filterDialog = ref(null);
 	const selectedCategoryCode = ref(0)
+	// 忽略不计入统计数据
+	const ignoreNotStatistics = ref(false)
 	
 	const pageRange = ref(['', ''])
 	const page = reactive({
@@ -136,7 +149,9 @@
 			recordEndDate: '', // 记账记录结束时间
 			recordType: '', // 记录分类
 			currentPage: 1,
-			pageSize: 20
+			pageSize: 20,
+			mixAmount: '', // 最小金额
+			maxAmount: '', // 最大金额
 		},
 		list: [],
 		statistics: {}
@@ -151,6 +166,9 @@
 		}
 		if (option.recordType) {
 			selectedButtonCode.value = option.recordType
+		}
+		if (option.ignoreNotStatistics) {
+			ignoreNotStatistics.value = option.ignoreNotStatistics
 		}
 	})
 
@@ -181,23 +199,32 @@
 		selectedButtonCode.value = code;
 		initPage()
 	}
+	
+	function switchIgnoreStatistics() {
+		ignoreNotStatistics.value = !ignoreNotStatistics.value
+	}
 
 	function openFilter() {
 		filterDialog.value.open();
-		console.log("2");
 	}
 
-	function cancelFilter() {
+	function resetFilter() {
 		filterDialog.value.close();
-		// 重置筛选条件
+		// 重置记账分类的筛选条件
 		selectedCategoryCode.value = 0
+		
+		ignoreNotStatistics.value = false;
+		page.dto.isSearchAll = '';
+		page.dto.mixAmount = '';
+		page.dto.maxAmount = '';
+		
+		initPage()
 	}
 
 	function applyFilter() {
 		filterDialog.value.close();
-		// 执行筛选逻辑
-		// 可以在这里发送请求，传递筛选条件
-		console.log('筛选条件：');
+		
+		initPage()
 	}
 
 	function toggleCategory(code) {
@@ -275,6 +302,7 @@
 		page.dto.recordStartDate = pageRange.value[0]
 		page.dto.recordEndDate = pageRange.value[1]
 		page.dto.recordType = selectedButtonCode.value == -1 ? '' : selectedButtonCode.value
+		page.dto.isSearchAll = ignoreNotStatistics.value ? 0 : 1
 		mealListStatus.value = 'loading'
 		Promise.all([searchStatistics(), searchPage()])
 			.then(([result1, result2]) => {
@@ -442,5 +470,12 @@
 	.confirm-button {
 		background-color: #007aff;
 		color: #fff;
+	}
+	
+	.switch-container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 10rpx 20rpx;
 	}
 </style>
