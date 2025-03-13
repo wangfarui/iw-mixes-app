@@ -88,14 +88,14 @@
 							</uni-col>
 						</uni-row>
 					</view>
-					<!-- 分类选择 -->
+					<!-- 标签选择 -->
 					<view class="filter-item">
-						<text class="filter-label">分类：</text>
+						<text class="filter-label">标签：</text>
 						<scroll-view scroll-x class="category-group">
 							<view class="category-button"
-								:class="{ selected: selectedCategoryCode == category.dictCode }"
-								v-for="category in dictStore.getDictDataArray(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TYPE)"
-								:key="category.id" @click="toggleCategory(category.dictCode)">
+								:class="{ selected: tagIdList.includes(category.id) }"
+								v-for="category in dictStore.getDictDataArray(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG)"
+								:key="category.id" @click="toggleCategory(category.id)">
 								{{ category.dictName }}
 							</view>
 						</scroll-view>
@@ -138,9 +138,10 @@
 	const buttonList = ['全部', '支出', '收入']
 	const selectedButtonCode = ref(-1)
 	const filterDialog = ref(null);
-	const selectedCategoryCode = ref(0)
 	// 忽略不计入统计数据
 	const ignoreNotStatistics = ref(false)
+	// 筛选的标签
+	const tagIdList = ref([])
 	
 	const pageRange = ref(['', ''])
 	const page = reactive({
@@ -152,6 +153,7 @@
 			pageSize: 20,
 			mixAmount: '', // 最小金额
 			maxAmount: '', // 最大金额
+			tagIdList: [], // 记账标签id集合
 		},
 		list: [],
 		statistics: {}
@@ -211,7 +213,7 @@
 	function resetFilter() {
 		filterDialog.value.close();
 		// 重置记账分类的筛选条件
-		selectedCategoryCode.value = 0
+		tagIdList.value = []
 		
 		ignoreNotStatistics.value = false;
 		page.dto.isSearchAll = '';
@@ -227,8 +229,13 @@
 		initPage()
 	}
 
-	function toggleCategory(code) {
-		selectedCategoryCode.value = code
+	function toggleCategory(id) {
+		const index = tagIdList.value.indexOf(id);
+		if (index !== -1) {
+			tagIdList.value.splice(index, 1)
+		} else {
+			tagIdList.value.push(id)
+		}
 	}
 
 	function formatSourceText(item) {
@@ -303,6 +310,7 @@
 		page.dto.recordEndDate = pageRange.value[1]
 		page.dto.recordType = selectedButtonCode.value == -1 ? '' : selectedButtonCode.value
 		page.dto.isSearchAll = ignoreNotStatistics.value ? 0 : 1
+		page.dto.tagIdList = tagIdList.value
 		mealListStatus.value = 'loading'
 		Promise.all([searchStatistics(), searchPage()])
 			.then(([result1, result2]) => {
