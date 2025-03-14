@@ -2,6 +2,12 @@
 <template>
 	<view>
 		<view>
+			<uni-section v-if="isUpdateForm" title="表单状态" type="line">
+				<view class="example-body" style="color: red">
+					当前为编辑状态
+				</view>
+			</uni-section>
+			
 			<uni-section title="记账日期" subTitle="为空时默认为当天" type="line">
 				<view class="example-body">
 					<uni-datetime-picker type="date" :clear-icon="false" v-model="formData.recordDate"
@@ -63,8 +69,8 @@
 			<uni-section title="分类" type="line">
 				<view class="example-body">
 					<uni-data-select v-model="formData.recordType"
-						:localdata="dictStore.getDictDataWithDataSelectCode(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TYPE)"
-						@change="classifyChange"></uni-data-select>
+						:localdata="dictStore.getDictDataWithDataSelectCode(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TYPE)">
+					</uni-data-select>
 				</view>
 			</uni-section>
 			<uni-section title="标签" type="line">
@@ -124,6 +130,7 @@
 	import http from '@/api/request.js'
 
 	import {
+		onLoad,
 		onShow
 	} from '@dcloudio/uni-app'
 
@@ -132,20 +139,23 @@
 	} from "@/stores/dict.ts";
 
 	const dictStore = useDictStore()
-
 	const items = ['支出', '收入']
-
-	const formData = ref({})
-
-	const current = ref(0)
-
-	const toDayRecords = ref([])
-
-	const toDayConsume = ref(0)
-
-	const isExcitationRecord = ref(false)
-
-	const isNotStatistics = ref(false)
+	const formData = ref({}) // 记账表单数据
+	const current = ref(0) // 当前所选的记录类型 对应items下表
+	const toDayRecords = ref([]) // 今日记账记录列表
+	const toDayConsume = ref(0) // 今日总消费
+	const isExcitationRecord = ref(false) // 是否为激励记录
+	const isNotStatistics = ref(false) // 是否不计入统计
+	const isUpdateForm = ref(false) // 是否为编辑表单
+	const updateFormId = ref('')
+	
+	onLoad((option) => {
+		console.log(option)
+		if (option.id) {
+			isUpdateForm.value = true
+			updateFormId.value = option.id
+		}
+	})
 
 	onShow(() => {
 		initFormData()
@@ -153,16 +163,26 @@
 	})
 
 	function initFormData() {
-		isExcitationRecord.value = false
-		formData.value = {
-			recordDate: '',
-			recordCategory: current.value + 1,
-			recordSource: '',
-			amount: '',
-			recordType: '',
-			remark: '',
-			recordTags: [],
-			isStatistics: ''
+		console.log(isUpdateForm.value);
+		if (isUpdateForm.value) {
+			http.get('/bookkeeping-service/bookkeepingRecords/detail?id=' + updateFormId.value)
+				.then(res => {
+					isExcitationRecord.value = res.data.isExcitationRecord == 1
+					isNotStatistics.value = res.data.isStatistics == 0
+					formData.value = res.data			
+				})
+		} else {
+			isExcitationRecord.value = false
+			formData.value = {
+				recordDate: '',
+				recordCategory: current.value + 1,
+				recordSource: '',
+				amount: '',
+				recordType: '',
+				remark: '',
+				recordTags: [],
+				isStatistics: ''
+			}
 		}
 	}
 
@@ -195,10 +215,6 @@
 		formData.value.recordCategory = current.value + 1
 	}
 
-	function classifyChange(e) {
-
-	}
-
 	function saveRecord() {
 		if (formData.value.amount == undefined || formData.value.amount === '') {
 			uni.showToast({
@@ -213,14 +229,24 @@
 		}
 		formData.value.isStatistics = isNotStatistics.value ? 0 : 1
 
-		http.post('/bookkeeping-service/bookkeepingRecords/add', formData.value)
+		let url = '/bookkeeping-service/bookkeepingRecords/add';
+		if (isUpdateForm.value) {
+			url = '/bookkeeping-service/bookkeepingRecords/update';
+		}
+		const method = isUpdateForm.value ? 'put' : 'post';
+		http.request(url, method, formData.value)
 			.then(res => {
 				uni.showToast({
 					icon: 'success',
 					title: `保存成功`
 				})
-				initFormData()
-				loadTodayConsume()
+				if (isUpdateForm.value) {
+					// 返回上一页
+					uni.navigateBack({})
+				} else {
+					initFormData()
+					loadTodayConsume()
+				}
 			})
 	}
 

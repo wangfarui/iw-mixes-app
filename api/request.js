@@ -97,6 +97,15 @@ class Request {
 			throw error;
 		}
 	}
+	
+	async request(url, method, data) {
+		try {
+			const response = await http(url, method, data);
+			return response;
+		} catch (error) {
+			throw error;
+		}
+	}
 }
 
 export default new Request();
