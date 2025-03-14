@@ -1,26 +1,26 @@
 <template>
 	<view>
-		<uni-row>
-			<uni-col :span="8">记账日期</uni-col>
-			<uni-col :span="16">{{recordDetail.recordDate}}</uni-col>
+		<uni-row class="detail-row">
+			<uni-col :span="6">记账日期</uni-col>
+			<uni-col :span="18">{{recordDetail.recordDate}}</uni-col>
 		</uni-row>
 
-		<uni-row>
-			<uni-col :span="8">
+		<uni-row class="detail-row">
+			<uni-col :span="6">
 				<span v-if="recordDetail.recordCategory === 1">支出项目:</span>
 				<span v-if="recordDetail.recordCategory === 2">收入来源:</span>
 			</uni-col>
-			<uni-col :span="16">{{recordDetail.recordSource}}</uni-col>
+			<uni-col :span="18">{{recordDetail.recordSource}}</uni-col>
 		</uni-row>
 
-		<uni-row>
-			<uni-col :span="8">记账金额</uni-col>
-			<uni-col :span="16">{{recordDetail.amount}}</uni-col>
+		<uni-row class="detail-row">
+			<uni-col :span="6">记账金额</uni-col>
+			<uni-col :span="18">{{recordDetail.amount}}</uni-col>
 		</uni-row>
 
-		<uni-row>
-			<uni-col :span="8">分类</uni-col>
-			<uni-col :span="16">{{dictStore.getDictNameByCode(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TYPE, recordDetail.recordType)}}</uni-col>
+		<uni-row class="detail-row">
+			<uni-col :span="6">分类</uni-col>
+			<uni-col :span="18">{{dictStore.getDictNameByCode(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TYPE, recordDetail.recordType)}}</uni-col>
 		</uni-row>
 		
 		<uni-row>
@@ -33,11 +33,20 @@
 		</uni-row>
 
 		<uni-row>
-			<uni-col :span="8">备注</uni-col>
-			<uni-col :span="16">{{recordDetail.remark}}</uni-col>
+			<uni-col :span="6">备注</uni-col>
+			<uni-col :span="18">{{recordDetail.remark}}</uni-col>
 		</uni-row>
-
+		
+		<uni-row>
+			<uni-col :span="6">订单编号</uni-col>
+			<uni-col :span="18">{{recordDetail.orderNo}}</uni-col>
+		</uni-row>
+		
 		<view style="margin: 10px 20px">
+			<button class="button popup-warn" @click="clickUpdateButton()">
+				<text class="button-text warn-text">编辑</text>
+			</button>
+			<view style="margin-bottom: 20px;"></view>
 			<button class="button popup-warn" @click="dialogToggle()">
 				<text class="button-text warn-text">删除</text>
 			</button>
@@ -60,7 +69,8 @@
 	} from 'vue'
 
 	import {
-		onLoad
+		onLoad,
+		onShow
 	} from '@dcloudio/uni-app'
 
 	import {
@@ -75,14 +85,25 @@
 	const dictStore = useDictStore()
 
 	const recordDetail = ref({})
-	const alertDialog = ref(null);
+	const alertDialog = ref(null)
+	const detailId = ref('')
 
 	onLoad((option) => {
-		http.get('/bookkeeping-service/bookkeepingRecords/detail?id=' + option.id)
+		detailId.value = option.id;
+	})
+	
+	onShow(() => {
+		http.get('/bookkeeping-service/bookkeepingRecords/detail?id=' + detailId.value)
 			.then(res => {
 				recordDetail.value = res.data
 			})
 	})
+	
+	function clickUpdateButton() {
+		uni.navigateTo({
+			url: '/pages/bookkeeping/bookkeeping-action?id=' + recordDetail.value.id
+		});
+	}
 	
 	function deleteRecord() {
 		http.delete('/bookkeeping-service/bookkeepingRecords/delete?id=' + recordDetail.value.id)
@@ -114,5 +135,11 @@
 
 	.warn-text {
 		color: #e6a23c;
+	}
+	
+	.detail-row {
+		margin-bottom: 10px;
+		margin-left: 10px;
+		margin-right: 10px;
 	}
 </style>
