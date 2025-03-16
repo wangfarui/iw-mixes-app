@@ -58,7 +58,7 @@
 		</view>
 
 		<!-- 筛选弹出层 -->
-		<uni-popup ref="filterDialog" type="bottom" :mask-click="false">
+		<uni-popup ref="filterDialog" type="bottom" :is-mask-click="true">
 			<view class="popup-content">
 				<view class="popup-header">
 					<text class="popup-title">筛选条件</text>
@@ -74,6 +74,13 @@
 								<switch :checked="ignoreNotStatistics" @change="switchIgnoreStatistics" style="transform:scale(0.7)" />
 							</view>
 						</view>
+					</view>
+					<!-- 记录来源模糊查询 -->
+					<view class="filter-item">
+						<text class="filter-label">记录来源：</text>
+						<uni-row>
+							<uni-easyinput v-model="page.dto.recordSource" maxlength="64"></uni-easyinput>
+						</uni-row>
 					</view>
 					<!-- 金额范围输入 -->
 					<view class="filter-item">
@@ -91,7 +98,7 @@
 					<!-- 标签选择 -->
 					<view class="filter-item">
 						<text class="filter-label">标签：</text>
-						<scroll-view scroll-x class="category-group">
+						<scroll-view scroll-y class="category-group">
 							<view class="category-button"
 								:class="{ selected: tagIdList.includes(category.id) }"
 								v-for="category in dictStore.getDictDataArray(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG)"
@@ -145,18 +152,37 @@
 	const pageRange = ref(['', ''])
 	const page = reactive({
 		dto: {
+			currentPage: 1,
+			pageSize: 20,
 			recordStartDate: '', // 记账记录开始时间
 			recordEndDate: '', // 记账记录结束时间
 			recordType: '', // 记录分类
-			currentPage: 1,
-			pageSize: 20,
+			recordSource: '', // 记录来源
 			mixAmount: '', // 最小金额
 			maxAmount: '', // 最大金额
 			tagIdList: [], // 记账标签id集合
+			isSearchAll: '', // 是否查询所有记录
 		},
 		list: [],
 		statistics: {}
 	})
+	
+	function initFormSearchDto() {
+		page.dto.recordStartDate = ''; // 记账记录开始时间
+		page.dto.recordEndDate = ''; // 记账记录结束时间
+		page.dto.recordType = ''; // 记录分类
+		page.dto.recordSource = ''; // 记录来源
+		page.dto.mixAmount = ''; // 最小金额
+		page.dto.maxAmount = ''; // 最大金额
+		page.dto.tagIdList = []; // 记账标签id集合
+		page.dto.isSearchAll = ''; // 是否查询所有记录
+	}
+	
+	function initFormPageDto() {
+		page.list = []
+		page.dto.currentPage = 1;
+		page.dto.pageSize = 20;
+	}
 	
 	onLoad((option) => {
 		if (option.recordDate) {
@@ -208,19 +234,22 @@
 	}
 
 	function resetFilter() {
-		filterDialog.value.close();
-		// 重置记账分类的筛选条件
+		// 重置高级筛选中的筛选条件
 		tagIdList.value = []
-		
 		ignoreNotStatistics.value = false;
-		page.dto.isSearchAll = '';
-		page.dto.mixAmount = '';
-		page.dto.maxAmount = '';
+		// 并且重置查询表单
+		initFormSearchDto();
+		
+		filterDialog.value.close();
 		
 		initPage()
 	}
 
 	function applyFilter() {
+		// 应用筛选项
+		page.dto.isSearchAll = ignoreNotStatistics.value ? 0 : 1
+		page.dto.tagIdList = tagIdList.value
+		
 		filterDialog.value.close();
 		
 		initPage()
@@ -303,11 +332,12 @@
 	 * 查询数据
 	 */
 	function searchData() {
+		// 记录日期
 		page.dto.recordStartDate = pageRange.value[0]
 		page.dto.recordEndDate = pageRange.value[1]
+		// 记录分类
 		page.dto.recordType = selectedButtonCode.value == -1 ? '' : selectedButtonCode.value
-		page.dto.isSearchAll = ignoreNotStatistics.value ? 0 : 1
-		page.dto.tagIdList = tagIdList.value
+		
 		mealListStatus.value = 'loading'
 		Promise.all([searchStatistics(), searchPage()])
 			.then(([result1, result2]) => {
@@ -325,8 +355,7 @@
 	}
 
 	function initPage() {
-		page.dto.currentPage = 1
-		page.list = []
+		initFormPageDto()
 		searchData()
 	}
 
@@ -430,6 +459,7 @@
 	}
 
 	.category-group {
+		height: 150px;
 		display: flex;
 		overflow-x: scroll;
 	}
