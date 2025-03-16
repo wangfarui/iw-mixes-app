@@ -119,7 +119,6 @@
 	import {
 		onPullDownRefresh,
 		onReachBottom,
-		onShow,
 		onLoad,
 		onReady
 	} from '@dcloudio/uni-app'
@@ -173,10 +172,6 @@
 			ignoreNotStatistics.value = option.ignoreNotStatistics
 		}
 	})
-
-	onShow(() => {
-		initPage()
-	})
 	
 	onReady(() => {
 		if (pageRange.value[0] != '') {
@@ -186,6 +181,8 @@
 		}
 		
 		selectedButtonCode.value = selectedButtonCode.value - 1 + 1
+		
+		initPage()
 	})
 
 	function computeRecodTypeArray() {
