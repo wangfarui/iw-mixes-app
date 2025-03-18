@@ -111,76 +111,6 @@
   </view>
 </template>
 
-<style scoped>
-/* 容器 */
-.container {
-  padding: 10px;
-}
-
-/* 编辑状态提示 */
-.status-warning {
-  color: red;
-  font-weight: bold;
-  padding: 5px 0;
-}
-
-/* 通用表单项 */
-.form-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 10px 0;
-}
-
-/* label 样式，固定宽度 */
-.label {
-  width: 90px;
-  color: #666;
-  font-size: 14px;
-  text-align: right;
-  flex-shrink: 0;
-}
-
-.segmented-control {
-  display: flex;
-  width: 100%;
-}
-
-.segmented-control uni-segmented-control {
-  flex: 1;
-}
-
-.full-width uni-data-select {
-  width: 100%; /* 让下拉框占满整行 */
-}
-
-/* 金额输入框 */
-.amount-input {
-  flex: 1;
-  font-size: 18px;
-  font-weight: bold;
-  padding: 8px;
-  border: 2px solid #eee;
-  border-radius: 6px;
-}
-
-/* 记录项样式 */
-.record-item {
-  width: 100%;
-}
-
-/* 右侧金额对齐 */
-.amount {
-  text-align: right;
-}
-
-/* 保存按钮样式 */
-.save-button {
-  margin: 20px 10px;
-}
-</style>
-
-
 <script setup>
 	import {
 		ref,
@@ -210,7 +140,6 @@
 	const updateFormId = ref('')
 	
 	onLoad((option) => {
-		console.log(option)
 		if (option.id) {
 			isUpdateForm.value = true
 			updateFormId.value = option.id
@@ -223,7 +152,6 @@
 	})
 
 	function initFormData() {
-		console.log(isUpdateForm.value);
 		if (isUpdateForm.value) {
 			http.get('/bookkeeping-service/bookkeepingRecords/detail?id=' + updateFormId.value)
 				.then(res => {
@@ -317,3 +245,73 @@
 		return item.recordCategory == 2 ? '收入' : '消费';
 	}
 </script>
+
+<style scoped>
+/* 容器 */
+.container {
+  padding: 10px;
+}
+
+/* 编辑状态提示 */
+.status-warning {
+  color: red;
+  font-weight: bold;
+  padding: 5px 0;
+}
+
+/* 通用表单项 */
+.form-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+/* label 样式，固定宽度 */
+.label {
+  width: 90px;
+  color: #666;
+  font-size: 14px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.segmented-control {
+  display: flex;
+  width: 100%;
+}
+
+.segmented-control uni-segmented-control {
+  flex: 1;
+}
+
+.full-width uni-data-select {
+  width: 100%; /* 让下拉框占满整行 */
+}
+
+/* 金额输入框 */
+.amount-input {
+  height: 40px;
+  flex: 1;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 8px;
+  border: 2px solid #eee;
+  border-radius: 6px;
+}
+
+/* 记录项样式 */
+.record-item {
+  width: 100%;
+}
+
+/* 右侧金额对齐 */
+.amount {
+  text-align: right;
+}
+
+/* 保存按钮样式 */
+.save-button {
+  margin: 20px 10px;
+}
+</style>
