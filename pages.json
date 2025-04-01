@@ -142,7 +142,14 @@
 			"style": {
 				"navigationBarTitleText": "账号详情"
 			}
-		}
+		},
+		{
+			"path": "pages/points/task-list",
+			"style": {
+				"navigationBarTitleText": "任务列表",
+				"enablePullDownRefresh": true
+			}
+		}	
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

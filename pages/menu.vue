@@ -78,6 +78,11 @@
 					url: '/static/menus/points-task.png',
 					text: '积分任务',
 					path: '/pages/points/points-task'
+				},
+				{
+					url: '/static/menus/task-list.png',
+					text: '任务列表',
+					path: '/pages/points/task-list'
 				}
 			],
 		},
