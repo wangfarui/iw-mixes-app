@@ -1,5 +1,5 @@
 {
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+	"pages": [
 		{
 			"path": "pages/menu",
 			"style": {
@@ -116,7 +116,40 @@
 			"style": {
 				"navigationBarTitleText": "新建积分任务"
 			}
-		}
+		},
+		{
+			"path": "pages/base/dict-manage",
+			"style": {
+				"navigationBarTitleText": "字典管理",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/base/dict-detail",
+			"style": {
+				"navigationBarTitleText": "字典详情"
+			}
+		},
+		{
+			"path": "pages/base/account-manage",
+			"style": {
+				"navigationBarTitleText": "账号管理",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/base/account-detail",
+			"style": {
+				"navigationBarTitleText": "账号详情"
+			}
+		},
+		{
+			"path": "pages/points/task-list",
+			"style": {
+				"navigationBarTitleText": "任务列表",
+				"enablePullDownRefresh": true
+			}
+		}	
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

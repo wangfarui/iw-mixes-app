@@ -78,6 +78,25 @@
 					url: '/static/menus/points-task.png',
 					text: '积分任务',
 					path: '/pages/points/points-task'
+				},
+				{
+					url: '/static/menus/task-list.png',
+					text: '任务列表',
+					path: '/pages/points/task-list'
+				}
+			],
+		},
+		{
+			title: '基础服务',
+			components: [{
+					url: '/static/menus/dict-manage.png',
+					text: '字典管理',
+					path: '/pages/base/dict-manage'
+				},
+				{
+					url: '/static/menus/account-manage.png',
+					text: '账号管理',
+					path: '/pages/base/account-manage'
 				}
 			],
 		}
