@@ -1,21 +1,39 @@
 {
 	"pages": [
 		{
+			"path": "pages/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		},
+		{
+			"path": "pages/home/index",
+			"style": {
+				"navigationBarTitleText": "首页"
+			}
+		},
+		{
+			"path": "pages/bill/index",
+			"style": {
+				"navigationBarTitleText": "账单"
+			}
+		},
+		{
 			"path": "pages/menu",
 			"style": {
 				"navigationBarTitleText": "菜单"
 			}
 		},
 		{
-			"path": "pages/my/my",
+			"path": "pages/task/index",
 			"style": {
-				"navigationBarTitleText": "我的"
+				"navigationBarTitleText": "任务"
 			}
 		},
 		{
-			"path": "pages/login",
+			"path": "pages/my/my",
 			"style": {
-				"navigationBarTitleText": "登录"
+				"navigationBarTitleText": "我的"
 			}
 		},
 		{
@@ -149,7 +167,7 @@
 				"navigationBarTitleText": "任务列表",
 				"enablePullDownRefresh": true
 			}
-		}	
+		}
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
@@ -164,17 +182,38 @@
 		"color": "#7A7E83",
 		"selectedColor": "#007AFF",
 		"borderStyle": "black",
-		"backgroundColor": "#FFFFFF",
-		"list": [{
-			"pagePath": "pages/menu",
-			"iconPath": "static/tabbar/menu_unselect.png",
-			"selectedIconPath": "static/tabbar/menu_selected.png",
-			"text": "菜单"
-		}, {
-			"pagePath": "pages/my/my",
-			"iconPath": "static/tabbar/my_unselect.png",
-			"selectedIconPath": "static/tabbar/my_selected.png",
-			"text": "我的"
-		}]
+		"backgroundColor": "#ffffff",
+		"list": [
+			{
+				"pagePath": "pages/home/index",
+				"iconPath": "static/tabbar/home.png",
+				"selectedIconPath": "static/tabbar/home-active.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/bill/index",
+				"iconPath": "static/tabbar/bill.png",
+				"selectedIconPath": "static/tabbar/bill-active.png",
+				"text": "账单"
+			},
+			{
+				"pagePath": "pages/menu",
+				"iconPath": "static/tabbar/menu.png",
+				"selectedIconPath": "static/tabbar/menu-active.png",
+				"text": "菜单"
+			},
+			{
+				"pagePath": "pages/task/index",
+				"iconPath": "static/tabbar/task.png",
+				"selectedIconPath": "static/tabbar/task-active.png",
+				"text": "任务"
+			},
+			{
+				"pagePath": "pages/my/my",
+				"iconPath": "static/tabbar/my.png",
+				"selectedIconPath": "static/tabbar/my-active.png",
+				"text": "我的"
+			}
+		]
 	}
 }
