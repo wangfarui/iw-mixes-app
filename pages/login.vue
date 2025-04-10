@@ -207,7 +207,7 @@
 		refreshDictCache()
 		
 		uni.switchTab({
-			url: '/pages/menu'
+			url: '/pages/bill/index'
 		})
 	}
 </script>

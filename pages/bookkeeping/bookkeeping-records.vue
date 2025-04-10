@@ -45,7 +45,7 @@
 							<uni-row>
 								<view style="color: #8c8c8c; font-size: 13px;">
 									<view>{{item.recordTypeName}}</view>
-									<view>{{item.recordTime}}</view>
+									<view>{{item.recordTimeStr}}</view>
 								</view>
 							</uni-row>
 						</view>
