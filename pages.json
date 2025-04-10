@@ -15,7 +15,8 @@
 		{
 			"path": "pages/bill/index",
 			"style": {
-				"navigationBarTitleText": "账单"
+				"navigationBarTitleText": "账单",
+				"enablePullDownRefresh": true
 			}
 		},
 		{
@@ -74,9 +75,27 @@
 			}
 		},
 		{
-			"path": "pages/bookkeeping/bookkeeping-action",
+			"path": "pages/bookkeeping/bookkeeping-quick",
 			"style": {
 				"navigationBarTitleText": "记账"
+			}
+		},
+		{
+			"path": "pages/bookkeeping/bookkeeping-action",
+			"style": {
+				"navigationBarTitleText": "表单记账"
+			}
+		},
+		{
+			"path": "pages/bookkeeping/bookkeeping-action-setting",
+			"style": {
+				"navigationBarTitleText": "类别设置"
+			}
+		},
+		{
+			"path": "pages/bookkeeping/bookkeeping-action-edit",
+			"style": {
+				"navigationBarTitleText": "编辑类别"
 			}
 		},
 		{
