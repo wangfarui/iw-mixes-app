@@ -75,7 +75,7 @@
 	// 右侧按钮组点击事件
 	function buttonClick(e) {
 		uni.navigateTo({
-			url: '/pages/eat/dishes/cart-confirm'
+			url: '/pagesEat/eat/dishes/cart-confirm'
 		});
 	}
 </script>

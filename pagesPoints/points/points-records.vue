@@ -152,7 +152,7 @@
 
 	function handleRecordClick(item) {
 		uni.navigateTo({
-			url: '/pages/points/points-detail?id=' + item.id
+			url: '/pagesPoints/points/points-detail?id=' + item.id
 		});
 	}
 

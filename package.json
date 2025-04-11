@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "update-icons": "node scripts/convert-svg-to-base64.js",
+    "update-manifest": "node scripts/update-manifest.js",
+    "predev": "npm run update-manifest",
+    "prebuild": "npm run update-manifest"
+  }
+} 

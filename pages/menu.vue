@@ -24,17 +24,17 @@
 			components: [{
 					url: '/static/menus/eat-recipe.png',
 					text: '食谱',
-					path: '/pages/eat/recipe/index'
+					path: '/pagesEat/eat/recipe/index'
 				},
 				{
 					url: '/static/menus/eat-dishes.png',
 					text: '点餐',
-					path: '/pages/eat/dishes/index'
+					path: '/pagesEat/eat/dishes/index'
 				},
 				{
 					url: '/static/menus/eat-meal.png',
 					text: '用餐记录',
-					path: '/pages/eat/meal/index'
+					path: '/pagesEat/eat/meal/index'
 				}
 			]
 		},
@@ -62,27 +62,27 @@
 			components: [{
 					url: '/static/menus/points-action.png',
 					text: '新增积分',
-					path: '/pages/points/points-action'
+					path: '/pagesPoints/points/points-action'
 				},
 				{
 					url: '/static/menus/points-records.png',
 					text: '积分记录',
-					path: '/pages/points/points-records'
+					path: '/pagesPoints/points/points-records'
 				},
 				{
 					url: '/static/menus/points-statistics.png',
 					text: '积分分析',
-					path: '/pages/points/points-statistics'
+					path: '/pagesPoints/points/points-statistics'
 				},
 				{
 					url: '/static/menus/points-task.png',
 					text: '积分任务',
-					path: '/pages/points/points-task'
+					path: '/pagesPoints/points/points-task'
 				},
 				{
 					url: '/static/menus/task-list.png',
 					text: '任务列表',
-					path: '/pages/points/task-list'
+					path: '/pagesPoints/points/task-list'
 				}
 			],
 		},
@@ -91,12 +91,12 @@
 			components: [{
 					url: '/static/menus/dict-manage.png',
 					text: '字典管理',
-					path: '/pages/base/dict-manage'
+					path: '/pagesBase/base/dict-manage'
 				},
 				{
 					url: '/static/menus/account-manage.png',
 					text: '账号管理',
-					path: '/pages/base/account-manage'
+					path: '/pagesBase/base/account-manage'
 				}
 			],
 		}

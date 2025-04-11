@@ -97,7 +97,7 @@
 	
 	function handleMealClick(item) {
 		uni.navigateTo({
-			url: '/pages/eat/meal/meal-detail?id=' + item.id
+			url: '/pagesEat/eat/meal/meal-detail?id=' + item.id
 		});
 	}
 	

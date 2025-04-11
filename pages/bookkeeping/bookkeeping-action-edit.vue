@@ -50,7 +50,7 @@
 						<view class="category-title">{{categoryGroup.category}}</view>
 						<view class="category-icons">
 							<view class="icon-item" v-for="icon in categoryGroup.icons" :key="icon.path" @click="selectIcon(icon)" :class="getIconItemClass(icon)">
-								<image :src="getIconUrl(icon.path)" class="icon-image"></image>
+								<image :src="icon.path" class="icon-image"></image>
 							</view>
 						</view>
 					</view>
@@ -67,8 +67,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useDictStore } from '@/stores/dict'
-import { onLoad } from '@dcloudio/uni-app'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import http from '@/api/request.js'
+import { getIconUrl, iconMap } from '@/utils/icon.js'
 
 const dictStore = useDictStore()
 const form = ref(null)
@@ -84,10 +85,7 @@ const iconCategories = [
 	{ dir: 'icon/jiating', name: '家庭' },
 	{ dir: 'icon/shouru', name: '收入' },
 	{ dir: 'icon/qita', name: '其他' }
-].map(category => ({
-	...category,
-	icons: []
-}))
+]
 
 const iconList = ref([])
 
@@ -126,6 +124,23 @@ onLoad((options) => {
 	loadIcons()
 })
 
+onMounted(() => {
+	iconCategories.forEach(category => {
+		// 从 iconMap 中筛选出当前类别的图标
+		const categoryIcons = Object.entries(iconMap)
+			.filter(([key]) => key.startsWith(`/${category.dir}/`))
+			.map(([key, value]) => ({
+				path: value,
+				recordIcon: key
+			}))
+			
+		iconList.value.push({
+			category: category.name,
+			icons: categoryIcons
+		})
+	})
+})
+
 // 获取详情
 function fetchDetail(id) {
 	http.get(`/bookkeeping-service/actions/detail?id=${id}`)
@@ -134,40 +149,10 @@ function fetchDetail(id) {
 		})
 }
 
-// 加载图标列表
-const loadIcons = () => {
-	iconList.value.length = 0 // 清空现有数据
-	
-	iconCategories.forEach(category => {
-		// 获取目录下的所有SVG文件
-		const files = uni.getFileSystemManager().readdirSync(`/static/bookkeeping/${category.dir}`)
-		const icons = files
-			.filter(file => file.endsWith('.svg'))
-			.map(file => ({
-				path: `/static/bookkeeping/${category.dir}/${file}`,
-				recordIcon: `/icon/${category.dir.split('/')[1]}/${file.replace('.svg', '')}`
-			}))
-			
-		iconList.value.push({
-			category: category.name,
-			icons: icons
-		})
-	})
-}
-
 // 选择图标
 const selectIcon = (icon) => {
 	formData.value.recordIcon = icon.recordIcon
 	closeIconSelector()
-}
-
-// 获取图标URL
-const getIconUrl = (iconPath) => {
-	if (iconPath.startsWith('/icon/')) {
-		// 如果是recordIcon格式，转换为实际文件路径
-		return `/static/bookkeeping/${iconPath}.svg`
-	}
-	return iconPath
 }
 
 // 获取选中图标的样式

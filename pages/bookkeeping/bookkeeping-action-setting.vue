@@ -40,6 +40,7 @@
 import { ref, onMounted } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import http from '@/api/request.js'
+import { getIconUrl } from '@/utils/icon.js'
 
 const selectedCategory = ref(1)
 const actions = ref([])
@@ -64,10 +65,6 @@ function fetchActions() {
 		.then(res => {
 			actions.value = res.data
 		})
-}
-
-function getIconUrl(icon) {
-	return `/static/bookkeeping/${icon}.svg`
 }
 
 function startDrag(event, index) {
