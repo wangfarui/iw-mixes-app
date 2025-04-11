@@ -156,7 +156,7 @@
 	// 进入菜品详情页面
 	const intoDishDetail = (dishId) => {
 		uni.navigateTo({
-			url: '/pages/eat/dishes/dishes-detail?id=' + dishId
+			url: '/pagesEat/eat/dishes/dishes-detail?id=' + dishId
 		});
 	}
 </script>

@@ -86,7 +86,7 @@
 		onReachBottom,
 		onLoad
 	} from '@dcloudio/uni-app'
-	import Cart from '@/pages/eat/dishes/cart.vue'
+	import Cart from '@/pagesEat/eat/dishes/cart.vue'
 	import http from '@/api/request.js'
 
 	const categories = ref([{
@@ -172,7 +172,7 @@
 
 	const intoDishDetail = (dishId) => {
 		uni.navigateTo({
-			url: '/pages/eat/dishes/dishes-detail?operate=edit&id=' + dishId
+			url: '/pagesEat/eat/dishes/dishes-detail?operate=edit&id=' + dishId
 		});
 	}
 

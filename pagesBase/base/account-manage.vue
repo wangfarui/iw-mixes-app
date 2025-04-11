@@ -104,13 +104,13 @@
 
 	function handleAccountClick(item) {
 		uni.navigateTo({
-			url: '/pages/base/account-detail?id=' + item.id
+			url: '/pagesBase/base/account-detail?id=' + item.id
 		});
 	}
 
 	function handleAddAccount() {
 		uni.navigateTo({
-			url: '/pages/base/account-detail'
+			url: '/pagesBase/base/account-detail'
 		});
 	}
 

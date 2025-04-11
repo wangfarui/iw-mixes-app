@@ -97,7 +97,7 @@
 
 	const intoDishDetail = (dishId) => {
 		uni.navigateTo({
-			url: '/pages/eat/dishes/dishes-detail?id=' + dishId
+			url: '/pagesEat/eat/dishes/dishes-detail?id=' + dishId
 		});
 	}
 
@@ -109,7 +109,7 @@
 		http.delete('/eat-service/meal/delete?id=' + mealDetail.value.id)
 			.then(res => {
 				uni.switchTab({
-					url: '/pages/eat/meal/index'
+					url: '/pagesEat/eat/meal/index'
 				});
 			})
 	}

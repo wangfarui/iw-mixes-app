@@ -1,6 +1,13 @@
 {
 	"pages": [
 		{
+			"path": "pages/bill/index",
+			"style": {
+				"navigationBarTitleText": "账单",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
 			"path": "pages/login",
 			"style": {
 				"navigationBarTitleText": "登录"
@@ -10,13 +17,6 @@
 			"path": "pages/home/index",
 			"style": {
 				"navigationBarTitleText": "首页"
-			}
-		},
-		{
-			"path": "pages/bill/index",
-			"style": {
-				"navigationBarTitleText": "账单",
-				"enablePullDownRefresh": true
 			}
 		},
 		{
@@ -35,43 +35,6 @@
 			"path": "pages/my/my",
 			"style": {
 				"navigationBarTitleText": "我的"
-			}
-		},
-		{
-			"path": "pages/eat/recipe/index",
-			"style": {
-				"navigationBarTitleText": "食谱"
-			}
-		},
-		{
-			"path": "pages/eat/dishes/index",
-			"style": {
-				"navigationBarTitleText": "点餐"
-			}
-		},
-		{
-			"path": "pages/eat/dishes/dishes-detail",
-			"style": {
-				"navigationBarTitleText": "菜品详情"
-			}
-		},
-		{
-			"path": "pages/eat/dishes/cart-confirm",
-			"style": {
-				"navigationBarTitleText": "确认订单"
-			}
-		},
-		{
-			"path": "pages/eat/meal/index",
-			"style": {
-				"navigationBarTitleText": "用餐记录",
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/eat/meal/meal-detail",
-			"style": {
-				"navigationBarTitleText": "用餐详情"
 			}
 		},
 		{
@@ -116,78 +79,146 @@
 			"style": {
 				"navigationBarTitleText": "收支分析"
 			}
-		},
-		{
-			"path": "pages/points/points-action",
-			"style": {
-				"navigationBarTitleText": "新增积分"
-			}
-		},
-		{
-			"path": "pages/points/points-records",
-			"style": {
-				"navigationBarTitleText": "积分记录",
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/points/points-statistics",
-			"style": {
-				"navigationBarTitleText": "积分分析"
-			}
-		},
-		{
-			"path": "pages/points/points-detail",
-			"style": {
-				"navigationBarTitleText": "记录详情"
-			}
-		},
-		{
-			"path": "pages/points/points-task",
-			"style": {
-				"navigationBarTitleText": "积分任务"
-			}
-		},
-		{
-			"path": "pages/points/points-task-add",
-			"style": {
-				"navigationBarTitleText": "新建积分任务"
-			}
-		},
-		{
-			"path": "pages/base/dict-manage",
-			"style": {
-				"navigationBarTitleText": "字典管理",
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/base/dict-detail",
-			"style": {
-				"navigationBarTitleText": "字典详情"
-			}
-		},
-		{
-			"path": "pages/base/account-manage",
-			"style": {
-				"navigationBarTitleText": "账号管理",
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/base/account-detail",
-			"style": {
-				"navigationBarTitleText": "账号详情"
-			}
-		},
-		{
-			"path": "pages/points/task-list",
-			"style": {
-				"navigationBarTitleText": "任务列表",
-				"enablePullDownRefresh": true
-			}
 		}
 	],
+	"subPackages": [
+		{
+			"root": "pagesBase",
+			"pages": [
+				{
+					"path": "base/dict-manage",
+					"style": {
+						"navigationBarTitleText": "字典管理",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "base/dict-detail",
+					"style": {
+						"navigationBarTitleText": "字典详情"
+					}
+				},
+				{
+					"path": "base/account-manage",
+					"style": {
+						"navigationBarTitleText": "账号管理",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "base/account-detail",
+					"style": {
+						"navigationBarTitleText": "账号详情"
+					}
+				}
+			]
+		},
+		{
+			"root": "pagesEat",
+			"pages": [
+				{
+					"path": "eat/recipe/index",
+					"style": {
+						"navigationBarTitleText": "食谱"
+					}
+				},
+				{
+					"path": "eat/dishes/index",
+					"style": {
+						"navigationBarTitleText": "点餐"
+					}
+				},
+				{
+					"path": "eat/dishes/dishes-detail",
+					"style": {
+						"navigationBarTitleText": "菜品详情"
+					}
+				},
+				{
+					"path": "eat/dishes/cart-confirm",
+					"style": {
+						"navigationBarTitleText": "确认订单"
+					}
+				},
+				{
+					"path": "eat/meal/index",
+					"style": {
+						"navigationBarTitleText": "用餐记录",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "eat/meal/meal-detail",
+					"style": {
+						"navigationBarTitleText": "用餐详情"
+					}
+				}
+			]
+		},
+		{
+			"root": "pagesPoints",
+			"pages": [
+				{
+					"path": "points/points-action",
+					"style": {
+						"navigationBarTitleText": "新增积分"
+					}
+				},
+				{
+					"path": "points/points-records",
+					"style": {
+						"navigationBarTitleText": "积分记录",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "points/points-statistics",
+					"style": {
+						"navigationBarTitleText": "积分分析"
+					}
+				},
+				{
+					"path": "points/points-detail",
+					"style": {
+						"navigationBarTitleText": "记录详情"
+					}
+				},
+				{
+					"path": "points/points-task",
+					"style": {
+						"navigationBarTitleText": "积分任务"
+					}
+				},
+				{
+					"path": "points/points-task-add",
+					"style": {
+						"navigationBarTitleText": "新建积分任务"
+					}
+				},
+				{
+					"path": "points/task-list",
+					"style": {
+						"navigationBarTitleText": "任务列表",
+						"enablePullDownRefresh": true
+					}
+				}
+			]
+		}
+	],
+	"preLoadRule": {
+		"pagesBase/base/dict-manage": {
+			"network": "all",
+			"packages": ["pages/menu"]
+		},
+		"pagesBase/base/account-manage": {
+			"network": "all",
+			"packages": ["pages/menu"]
+		},
+		"pagesPoints/points/task-list": {
+			"network": "all",
+			"packages": ["pages/menu"]
+		}
+	},
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-app",
@@ -234,5 +265,18 @@
 				"text": "我的"
 			}
 		]
+	},
+	"mp-weixin": {
+		"setting": {
+			"urlCheck": false
+		},
+		"usingComponents": {},
+		"permission": {},
+		"staticResources": {
+			"static": [
+				"static/bookkeeping/**/*.svg",
+				"static/bookkeeping/*.svg"
+			]
+		}
 	}
 }

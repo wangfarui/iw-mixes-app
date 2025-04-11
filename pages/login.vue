@@ -171,22 +171,40 @@
 		if (loginWay.value == '1') {
 			loginByPasswordApi(loginForm).then(res => {
 				loginSuccessAfter(res)
+			}).catch(err => {
+				setTimeout(() => {
+					uni.hideLoading();
+				}, 1500);
 			}).finally(() => {
-				uni.hideLoading();
+				if (uni.getStorageSync('loading')) {
+					uni.hideLoading();
+				}
 			})
 		} else if (loginWay.value == '2') {
 			loginForm.phoneNumber = loginForm.account
 			loginByVerificationCodeApi(loginForm).then(res => {
 				loginSuccessAfter(res)
+			}).catch(err => {
+				setTimeout(() => {
+					uni.hideLoading();
+				}, 1500);
 			}).finally(() => {
-				uni.hideLoading();
+				if (uni.getStorageSync('loading')) {
+					uni.hideLoading();
+				}
 			})
 		} else if (loginWay.value == '3') {
 			loginForm.phoneNumber = loginForm.account
 			registerAndLoginApi(loginForm).then(res => {
 				loginSuccessAfter(res)
+			}).catch(err => {
+				setTimeout(() => {
+					uni.hideLoading();
+				}, 1500);
 			}).finally(() => {
-				uni.hideLoading();
+				if (uni.getStorageSync('loading')) {
+					uni.hideLoading();
+				}
 			})
 		} else {
 			uni.hideLoading();

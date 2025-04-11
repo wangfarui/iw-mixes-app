@@ -1,6 +1,6 @@
 {
     "name" : "iw-mixes-app",
-    "appid" : "__UNI__0941D6F",
+    "appid" : "",
     "description" : "",
     "versionName" : "1.0.0",
     "versionCode" : "100",
@@ -38,10 +38,9 @@
     },
     "quickapp" : {},
     "mp-weixin" : {
-        "appid" : "wx3320efbc19488fa8",
+        "appid" : "",
         "setting" : {
-            "urlCheck" : false,
-            "minified" : true
+            "urlCheck" : false
         },
         "usingComponents" : true
     },
@@ -58,4 +57,4 @@
         "enable" : false
     },
     "vueVersion" : "3"
-}
+} 

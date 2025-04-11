@@ -14,3 +14,10 @@ dist
 *.njsproj
 *.sln
 *.sw?
+
+# 配置文件
+config/index.js
+manifest.json
+
+# 其他忽略项
+node_modules/

@@ -79,7 +79,7 @@
 	
 	function navigateToAdd() {
 		uni.navigateTo({
-			url: '/pages/points/points-task-add'
+			url: '/pagesPoints/points/points-task-add'
 		})
 	}
 </script>

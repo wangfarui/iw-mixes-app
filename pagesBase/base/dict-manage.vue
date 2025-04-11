@@ -121,13 +121,13 @@
 
 	function handleDictClick(item) {
 		uni.navigateTo({
-			url: '/pages/base/dict-detail?id=' + item.id
+			url: '/pagesBase/base/dict-detail?id=' + item.id
 		});
 	}
 
 	function handleAddDict() {
 		uni.navigateTo({
-			url: '/pages/base/dict-detail'
+			url: '/pagesBase/base/dict-detail'
 		});
 	}
 
