@@ -116,6 +116,15 @@
 					<text class="more-label">不计入统计:</text>
 					<switch :checked="formData.isStatistics === 0" @change="switchStatistics" />
 				</view>
+				
+				<!-- 汇率转换 -->
+				<view class="more-item">
+					<text class="more-label">货币:</text>
+					<uni-data-select
+					  v-model="formData.fromCurrency"
+					  :localdata="currencyTypes"
+					/>
+				</view>
 			</view>
 		</uni-popup>
 	</view>
@@ -139,7 +148,8 @@ const formData = ref({
 	recordTags: [],
 	recordType: null,
 	isExcitationRecord: 0,
-	isStatistics: 1
+	isStatistics: 1,
+	fromCurrency: ''
 })
 const dictStore = useDictStore()
 const bookkeepingPopup = ref(null)
@@ -153,6 +163,29 @@ const numberRows = ref([
 	[4, 5, 6, '+'],
 	[1, 2, 3, '标签'],
 	['.', 0, '⌫', '完成']
+])
+
+const currencyTypes = ref([
+	{
+		value: 'KRW',
+		text: '韩元'
+	},
+	{
+		value: 'USD',
+		text: '美元'
+	},
+	{
+		value: 'JPY',
+		text: '日元'
+	},
+	{
+		value: 'EUR',
+		text: '欧元'
+	},
+	{
+		value: 'HKD',
+		text: '港币'
+	}
 ])
 
 onMounted(() => {
@@ -306,7 +339,8 @@ function submitBookkeeping() {
 		remark: '', // remark 永远为空
 		recordTags: formData.value.recordTags,
 		isExcitationRecord: formData.value.isExcitationRecord,
-		isStatistics: formData.value.isStatistics
+		isStatistics: formData.value.isStatistics,
+		fromCurrency: formData.value.fromCurrency
 	}
 
 	http.post('/bookkeeping-service/bookkeepingRecords/add', submitData)
