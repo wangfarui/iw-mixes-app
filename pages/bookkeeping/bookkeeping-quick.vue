@@ -123,6 +123,7 @@
 					<uni-data-select
 					  v-model="formData.fromCurrency"
 					  :localdata="currencyTypes"
+					  placement="top"
 					/>
 				</view>
 			</view>

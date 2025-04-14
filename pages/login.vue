@@ -50,7 +50,8 @@
 <script setup>
 	import {
 		ref,
-		reactive
+		reactive,
+		onMounted
 	} from 'vue';
 
 	import {
@@ -66,11 +67,6 @@
 		useDictStore
 	} from "@/stores/dict.ts";
 
-	import {
-		onLoad
-	} from '@dcloudio/uni-app'
-
-
 	const dictStore = useDictStore()
 
 	const loginForm = reactive({
@@ -84,8 +80,34 @@
 	const isCountingDown = ref(false) // 标记是否处于倒计时状态
 	const count = ref(60) // 初始倒计时时间
 
-	onLoad(() => {
+	// 从本地存储获取保存的账号密码
+	onMounted(() => {
+		const savedUsername = uni.getStorageSync('savedUsername')
+		const savedPassword = uni.getStorageSync('savedPassword')
+		if (savedUsername && savedPassword) {
+			loginForm.account = savedUsername
+			loginForm.password = savedPassword
+		}
 	})
+
+	// 检查账号密码是否与保存的一致
+	function checkSavedCredentials() {
+		const savedUsername = uni.getStorageSync('savedUsername')
+		const savedPassword = uni.getStorageSync('savedPassword')
+		return savedUsername === loginForm.account && savedPassword === loginForm.password
+	}
+
+	// 保存账号密码到本地存储
+	function saveCredentials() {
+		uni.setStorageSync('savedUsername', loginForm.account)
+		uni.setStorageSync('savedPassword', loginForm.password)
+	}
+
+	// 清除保存的账号密码
+	function clearSavedCredentials() {
+		uni.removeStorageSync('savedUsername')
+		uni.removeStorageSync('savedPassword')
+	}
 
 	/**
 	 * 切换登录方式
@@ -139,47 +161,30 @@
 		}, 1000); // 每隔1秒执行一次
 	}
 
-	function loginFun() {
-		if (loginForm.account == undefined || loginForm.account == '') {
-			uni.showToast({
-				icon: 'error',
-				title: `账号不能为空`
-			})
-			return
-		}
-
-		if (loginWay.value == '1' && (loginForm.password == undefined || loginForm.password == '')) {
-			uni.showToast({
-				icon: 'error',
-				title: `密码不能为空`
-			})
-			return
-		}
-		
-		if (loginWay.value != '1' && (loginForm.verificationCode == undefined || loginForm.verificationCode == '')) {
-			uni.showToast({
-				icon: 'error',
-				title: `验证码不能为空`
-			})
-			return
-		}
-
+	async function loginFun() {
 		uni.showLoading({
 			title: '登录中'
 		});
-
-		if (loginWay.value == '1') {
-			loginByPasswordApi(loginForm).then(res => {
-				loginSuccessAfter(res)
-			}).catch(err => {
-				setTimeout(() => {
-					uni.hideLoading();
-				}, 1500);
-			}).finally(() => {
-				if (uni.getStorageSync('loading')) {
-					uni.hideLoading();
-				}
-			})
+		if (loginWay.value === '1') {
+			// 检查是否与保存的账号密码一致
+			if (!checkSavedCredentials()) {
+				// 如果不一致，弹出提示框
+				uni.showModal({
+					title: '提示',
+					content: '是否记住账号密码？',
+					success: (res) => {
+						if (res.confirm) {
+							// 用户点击确定，保存账号密码
+							saveCredentials()
+						}
+						// 无论用户点击确定还是取消，都继续登录流程
+						doLogin()
+					}
+				})
+			} else {
+				// 如果一致，直接登录
+				doLogin()
+			}
 		} else if (loginWay.value == '2') {
 			loginForm.phoneNumber = loginForm.account
 			loginByVerificationCodeApi(loginForm).then(res => {
@@ -213,9 +218,22 @@
 				title: `无法识别的操作`
 			})
 		}
-		
 	}
-	
+
+	function doLogin() {
+		loginByPasswordApi(loginForm).then(res => {
+				loginSuccessAfter(res)
+			}).catch(err => {
+				setTimeout(() => {
+					uni.hideLoading();
+				}, 1500);
+			}).finally(() => {
+				if (uni.getStorageSync('loading')) {
+					uni.hideLoading();
+				}
+			})
+	}
+
 	function loginSuccessAfter(res) {
 		const userInfo = res.data
 		uni.setStorageSync('iwtoken', userInfo.tokenValue)
