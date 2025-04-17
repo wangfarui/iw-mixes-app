@@ -5,16 +5,7 @@
       <view class="status-warning">当前为编辑状态</view>
     </uni-section>
 
-    <!-- 记账日期 -->
-    <uni-section title="记账日期" subTitle="为空时默认为当天" type="line">
-      <view class="form-item">
-        <uni-datetime-picker type="date" :clear-icon="false" v-model="formData.recordDate" return-type="string" />
-      </view>
-    </uni-section>
-
-    <!-- 记账记录 -->
-    <uni-section title="记账记录" type="line">
-      <view class="form-item segmented-control">
+    <view class="form-item segmented-control">
         <uni-segmented-control
           :current="current"
           :values="items"
@@ -24,61 +15,74 @@
         />
       </view>
 
+    <!-- 记账日期 -->
+    <view class="form-item">
+      <view class="label">记账日期:</view>
+      <uni-datetime-picker type="date" :clear-icon="false" v-model="formData.recordDate" return-type="string" />
+    </view>
+
       <!-- 支出项目 / 收入来源 -->
-      <view class="form-item">
-        <view class="label">
-          <span v-if="formData.recordCategory === 1">支出项目:</span>
-          <span v-if="formData.recordCategory === 2">收入来源:</span>
-        </view>
-        <uni-easyinput v-model="formData.recordSource" maxlength="64"></uni-easyinput>
+    <view class="form-item">
+      <view class="label">
+        <span v-if="formData.recordCategory === 1">支出项目:</span>
+        <span v-if="formData.recordCategory === 2">收入来源:</span>
       </view>
+      <uni-easyinput v-model="formData.recordSource" maxlength="64"></uni-easyinput>
+    </view>
 
-      <!-- 记账金额 -->
-      <view class="form-item">
-        <view class="label">记账金额:</view>
-        <input class="amount-input" v-model="formData.amount" placeholder="请输入金额" />
-      </view>
+    <!-- 记账金额 -->
+    <view class="form-item">
+      <view class="label">记账金额:</view>
+      <input class="amount-input" v-model="formData.amount" placeholder="请输入金额" />
+    </view>
 
-      <!-- 激励记录（仅收入） -->
-      <view v-if="formData.recordCategory === 2" class="form-item">
-        <view class="label">激励记录:</view>
-        <switch :checked="isExcitationRecord" @change="switchExcitationRecord" />
-      </view>
+    <!-- 激励记录（仅收入） -->
+    <view v-if="formData.recordCategory === 2" class="form-item">
+      <view class="label">激励记录:</view>
+      <switch :checked="isExcitationRecord" @change="switchExcitationRecord" />
+    </view>
 
-      <!-- 不计入统计（仅支出） -->
-      <view v-if="formData.recordCategory === 1" class="form-item">
-        <view class="label">不计入统计:</view>
-        <switch :checked="isNotStatistics" @change="switchNotStatistics" />
-      </view>
-    </uni-section>
+    <!-- 不计入统计（仅支出） -->
+    <view v-if="formData.recordCategory === 1" class="form-item">
+      <view class="label">不计入统计:</view>
+      <switch :checked="isNotStatistics" @change="switchNotStatistics" size="20px" />
+    </view>
 
     <!-- 分类 -->
-   <uni-section title="分类" type="line">
-       <view class="form-item full-width">
-         <uni-data-select
-           v-model="formData.recordType"
-           :localdata="dictStore.getDictDataWithDataSelectCode(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TYPE)"
-         />
-       </view>
-    </uni-section>
+    <view class="form-item full-width">
+      <view class="label">分类:</view>
+        <uni-data-select
+          v-model="formData.recordType"
+          :localdata="dictStore.getDictDataWithDataSelectCode(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TYPE)"
+        />
+    </view>
+
+    <view class="form-item full-width">
+      <view class="label">图标:</view>
+      <view class="icon-selector" @click="showIconSelector">
+        <view v-if="formData.recordIcon" class="icon-container">
+          <image :src="getIconUrl(formData.recordIcon)" class="selected-icon"></image>
+          <view class="delete-icon" @click.stop="clearIcon">×</view>
+        </view>
+        <text v-else>请选择图标</text>
+      </view>
+    </view>
 
     <!-- 标签 -->
-    <uni-section title="标签" type="line">
-      <view class="form-item">
+    <view class="form-item">
+        <view class="label">标签:</view>
         <uni-data-checkbox
           multiple
           v-model="formData.recordTags"
           :localdata="dictStore.getDictDataWithDataSelectId(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG)"
         />
-      </view>
-    </uni-section>
+    </view>
 
     <!-- 备注 -->
-    <uni-section title="备注" type="line">
-      <view class="form-item">
+    <view class="form-item">
+        <view class="label">备注:</view>
         <uni-easyinput v-model="formData.remark" placeholder="请输入内容"></uni-easyinput>
-      </view>
-    </uni-section>
+    </view>
 
     <!-- 保存按钮 -->
     <view class="save-button">
@@ -108,13 +112,34 @@
         </uni-list>
       </view>
     </uni-section>
+
+    <!-- 图标选择弹框 -->
+		<uni-popup ref="iconPopup" type="center">
+			<view class="icon-popup">
+				<view class="popup-header">
+					<text class="popup-title">选择图标</text>
+					<text class="popup-close" @click="closeIconSelector">×</text>
+				</view>
+				<scroll-view class="icon-list" scroll-y>
+					<view v-for="categoryGroup in iconList" :key="categoryGroup.category" class="icon-category">
+						<view class="category-title">{{categoryGroup.category}}</view>
+						<view class="category-icons">
+							<view class="icon-item" v-for="icon in categoryGroup.icons" :key="icon.path" @click="selectIcon(icon)" :class="getIconItemClass(icon)">
+								<image :src="icon.path" class="icon-image"></image>
+							</view>
+						</view>
+					</view>
+				</scroll-view>
+			</view>
+		</uni-popup>
   </view>
 </template>
 
 <script setup>
 	import {
 		ref,
-		reactive
+		reactive,
+		onMounted
 	} from 'vue'
 
 	import http from '@/api/request.js'
@@ -127,6 +152,7 @@
 	import {
 		useDictStore
 	} from "@/stores/dict.ts";
+	import { getIconUrl, getIconList} from '@/utils/icon.js'
 
 	const dictStore = useDictStore()
 	const items = ['支出', '收入']
@@ -138,6 +164,8 @@
 	const isNotStatistics = ref(false) // 是否不计入统计
 	const isUpdateForm = ref(false) // 是否为编辑表单
 	const updateFormId = ref('')
+  const iconList = ref([])
+  const iconPopup = ref(null)
 	
 	onLoad((option) => {
 		if (option.id) {
@@ -145,6 +173,10 @@
 			updateFormId.value = option.id
 		}
 	})
+
+  onMounted(() => {
+    iconList.value = getIconList()
+  })
 
 	onShow(() => {
 		initFormData()
@@ -161,8 +193,15 @@
 				})
 		} else {
 			isExcitationRecord.value = false
+			// 获取当前日期并格式化为 YYYY-MM-DD
+			const today = new Date()
+			const year = today.getFullYear()
+			const month = String(today.getMonth() + 1).padStart(2, '0')
+			const day = String(today.getDate()).padStart(2, '0')
+			const formattedDate = `${year}-${month}-${day}`
+			
 			formData.value = {
-				recordDate: '',
+				recordDate: formattedDate,
 				recordCategory: current.value + 1,
 				recordSource: '',
 				amount: '',
@@ -189,6 +228,28 @@
 				}
 			})
 	}
+
+  function showIconSelector() {
+    iconPopup.value.open()
+  }
+
+  // 获取选中图标的样式
+  const getIconItemClass = (icon) => {
+    return {
+      'icon-item': true,
+      'selected': formData.value.recordIcon === icon.recordIcon
+    }
+  }
+
+   // 选择图标
+  const selectIcon = (icon) => {
+    formData.value.recordIcon = icon.recordIcon
+    closeIconSelector()
+  }
+
+  function closeIconSelector() {
+    iconPopup.value.close()
+  }
 
 	function switchExcitationRecord() {
 		isExcitationRecord.value = !isExcitationRecord.value
@@ -244,6 +305,11 @@
 		}
 		return item.recordCategory == 2 ? '收入' : '消费';
 	}
+
+  // 清除图标
+  const clearIcon = () => {
+    formData.value.recordIcon = ''
+  }
 </script>
 
 <style scoped>
@@ -314,4 +380,133 @@
 .save-button {
   margin: 20px 10px;
 }
+
+.icon-selector {
+	border: 1px solid #ddd;
+	padding: 12px;
+	border-radius: 8px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	background: #f9f9f9;
+}
+
+.selected-icon {
+	width: 24px;
+	height: 24px;
+}
+
+.icon-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.delete-icon {
+  position: absolute;
+  right: -8px;
+  top: -8px;
+  width: 20px;
+  height: 20px;
+  background-color: #ff4d4f;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.delete-icon:hover {
+  background-color: #ff7875;
+}
+
+.icon-popup {
+	background-color: #fff;
+	border-radius: 10px;
+	width: 90vw;
+	max-height: 80vh;
+	padding: 20px;
+}
+
+.popup-header {
+	padding: 0 0 15px 0;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-bottom: 1px solid #eee;
+}
+
+.popup-title {
+	font-size: 16px;
+	font-weight: bold;
+	color: #333;
+}
+
+.popup-close {
+	font-size: 24px;
+	color: #999;
+	cursor: pointer;
+	width: 30px;
+	height: 30px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.icon-list {
+	padding: 15px 0;
+	max-height: calc(80vh - 80px);
+}
+
+.icon-category {
+	margin-bottom: 20px;
+}
+
+.category-title {
+	font-size: 15px;
+	color: #333;
+	font-weight: 500;
+	padding: 10px 0;
+	text-align: center;
+}
+
+.category-icons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	padding: 0 5px;
+}
+
+.icon-item {
+	width: 50px;
+	height: 50px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	background-color: #f5f5f5;
+	transition: all 0.3s ease;
+}
+
+.icon-item.selected {
+	background-color: #FFE082;
+}
+
+.icon-item:active {
+	transform: scale(0.95);
+}
+
+.icon-image {
+	width: 24px;
+	height: 24px;
+	filter: grayscale(100%);
+}
+
+.selected .icon-image {
+	filter: none;
+}
+
 </style>

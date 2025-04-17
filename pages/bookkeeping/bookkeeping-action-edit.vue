@@ -69,23 +69,11 @@ import { ref, onMounted } from 'vue'
 import { useDictStore } from '@/stores/dict'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import http from '@/api/request.js'
-import { getIconUrl, iconMap } from '@/utils/icon.js'
+import { getIconUrl, getIconList} from '@/utils/icon.js'
 
 const dictStore = useDictStore()
 const form = ref(null)
 const iconPopup = ref(null)
-
-const iconCategories = [
-	{ dir: 'icon/yinshi', name: '饮食' },
-	{ dir: 'icon/gouwu', name: '购物' },
-	{ dir: 'icon/shenghuo', name: '生活' },
-	{ dir: 'icon/jiaotong', name: '交通' },
-	{ dir: 'icon/yule', name: '娱乐' },
-	{ dir: 'icon/bangong', name: '办公' },
-	{ dir: 'icon/jiating', name: '家庭' },
-	{ dir: 'icon/shouru', name: '收入' },
-	{ dir: 'icon/qita', name: '其他' }
-]
 
 const iconList = ref([])
 
@@ -125,20 +113,7 @@ onLoad((options) => {
 })
 
 onMounted(() => {
-	iconCategories.forEach(category => {
-		// 从 iconMap 中筛选出当前类别的图标
-		const categoryIcons = Object.entries(iconMap)
-			.filter(([key]) => key.startsWith(`/${category.dir}/`))
-			.map(([key, value]) => ({
-				path: value,
-				recordIcon: key
-			}))
-			
-		iconList.value.push({
-			category: category.name,
-			icons: categoryIcons
-		})
-	})
+	iconList.value = getIconList()
 })
 
 // 获取详情
