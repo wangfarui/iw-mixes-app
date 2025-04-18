@@ -70,3 +70,34 @@ export function getIconUrl(icon) {
 	return `/static/bookkeeping/${icon}.svg`
 	// #endif
 }
+
+const iconCategories = [
+	{ dir: 'icon/yinshi', name: '饮食' },
+	{ dir: 'icon/gouwu', name: '购物' },
+	{ dir: 'icon/shenghuo', name: '生活' },
+	{ dir: 'icon/jiaotong', name: '交通' },
+	{ dir: 'icon/yule', name: '娱乐' },
+	{ dir: 'icon/bangong', name: '办公' },
+	{ dir: 'icon/jiating', name: '家庭' },
+	{ dir: 'icon/shouru', name: '收入' },
+	{ dir: 'icon/qita', name: '其他' }
+]
+
+export function getIconList() {
+  const iconList = [];
+  iconCategories.forEach(category => {
+		// 从 iconMap 中筛选出当前类别的图标
+		const categoryIcons = Object.entries(iconMap)
+			.filter(([key]) => key.startsWith(`/${category.dir}/`))
+			.map(([key, value]) => ({
+				path: value,
+				recordIcon: key
+			}))
+			
+		iconList.push({
+			category: category.name,
+			icons: categoryIcons
+		})
+	})
+	return iconList;
+}
