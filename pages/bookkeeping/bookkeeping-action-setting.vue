@@ -7,12 +7,13 @@
 		</view>
 
 		<!-- 可拖拽排序列表 -->
-		<scroll-view class="sortable-list" scroll-y>
+		<scroll-view class="sortable-list" scroll-y ref="scrollView" @scroll="handleScroll">
 			<view class="sortable-item" v-for="(action, index) in actions" :key="action.id" 
 				:class="{'dragging': draggingIndex === index}"
 				@touchstart="startDrag($event, index)"
-				@touchmove.prevent="onDrag($event, index)"
-				@touchend="endDrag">
+				@touchmove="onDrag($event, index)"
+				@touchend="endDrag"
+				@touchcancel="endDrag">
                 <image src="/static/bookkeeping/icon/delete.svg" class="delete-icon" @click="confirmDelete(action)"></image>
 				<image :src="getIconUrl(action.recordIcon)" class="action-icon"></image>
 				<text class="action-text">{{action.recordSource}}</text>
@@ -50,6 +51,11 @@ const currentY = ref(0)
 const isDragging = ref(false)
 const deletePopup = ref(null)
 const actionToDelete = ref(null)
+const scrollView = ref(null)
+const longPressTimer = ref(null)
+const isLongPressing = ref(false)
+const lastScrollTop = ref(0)
+const scrollTimer = ref(null)
 
 onShow(() => {
 	fetchActions()
@@ -68,19 +74,41 @@ function fetchActions() {
 }
 
 function startDrag(event, index) {
-	isDragging.value = true
-	draggingIndex.value = index
-	startY.value = event.touches[0].pageY
-	currentY.value = startY.value
+	// 清除之前的定时器
+	if (longPressTimer.value) {
+		clearTimeout(longPressTimer.value)
+	}
+	
+	// 设置长按定时器
+	longPressTimer.value = setTimeout(() => {
+		isLongPressing.value = true
+		isDragging.value = true
+		draggingIndex.value = index
+		startY.value = event.touches[0].pageY
+		currentY.value = startY.value
+		
+		// 触发震动效果
+		uni.vibrateShort({
+			success: function () {
+				// console.log('震动成功')
+			}
+		})
+	}, 1000) // 1秒后触发
 }
 
 function onDrag(event, index) {
+	// 如果不是长按状态，则只处理滚动
+	if (!isLongPressing.value) {
+		return
+	}
+	
 	if (draggingIndex.value === -1) return
-	isDragging.value = true
 	currentY.value = event.touches[0].pageY
 	const moveY = currentY.value - startY.value
+	
 	const itemHeight = 50 // 假设每个项目高度为50px
 	
+	// 只有当垂直移动距离超过阈值时才触发排序
 	if (Math.abs(moveY) > itemHeight / 2) {
 		const targetIndex = draggingIndex.value + (moveY > 0 ? 1 : -1)
 		if (targetIndex >= 0 && targetIndex < actions.value.length) {
@@ -96,8 +124,15 @@ function onDrag(event, index) {
 }
 
 function endDrag(event) {
+	// 清除长按定时器
+	if (longPressTimer.value) {
+		clearTimeout(longPressTimer.value)
+		longPressTimer.value = null
+	}
+	
 	if (!isDragging.value) return
 	isDragging.value = false
+	isLongPressing.value = false
 	
 	if (draggingIndex.value !== -1) {
 		const currentAction = actions.value[draggingIndex.value]
@@ -156,6 +191,10 @@ function addCategory() {
 	uni.navigateTo({
 		url: '/pages/bookkeeping/bookkeeping-action-edit'
 	})
+}
+
+function handleScroll(event) {
+	// 处理滚动事件
 }
 </script>
 

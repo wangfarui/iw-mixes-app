@@ -22,7 +22,7 @@ const http = (url, method, data) => {
 				const result = res.data;
 				if (result == undefined) {
 					uni.showToast({
-						icon: 'exception',
+						icon: 'error',
 						title: '数据加载异常'
 					});
 					reject(new Error('数据加载异常'));
@@ -30,8 +30,8 @@ const http = (url, method, data) => {
 				}
 				if (result.code == 401) {
 					uni.showToast({
-						icon: 'exception',
-						title: '登录状态失效，请重新登录'
+						icon: 'error',
+						title: '登录状态失效'
 					});
 					uni.removeStorageSync(token_key)
 					uni.reLaunch({
