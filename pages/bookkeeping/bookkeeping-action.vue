@@ -84,6 +84,29 @@
         <uni-easyinput v-model="formData.remark" placeholder="请输入内容"></uni-easyinput>
     </view>
 
+    <!-- 图片上传 -->
+    <view class="form-item">
+      <view class="label">附件:</view>
+      <view class="file-upload-container">
+        <view class="file-list">
+          <view v-for="(file, index) in formData.fileList" :key="index" class="file-item">
+            <image :src="file.fileUrl" class="file-thumbnail" @click="previewImage(file.fileUrl)" mode="aspectFill"></image>
+            <view class="delete-file" @click="deleteFile(index)">×</view>
+          </view>
+        </view>
+        <button size="mini" @click="showUploadPopup">上传图片</button>
+      </view>
+    </view>
+
+    <!-- 上传附图片弹窗 -->
+    <uni-popup ref="uploadPopup" type="bottom" :animation="true">
+      <view class="popup-content">
+        <button class="popup-button" @click="takePhoto">拍照</button>
+        <button class="popup-button" @click="chooseFromAlbum">从相册选择</button>
+        <button class="popup-button cancel" @click="closeUploadPopup">取消</button>
+      </view>
+    </uni-popup>
+
     <!-- 保存按钮 -->
     <view class="save-button">
       <button type="primary" @click="saveRecord">保存</button>
@@ -153,10 +176,24 @@
 		useDictStore
 	} from "@/stores/dict.ts";
 	import { getIconUrl, getIconList} from '@/utils/icon.js'
+	import {
+		baseUrl,
+		tokenHeader
+	} from '@/api/env.js'
 
 	const dictStore = useDictStore()
 	const items = ['支出', '收入']
-	const formData = ref({}) // 记账表单数据
+	const formData = ref({
+		fileList: [], // 初始化文件列表
+		recordDate: '',
+		recordCategory: 1,
+		recordSource: '',
+		amount: '',
+		recordType: '',
+		remark: '',
+		recordTags: [],
+		isStatistics: ''
+	}) // 记账表单数据
 	const current = ref(0) // 当前所选的记录类型 对应items下表
 	const toDayRecords = ref([]) // 今日记账记录列表
 	const toDayConsume = ref(0) // 今日总消费
@@ -164,24 +201,24 @@
 	const isNotStatistics = ref(false) // 是否不计入统计
 	const isUpdateForm = ref(false) // 是否为编辑表单
 	const updateFormId = ref('')
-  const iconList = ref([])
-  const iconPopup = ref(null)
+	const iconList = ref([])
+	const iconPopup = ref(null)
+	const uploadPopup = ref(null)
 	
 	onLoad((option) => {
 		if (option.id) {
 			isUpdateForm.value = true
 			updateFormId.value = option.id
 		}
+		initFormData()
+		loadTodayConsume()
 	})
 
   onMounted(() => {
     iconList.value = getIconList()
   })
 
-	onShow(() => {
-		initFormData()
-		loadTodayConsume()
-	})
+	
 
 	function initFormData() {
 		if (isUpdateForm.value) {
@@ -208,7 +245,8 @@
 				recordType: '',
 				remark: '',
 				recordTags: [],
-				isStatistics: ''
+				isStatistics: '',
+				fileList: []
 			}
 		}
 	}
@@ -309,6 +347,96 @@
   // 清除图标
   const clearIcon = () => {
     formData.value.recordIcon = ''
+  }
+
+  // 显示上传弹窗
+  function showUploadPopup() {
+    uploadPopup.value.open()
+  }
+
+  // 关闭上传弹窗
+  function closeUploadPopup() {
+    uploadPopup.value.close()
+  }
+
+  // 拍照上传
+  function takePhoto() {
+    closeUploadPopup()
+    uni.chooseImage({
+      count: 1,
+      sizeType: ['original', 'compressed'],
+      sourceType: ['camera'],
+      success: (res) => {
+        const tempFilePaths = res.tempFilePaths;
+        uploadFile(tempFilePaths[0]);
+      }
+    })
+  }
+
+  // 从相册选择
+  function chooseFromAlbum() {
+    closeUploadPopup()
+    uni.chooseImage({
+      count: 9,
+      sizeType: ['original', 'compressed'],
+      sourceType: ['album'],
+      success: (res) => {
+        const tempFilePaths = res.tempFilePaths;
+        tempFilePaths.forEach(filePath => {
+          uploadFile(filePath);
+        });
+      }
+    })
+  }
+
+  // 上传文件
+  function uploadFile(filePath) {
+    uni.uploadFile({
+      url: baseUrl + '/auth-service/file/upload',
+      filePath: filePath,
+      name: 'file',
+      header: {
+        'Content-Type': 'multipart/form-data',
+        ...tokenHeader()
+      },
+      success: (uploadFileRes) => {
+        if (uploadFileRes.statusCode !== 200 || JSON.parse(uploadFileRes.data).code !== 200) {
+          uni.showToast({
+            icon: 'error',
+            title: `上传失败`
+          })
+        } else {
+          const responseData = JSON.parse(uploadFileRes.data).data;
+          if (!formData.value.fileList) {
+            formData.value.fileList = [];
+          }
+          formData.value.fileList.push({
+            fileName: responseData.fileName,
+            fileUrl: responseData.fileUrl
+          });
+        }
+      },
+      fail: (err) => {
+        console.error('上传失败', err);
+        uni.showToast({
+          icon: 'error',
+          title: '上传失败'
+        });
+      }
+    })
+  }
+
+  // 预览图片
+  function previewImage(url) {
+    uni.previewImage({
+      urls: formData.value.fileList.map(file => file.fileUrl),
+      current: url
+    });
+  }
+
+  // 删除文件
+  function deleteFile(index) {
+    formData.value.fileList.splice(index, 1);
   }
 </script>
 
@@ -487,7 +615,7 @@
 	align-items: center;
 	justify-content: center;
 	border-radius: 50%;
-	background-color: #f5f5f5;
+	background-color: #f5f5f9;
 	transition: all 0.3s ease;
 }
 
@@ -507,6 +635,44 @@
 
 .selected .icon-image {
 	filter: none;
+}
+
+.file-upload-container {
+  padding: 10px;
+}
+
+.file-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.file-item {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.file-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.delete-file {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border-radius: 50%;
+  cursor: pointer;
 }
 
 </style>
