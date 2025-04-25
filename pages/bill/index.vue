@@ -192,6 +192,10 @@
 			uni.navigateTo({
 				url: '/pages/bookkeeping/bookkeeping-quick'
 			})
+		} else if (item.text === '预算') {
+			uni.navigateTo({
+				url: '/pages/bookkeeping/bookkeeping-budget'
+			})
 		} else {
 			uni.showToast({
 				title: `点击了${item.text}`,

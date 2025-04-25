@@ -79,6 +79,12 @@
 			"style": {
 				"navigationBarTitleText": "收支分析"
 			}
+		},
+		{
+			"path": "pages/bookkeeping/bookkeeping-budget",
+			"style": {
+				"navigationBarTitleText": "预算"
+			}
 		}
 	],
 	"subPackages": [
@@ -265,6 +271,12 @@
 				"text": "我的"
 			}
 		]
+	},
+	"easycom": {
+		"autoscan": true,
+		"custom": {
+			"^qiun-data-charts": "uni_modules/qiun-data-charts/components/qiun-data-charts/qiun-data-charts"
+		}
 	},
 	"mp-weixin": {
 		"setting": {
