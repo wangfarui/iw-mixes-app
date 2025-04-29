@@ -43,17 +43,17 @@
 			components: [{
 					url: '/static/menus/bookkeeping-action.png',
 					text: '记账',
-					path: '/pages/bookkeeping/bookkeeping-action'
+					path: '/pagesBookkeeping/bookkeeping/bookkeeping-action'
 				},
 				{
 					url: '/static/menus/bookkeeping-records.png',
 					text: '记账记录',
-					path: '/pages/bookkeeping/bookkeeping-records'
+					path: '/pagesBookkeeping/bookkeeping/bookkeeping-records'
 				},
 				{
 					url: '/static/menus/bookkeeping-statistics.png',
 					text: '收支分析',
-					path: '/pages/bookkeeping/bookkeeping-statistics'
+					path: '/pagesBookkeeping/bookkeeping/bookkeeping-statistics'
 				}
 			],
 		},

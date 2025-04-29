@@ -36,58 +36,63 @@
 			"style": {
 				"navigationBarTitleText": "我的"
 			}
-		},
-		{
-			"path": "pages/bookkeeping/bookkeeping-quick",
-			"style": {
-				"navigationBarTitleText": "记账"
-			}
-		},
-		{
-			"path": "pages/bookkeeping/bookkeeping-action",
-			"style": {
-				"navigationBarTitleText": "表单记账"
-			}
-		},
-		{
-			"path": "pages/bookkeeping/bookkeeping-action-setting",
-			"style": {
-				"navigationBarTitleText": "类别设置"
-			}
-		},
-		{
-			"path": "pages/bookkeeping/bookkeeping-action-edit",
-			"style": {
-				"navigationBarTitleText": "编辑类别"
-			}
-		},
-		{
-			"path": "pages/bookkeeping/bookkeeping-records",
-			"style": {
-				"navigationBarTitleText": "记账记录",
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/bookkeeping/bookkeeping-detail",
-			"style": {
-				"navigationBarTitleText": "记录详情"
-			}
-		},
-		{
-			"path": "pages/bookkeeping/bookkeeping-statistics",
-			"style": {
-				"navigationBarTitleText": "收支分析"
-			}
-		},
-		{
-			"path": "pages/bookkeeping/bookkeeping-budget",
-			"style": {
-				"navigationBarTitleText": "预算"
-			}
 		}
 	],
 	"subPackages": [
+		{
+			"root": "pagesBookkeeping",
+			"pages": [
+				{
+					"path": "bookkeeping/bookkeeping-quick",
+					"style": {
+						"navigationBarTitleText": "记账"
+					}
+				},
+				{
+					"path": "bookkeeping/bookkeeping-action",
+					"style": {
+						"navigationBarTitleText": "表单记账"
+					}
+				},
+				{
+					"path": "bookkeeping/bookkeeping-action-setting",
+					"style": {
+						"navigationBarTitleText": "类别设置"
+					}
+				},
+				{
+					"path": "bookkeeping/bookkeeping-action-edit",
+					"style": {
+						"navigationBarTitleText": "编辑类别"
+					}
+				},
+				{
+					"path": "bookkeeping/bookkeeping-records",
+					"style": {
+						"navigationBarTitleText": "记账记录",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "bookkeeping/bookkeeping-detail",
+					"style": {
+						"navigationBarTitleText": "记录详情"
+					}
+				},
+				{
+					"path": "bookkeeping/bookkeeping-statistics",
+					"style": {
+						"navigationBarTitleText": "收支分析"
+					}
+				},
+				{
+					"path": "bookkeeping/bookkeeping-budget",
+					"style": {
+						"navigationBarTitleText": "预算"
+					}
+				}
+			]
+		},
 		{
 			"root": "pagesBase",
 			"pages": [
@@ -212,6 +217,10 @@
 		}
 	],
 	"preLoadRule": {
+		"pagesBookkeeping/bookkeeping/bookkeeping-quick": {
+			"network": "all",
+			"packages": ["__APP__"]
+		},
 		"pagesBase/base/dict-manage": {
 			"network": "all",
 			"packages": ["pages/menu"]

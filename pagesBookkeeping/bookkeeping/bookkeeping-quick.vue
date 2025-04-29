@@ -242,7 +242,7 @@ function fetchActions() {
 
 function openSettings() {
 	uni.navigateTo({
-		url: '/pages/bookkeeping/bookkeeping-action-setting'
+		url: '/pagesBookkeeping/bookkeeping/bookkeeping-action-setting'
 	})
 }
 

@@ -350,7 +350,7 @@
 
 	function handleRecordClick(item) {
 		uni.navigateTo({
-			url: '/pages/bookkeeping/bookkeeping-detail?id=' + item.id
+			url: '/pagesBookkeeping/bookkeeping/bookkeeping-detail?id=' + item.id
 		});
 	}
 

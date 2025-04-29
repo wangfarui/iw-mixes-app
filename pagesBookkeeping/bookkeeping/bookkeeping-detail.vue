@@ -109,7 +109,7 @@
 	
 	function clickUpdateButton() {
 		uni.navigateTo({
-			url: '/pages/bookkeeping/bookkeeping-action?id=' + detail.value.id
+			url: '/pagesBookkeeping/bookkeeping/bookkeeping-action?id=' + detail.value.id
 		});
 	}
 	
