@@ -272,12 +272,6 @@
 			}
 		]
 	},
-	"easycom": {
-		"autoscan": true,
-		"custom": {
-			"^qiun-data-charts": "uni_modules/qiun-data-charts/components/qiun-data-charts/qiun-data-charts"
-		}
-	},
 	"mp-weixin": {
 		"setting": {
 			"urlCheck": false

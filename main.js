@@ -15,15 +15,10 @@ app.$mount()
 import { createSSRApp } from 'vue'
 import * as Pinia from 'pinia';
 
-// 引入 uCharts 组件
-import qiunDataCharts from './uni_modules/qiun-data-charts/components/qiun-data-charts/qiun-data-charts.vue'
-
 export function createApp() {
   const app = createSSRApp(App)
   app.use(Pinia.createPinia())
   
-  // 注册 uCharts 组件
-  app.component('qiun-data-charts', qiunDataCharts)
   
   return {
     app,

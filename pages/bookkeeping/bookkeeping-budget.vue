@@ -7,20 +7,12 @@
     <!-- 总预算展示区域 -->
     <view class="total-budget" v-if="totalBudget">
       <view class="budget-actions">
-        <text class="edit-btn" @click="showBudgetActions">编辑</text>
+        <text class="edit-btn" @click="showBudgetActions" v-if="totalBudget.budgetAmount > 0">编辑</text>
       </view>
       <view class="budget-chart" v-if="totalBudget.budgetAmount > 0">
         <view class="budget-content">
           <view class="chart-container">
-            <qiun-data-charts 
-              type="ring"
-              :opts="chartOpts"
-              :chartData="chartData"
-              :canvas2d="true"
-              :animation="true"
-              :disableScroll="true"
-              canvasId="budgetRing"
-            />
+            <l-echart ref="chartRef"></l-echart>
           </view>
           <view class="budget-info">
             <view class="info-item">
@@ -133,15 +125,18 @@
 <script setup>
 import http from '@/api/request.js'
 import { useDictStore } from '@/stores/dict'
-import { ref, computed } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { ref, computed, watch } from 'vue'
+import { onShow, onReady } from '@dcloudio/uni-app'
 
 const dictStore = useDictStore()
+
+const echarts = require('../../uni_modules/lime-echart/static/echarts.min');
 
 // 组件引用
 const budgetTypePopup = ref(null)
 const addBudgetPopup = ref(null)
 const budgetActionsPopup = ref(null)
+const chartRef = ref(null)
 
 // 数据定义
 const budgetType = ref(1) // 1: 月预算, 2: 年预算
@@ -156,106 +151,79 @@ const budgetForm = ref({
 const currentBudget = ref(null)
 const isCategoryBudget = ref(false)
 
-// 图表配置
-const chartOpts = ref({
-  type: 'ring',
-  canvasId: 'budgetRing',
-  rotateLock: true,
-  fontSize: 13,
-  background: '#FFFFFF',
-  pixelRatio: 1,
-  animation: true,
-  width: 280,
-  height: 280,
-  padding: [15, 15, 15, 15],
-  rotate: false,
-  title: {
-    name: computed(() => {
-      if (!totalBudget.value || !totalBudget.value.budgetAmount || totalBudget.value.budgetAmount <= 0) {
-        return '0%'
-      }
-      const remainingAmount = Number(totalBudget.value.remainingAmount) || 0
-      const budgetAmount = Number(totalBudget.value.budgetAmount) || 0
-      const percentage = Math.max(0, (remainingAmount / budgetAmount * 100).toFixed(0))
-      return `${percentage}%`
-    }),
-    color: '#333333',
-    fontSize: 20,
-    offsetY: 0
-  },
-  subtitle: {
-    name: '',
-    fontSize: 0
-  },
-  legend: {
-    show: false
-  },
-  series: [{
-    name: '预算使用情况',
-    radius: '70%',
-    center: ['50%', '50%'],
-    data: []
-  }],
-  extra: {
-    ring: {
-      ringWidth: 25,
-      activeOpacity: 0.5,
-      activeRadius: 10,
-      offsetAngle: 0,
-      labelWidth: 15,
-      border: false,
-      borderWidth: 3,
-      borderColor: "#FFFFFF"
-    }
-  }
-})
-
 // 图表数据
-const chartData = computed(() => {
+const myChart = ref(null)
+
+function renderChart() {
   if (!totalBudget.value || !totalBudget.value.budgetAmount || totalBudget.value.budgetAmount <= 0) {
-    return {
-      series: [{
-        data: []
-      }]
-    }
+    return;
   }
 
-  const usedAmount = Number(totalBudget.value.usedAmount) || 0
-  const remainingAmount = Number(totalBudget.value.remainingAmount) || 0
+  const usedAmount = Number(totalBudget.value.usedAmount) || 0;
+  const remainingAmount = Number(totalBudget.value.remainingAmount) || 0;
   
-  // 如果剩余金额小于等于0，表示已全部使用
-  if (remainingAmount <= 0) {
-    return {
-      series: [{
-        data: [
-          {
-            name: '已使用',
-            value: totalBudget.value.budgetAmount,
-            color: '#FFD700'
-          }
-        ]
-      }]
-    }
-  }
-
-  // 正常情况：显示已使用和剩余
-  return {
+  const option = {
+    legend: {
+      orient: 'vertical',
+      left: 'left',
+      itemWidth: 10,
+      itemHeight: 10,
+      textStyle: {
+        fontSize: 10
+      }
+    },
     series: [{
+      type: 'pie',
       data: [
         {
           name: '已使用',
           value: usedAmount,
-          color: '#FFD700'
+          itemStyle: {
+            color: '#FFD700'
+          }
         },
         {
           name: '剩余',
           value: remainingAmount,
-          color: '#91d5ff'
+          itemStyle: {
+            color: '#91d5ff'
+          }
         }
-      ]
+      ],
+      radius: ['0%', '40%'],
+      label: {
+        position: 'inside',
+        formatter: '{b}\n{d}%',
+        fontSize: 10,
+        lineHeight: 12
+      }
     }]
+  };
+
+  if (chartRef.value) {
+    chartRef.value.setOption(option, true);
   }
-})
+}
+
+// 监控预算数据变化
+watch(() => totalBudget.value, (newVal) => {
+  if (myChart.value && newVal && newVal.budgetAmount > 0) {
+    renderChart();
+  }
+}, { deep: true });
+
+onReady(() => {
+  setTimeout(() => {
+    if (chartRef.value) {
+      chartRef.value.init(echarts, chart => {
+        myChart.value = chart;
+        if (totalBudget.value && totalBudget.value.budgetAmount > 0) {
+          renderChart();
+        }
+      });
+    }
+  }, 300);
+});
 
 // 计算属性
 const budgetTypeText = computed(() => {
@@ -277,8 +245,10 @@ const fetchBudgetData = async () => {
     )
     categoryBudgets.value = categoryRes.data
 
-    console.log('totalBudget:', totalBudget.value)
-    console.log('chartData:', chartData.value)
+    // 数据加载完成后重新渲染图表
+    if (myChart.value) {
+      renderChart();
+    }
   } catch (error) {
     uni.showToast({
       title: '获取预算数据失败',
@@ -296,20 +266,28 @@ const showBudgetTypePopup = () => {
   budgetTypePopup.value.open()
 }
 
-const selectBudgetType = (type) => {
+const selectBudgetType = async (type) => {
   budgetType.value = type
   budgetTypePopup.value.close()
-  fetchBudgetData()
+  await fetchBudgetData()
+  if (chartRef.value) {
+    chartRef.value.init(echarts, chart => {
+      myChart.value = chart;
+      renderChart();
+    });
+  }
 }
 
 const addBudget = () => {
   isAddingCategory.value = false
+  isEditing.value = false
   resetBudgetForm()
   addBudgetPopup.value.open()
 }
 
 const addCategoryBudget = () => {
   isAddingCategory.value = true
+  isEditing.value = false
   resetBudgetForm()
   addBudgetPopup.value.open()
 }
@@ -346,11 +324,11 @@ const closeBudgetActions = () => {
 
 const editBudget = () => {
   budgetActionsPopup.value.close()
+  isEditing.value = true
   budgetForm.value = {
     budgetAmount: currentBudget.value.budgetAmount,
     recordType: isCategoryBudget.value ? currentBudget.value.recordType : null
   }
-  isEditing.value = true
   isAddingCategory.value = isCategoryBudget.value
   addBudgetPopup.value.open()
 }
@@ -372,7 +350,11 @@ const deleteBudget = async () => {
       icon: 'success'
     })
     
-    fetchBudgetData()
+    // 重置状态
+    isEditing.value = false
+    currentBudget.value = null
+    
+    await fetchBudgetData()
   } catch (error) {
     if (error.errMsg !== 'showModal:fail cancel') {
       uni.showToast({
@@ -412,40 +394,41 @@ const saveBudget = async () => {
     return
   }
   
-  try {
-    const params = {
-      budgetType: isAddingCategory.value ? getCategoryBudgetType() : budgetType.value,
-      budgetAmount: amount
-    }
-    
-    // 如果是分类预算，添加recordType参数
-    if (isAddingCategory.value) {
-      params.recordType = budgetForm.value.recordType
-    }
-    
-    // 如果是编辑，添加id参数
-    if (isEditing.value) {
-      params.id = currentBudget.value.id
-    }
-    
-    const url = isEditing.value ? 
-      '/bookkeeping-service/bookkeeping/budget/update' : 
-      '/bookkeeping-service/bookkeeping/budget/add'
-    
-    await http[isEditing.value ? 'put' : 'post'](url, params)
-    
-    uni.showToast({
-      title: isEditing.value ? '修改成功' : '添加成功',
-      icon: 'success'
-    })
-    
-    closeAddBudgetPopup()
-    fetchBudgetData() // 刷新数据
-  } catch (error) {
-    uni.showToast({
-      title: isEditing.value ? '修改失败' : '添加失败',
-      icon: 'none'
-    })
+  const params = {
+    budgetType: isAddingCategory.value ? getCategoryBudgetType() : budgetType.value,
+    budgetAmount: amount
+  }
+  
+  // 如果是分类预算，添加recordType参数
+  if (isAddingCategory.value) {
+    params.recordType = budgetForm.value.recordType
+  }
+  
+  // 如果是编辑，添加id参数
+  if (isEditing.value) {
+    params.id = currentBudget.value.id
+  }
+  
+  const url = isEditing.value ? 
+    '/bookkeeping-service/bookkeeping/budget/update' : 
+    '/bookkeeping-service/bookkeeping/budget/add'
+  
+  await http[isEditing.value ? 'put' : 'post'](url, params)
+  
+  uni.showToast({
+    title: isEditing.value ? '修改成功' : '添加成功',
+    icon: 'success'
+  })
+  
+  closeAddBudgetPopup()
+  await fetchBudgetData() // 刷新数据
+  
+  // 如果是总预算，重新初始化图表
+  if (!isAddingCategory.value && chartRef.value) {
+    chartRef.value.init(echarts, chart => {
+      myChart.value = chart;
+      renderChart();
+    });
   }
 }
 
@@ -469,9 +452,19 @@ const getProgressColor = (used, total) => {
   return '#52c41a' // 绿色，预算充足
 }
 
+const getSystemInfo = () => {
+  // 使用新的推荐API
+  return uni.getSystemInfoSync();
+}
+
 // 页面加载时获取数据
 onShow(() => {
-  fetchBudgetData()
+  try {
+    const systemInfo = getSystemInfo();
+    fetchBudgetData();
+  } catch (error) {
+    console.error('获取系统信息失败:', error);
+  }
 })
 </script>
 
@@ -489,6 +482,8 @@ onShow(() => {
   font-size: 32rpx;
   margin-bottom: 20rpx;
   border-radius: 8rpx;
+  position: relative;
+  z-index: 2;
 }
 
 .total-budget {
@@ -519,16 +514,20 @@ onShow(() => {
       display: flex;
       align-items: center;
       gap: 40rpx;
+      position: relative;
+      z-index: 1;
     }
 
     .chart-container {
-      width: 280rpx;
-      height: 280rpx;
+      width: 100px !important;
+      height: 100px !important;
       flex-shrink: 0;
       background-color: #fff;
       display: flex;
       justify-content: center;
       align-items: center;
+      position: relative;
+      z-index: 1;
     }
 
     .budget-info {
@@ -672,9 +671,9 @@ onShow(() => {
 
 .budget-chart {
   .chart-container {
-    width: 100%;
-    height: 400rpx;
-    margin: 20rpx auto;
+    width: 100px !important;
+    height: 100px !important;
+    flex-shrink: 0;
     background-color: #fff;
     display: flex;
     justify-content: center;
