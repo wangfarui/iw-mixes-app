@@ -79,7 +79,7 @@
 	} from 'vue';
 	import {
 		useCartStore
-	} from '@/stores/cart'
+	} from '@/pagesEat/js/cart'
 	import http from '@/api/request.js'
 	import {
 		useDictStore

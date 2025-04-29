@@ -77,7 +77,7 @@
 	} from 'vue'
 	import {
 		useCartStore
-	} from '@/stores/cart'
+	} from '@/pagesEat/js/cart'
 	import {
 		useDictStore
 	} from "@/stores/dict.ts"

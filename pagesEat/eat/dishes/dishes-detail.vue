@@ -87,7 +87,7 @@
 	} from '@dcloudio/uni-app'
 	import {
 		useCartStore
-	} from '@/stores/cart'
+	} from '@/pagesEat/js/cart'
 	import Cart from '@/pagesEat/eat/dishes/cart.vue'
 	import http from '@/api/request.js'
 
