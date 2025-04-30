@@ -88,7 +88,7 @@
 		
 		formData.value.points = current.value == 1 ? -formData.value.inputPoints : formData.value.inputPoints
 
-		http.post('/points-service/pointsRecords/add', formData.value)
+		http.post('/points-service/points/records/add', formData.value)
 			.then(res => {
 				uni.showToast({
 					icon: 'success',
