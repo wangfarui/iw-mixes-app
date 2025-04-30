@@ -78,7 +78,7 @@
 	})
 	
 	function searchTotalPonts() {
-		http.get('/points-service/total/getPointsBalance')
+		http.get('/points-service/points/total/getPointsBalance')
 			.then(res => {
 				page.totalPoints = res.data
 			})
@@ -103,7 +103,7 @@
 	 */
 	function searchStatistics() {
 		return new Promise((resolve) => {
-			http.post('/points-service/pointsRecords/statistics', page.dto)
+			http.post('/points-service/points/records/statistics', page.dto)
 				.then(res => {
 					page.statistics = res.data
 				})
@@ -115,7 +115,7 @@
 	 */
 	function searchPage() {
 		return new Promise((resolve) => {
-			http.post('/points-service/pointsRecords/page', page.dto)
+			http.post('/points-service/points/records/page', page.dto)
 				.then(res => {
 					const data = res.data
 					if (data.records && data.records.length == page.dto.pageSize) {

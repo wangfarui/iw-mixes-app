@@ -1,6 +1,13 @@
 {
 	"pages": [
 		{
+			"path": "pages/home/index",
+			"style": {
+				"navigationBarTitleText": "首页",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
 			"path": "pages/bill/index",
 			"style": {
 				"navigationBarTitleText": "账单",
@@ -11,12 +18,6 @@
 			"path": "pages/login",
 			"style": {
 				"navigationBarTitleText": "登录"
-			}
-		},
-		{
-			"path": "pages/home/index",
-			"style": {
-				"navigationBarTitleText": "首页"
 			}
 		},
 		{
