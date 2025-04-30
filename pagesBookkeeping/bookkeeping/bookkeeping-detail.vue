@@ -36,6 +36,17 @@
 		        <text class="label">备注</text>
 		        <text class="value">{{ detail.remark }}</text>
 		      </view>
+
+		      <!-- 附件展示 -->
+		      <view class="item" v-if="detail.fileList && detail.fileList.length > 0">
+		        <text class="label">附件</text>
+		        <view class="file-list">
+		          <view v-for="(file, index) in detail.fileList" :key="index" class="file-item">
+		            <image :src="file.fileUrl" class="file-thumbnail" @click="previewImage(file.fileUrl)" mode="aspectFill"></image>
+		          </view>
+		        </view>
+		      </view>
+
 		      <view class="item">
 		        <text class="label">订单编号</text>
 		        <text class="value">{{ detail.orderNo }}</text>
@@ -98,7 +109,7 @@
 	
 	function clickUpdateButton() {
 		uni.navigateTo({
-			url: '/pages/bookkeeping/bookkeeping-action?id=' + detail.value.id
+			url: '/pagesBookkeeping/bookkeeping/bookkeeping-action?id=' + detail.value.id
 		});
 	}
 	
@@ -112,6 +123,14 @@
 
 	function dialogToggle() {
 		alertDialog.value.open();
+	}
+
+	// 预览图片
+	function previewImage(url) {
+		uni.previewImage({
+			urls: detail.value.fileList.map(file => file.fileUrl),
+			current: url
+		});
 	}
 </script>
 
@@ -163,5 +182,24 @@
 	.delete-btn {
 	  background-color: red;
 	  color: white;
+	}
+
+	.file-list {
+	  display: flex;
+	  flex-wrap: wrap;
+	  gap: 10px;
+	  margin-top: 10px;
+	}
+
+	.file-item {
+	  width: 100px;
+	  height: 100px;
+	}
+
+	.file-thumbnail {
+	  width: 100%;
+	  height: 100%;
+	  object-fit: cover;
+	  border-radius: 4px;
 	}
 </style>

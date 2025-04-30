@@ -53,7 +53,7 @@
 	import { ref } from 'vue';
 	import {
 		useCartStore
-	} from '@/stores/cart'
+	} from '@/pagesEat/js/cart'
 	
 	const cartStore = useCartStore()
 	const showShoppingCart = ref(null);

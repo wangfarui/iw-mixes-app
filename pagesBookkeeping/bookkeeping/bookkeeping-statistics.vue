@@ -179,7 +179,7 @@
 	// 点击分类 进入记账记录页面
 	function clickCategoryRow(recordType) {
 		uni.navigateTo({
-			url: '/pages/bookkeeping/bookkeeping-records?recordType=' + recordType +
+			url: '/pagesBookkeeping/bookkeeping/bookkeeping-records?recordType=' + recordType +
 				"&recordDate=" + currentMonth.value +
 				"&ignoreNotStatistics=" + ignoreNotStatistics.value
 		})
@@ -215,7 +215,7 @@
 
 	function handleRecordClick(item) {
 		uni.navigateTo({
-			url: '/pages/bookkeeping/bookkeeping-detail?id=' + item.id
+			url: '/pagesBookkeeping/bookkeeping/bookkeeping-detail?id=' + item.id
 		});
 	}
 

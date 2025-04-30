@@ -182,15 +182,19 @@
 	function handleFunctionClick(item) {
 		if (item.text === '明细') {
 			uni.navigateTo({
-				url: '/pages/bookkeeping/bookkeeping-records'
+				url: '/pagesBookkeeping/bookkeeping/bookkeeping-records'
 			})
 		} else if (item.text === '支出统计') {
 			uni.navigateTo({
-				url: '/pages/bookkeeping/bookkeeping-statistics'
+				url: '/pagesBookkeeping/bookkeeping/bookkeeping-statistics'
 			})
 		} else if (item.text === '记账') {
 			uni.navigateTo({
-				url: '/pages/bookkeeping/bookkeeping-quick'
+				url: '/pagesBookkeeping/bookkeeping/bookkeeping-quick'
+			})
+		} else if (item.text === '预算') {
+			uni.navigateTo({
+				url: '/pagesBookkeeping/bookkeeping/bookkeeping-budget'
 			})
 		} else {
 			uni.showToast({
@@ -202,7 +206,7 @@
 
 	function handleRecordClick(item) {
 		uni.navigateTo({
-			url: '/pages/bookkeeping/bookkeeping-detail?id=' + item.id
+			url: '/pagesBookkeeping/bookkeeping/bookkeeping-detail?id=' + item.id
 		});
 	}
 

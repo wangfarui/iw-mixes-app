@@ -183,13 +183,13 @@ function closeDeletePopup() {
 
 function editAction(action) {
 	uni.navigateTo({
-		url: `/pages/bookkeeping/bookkeeping-action-edit?id=${action.id}`
+		url: `/pagesBookkeeping/bookkeeping/bookkeeping-action-edit?id=${action.id}`
 	})
 }
 
 function addCategory() {
 	uni.navigateTo({
-		url: '/pages/bookkeeping/bookkeeping-action-edit'
+		url: '/pagesBookkeeping/bookkeeping/bookkeeping-action-edit'
 	})
 }
 
