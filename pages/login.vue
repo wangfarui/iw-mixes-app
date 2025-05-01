@@ -243,7 +243,7 @@
 		refreshDictCache()
 		
 		uni.switchTab({
-			url: '/pages/bill/index'
+			url: '/pages/home/index'
 		})
 	}
 </script>
