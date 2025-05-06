@@ -28,12 +28,18 @@
 			<!-- 记账卡片 -->
 			<view class="function-card">
 				<view class="card-header">
-					<view class="card-icon">
-						<image class="card-icon-img" src="/static/tabbar/bill-active.png" mode="aspectFill" />
+					<view class="card-left">
+						<view class="card-icon">
+							<image class="card-icon-img" src="/static/tabbar/bill-active.png" mode="aspectFill" />
+						</view>
+						<view class="card-content">
+							<text class="card-title">今日记账</text>
+							<text class="card-value">¥ {{ billTotalAmount }}</text>
+						</view>
 					</view>
-					<view class="card-content">
-						<text class="card-title">今日记账</text>
-						<text class="card-value">¥ {{ billTotalAmount }}</text>
+					<view class="quick-add-btn" @click="navigateToQuickBookkeep">
+						<text class="iconfont icon-add"></text>
+						<text>记一笔</text>
 					</view>
 				</view>
 				<view class="card-details bill-list">
@@ -190,6 +196,7 @@ const fetchBillRecords = async () => {
 		const res = await http.post('/bookkeeping-service/bookkeepingRecords/page', {
 			recordStartDate: today,
 			recordEndDate: today,
+			recordCategory: 1,
 			pageSize: 4
 		})
 		let records = res?.data?.records || []
@@ -262,6 +269,12 @@ const navigateToPoints = () => {
 const navigateToRecipes = () => {
 	uni.navigateTo({
 		url: '/pagesEat/eat/recipe/index'
+	})
+}
+
+const navigateToQuickBookkeep = () => {
+	uni.navigateTo({
+		url: '/pagesBookkeeping/bookkeeping/bookkeeping-quick'
 	})
 }
 
@@ -400,7 +413,14 @@ onPullDownRefresh(() => {
 	.card-header {
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
 		margin-bottom: 20rpx;
+	}
+
+	.card-left {
+		display: flex;
+		align-items: center;
+		flex: 1;
 	}
 
 	.card-icon {
@@ -437,6 +457,27 @@ onPullDownRefresh(() => {
 			font-weight: bold;
 			white-space: normal;
 			word-break: break-all;
+		}
+	}
+
+	.quick-add-btn {
+		background-color: #f0f3ff;
+		border-radius: 30rpx;
+		padding: 10rpx 20rpx;
+		color: #6e8efb;
+		font-size: 24rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		white-space: nowrap;
+
+		.iconfont {
+			margin-right: 5rpx;
+			font-size: 24rpx;
+		}
+
+		&:active {
+			opacity: 0.8;
 		}
 	}
 

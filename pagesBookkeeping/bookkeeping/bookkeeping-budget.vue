@@ -20,11 +20,11 @@
               <text :class="['value', totalBudget.remainingAmount < 0 ? 'negative' : '']">{{ formatAmount(totalBudget.remainingAmount) }}</text>
             </view>
             <view class="info-item">
-              <text class="label">本月支出：</text>
+              <text class="label">{{ budgetType === 1 ? '本月支出：' : '年度支出：' }}</text>
               <text class="value">{{ formatAmount(totalBudget.usedAmount) }}</text>
             </view>
             <view class="info-item">
-              <text class="label">本月预算：</text>
+              <text class="label">{{ budgetType === 1 ? '本月预算：' : '年度预算：' }}</text>
               <text class="value">{{ formatAmount(totalBudget.budgetAmount) }}</text>
             </view>
           </view>
@@ -43,6 +43,7 @@
         v-for="(item, index) in categoryBudgets" 
         :key="index"
         @longpress="showCategoryBudgetActions(item)"
+        @click="navigateToRecords(item)"
       >
         <view class="category-info">
           <text class="category-name">{{ dictStore.getDictNameByCode(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TYPE, item.recordType) }}</text>
@@ -452,19 +453,31 @@ const getProgressColor = (used, total) => {
   return '#52c41a' // 绿色，预算充足
 }
 
-const getSystemInfo = () => {
-  // 使用新的推荐API
-  return uni.getSystemInfoSync();
+const navigateToRecords = (item) => {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  const currentDate = `${year}-${month}-${day}`
+  
+  let url = '/pagesBookkeeping/bookkeeping/bookkeeping-records?recordType=' + item.recordType
+  
+  if (budgetType.value === 1) {
+    // 月预算
+    url += '&recordDate=' + currentDate
+  } else {
+    // 年预算
+    url += '&recordYear=' + currentDate
+  }
+  
+  uni.navigateTo({
+    url: url
+  })
 }
 
 // 页面加载时获取数据
 onShow(() => {
-  try {
-    const systemInfo = getSystemInfo();
-    fetchBudgetData();
-  } catch (error) {
-    console.error('获取系统信息失败:', error);
-  }
+  fetchBudgetData();
 })
 </script>
 

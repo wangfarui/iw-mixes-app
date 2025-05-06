@@ -107,6 +107,26 @@
 							</view>
 						</scroll-view>
 					</view>
+					<!-- 排序选择 -->
+					<view class="filter-item">
+						<text class="filter-label">排序：</text>
+						<view class="sort-container">
+							<uni-data-select
+								v-model="page.dto.sortType"
+								:localdata="sortTypeOptions"
+								class="sort-select"
+								placement="top"
+								style="width: 200rpx;"
+							></uni-data-select>
+							<uni-data-select
+								v-model="page.dto.sortWay"
+								:localdata="sortWayOptions"
+								class="sort-select"
+								placement="top"
+								style="width: 200rpx;"
+							></uni-data-select>
+						</view>
+					</view>
 				</view>
 				<!-- 底部按钮 -->
 				<view class="popup-footer">
@@ -130,7 +150,7 @@
 		onReady
 	} from '@dcloudio/uni-app'
 	import http from '@/api/request.js'
-	import {getMonthStartAndEnd, formatDate} from'@/stores/date-utils.js'
+	import {getMonthStartAndEnd, getYearStartAndEnd, formatDate} from'@/stores/date-utils.js'
 	import {
 		useDictStore
 	} from "@/stores/dict.ts";
@@ -162,11 +182,24 @@
 			maxAmount: '', // 最大金额
 			tagIdList: [], // 记账标签id集合
 			isSearchAll: '', // 是否查询所有记录
+			sortType: 0, // 排序类型
+			sortWay: 0, // 排序方式
 		},
 		list: [],
 		statistics: {}
 	})
 	
+	const sortTypeOptions = [
+		{ value: 0, text: '默认' },
+		{ value: 1, text: '记账时间' },
+		{ value: 2, text: '记账金额' }
+	]
+
+	const sortWayOptions = [
+		{ value: 0, text: '降序' },
+		{ value: 1, text: '升序' }
+	]
+
 	function initFormSearchDto() {
 		page.dto.recordStartDate = ''; // 记账记录开始时间
 		page.dto.recordEndDate = ''; // 记账记录结束时间
@@ -176,6 +209,8 @@
 		page.dto.maxAmount = ''; // 最大金额
 		page.dto.tagIdList = []; // 记账标签id集合
 		page.dto.isSearchAll = ''; // 是否查询所有记录
+		page.dto.sortType = 0; // 排序类型
+		page.dto.sortWay = 0; // 排序方式
 	}
 	
 	function initFormPageDto() {
@@ -188,6 +223,12 @@
 		if (option.recordDate) {
 			const [year, month] = option.recordDate.split("-").map(Number);
 			const {firstDay, lastDay} = getMonthStartAndEnd(new Date(year, month, 1))
+			pageRange.value[0] = firstDay
+			pageRange.value[1] = lastDay
+		}
+		if (option.recordYear) {
+			const [year, month] = option.recordYear.split("-").map(Number);
+			const {firstDay, lastDay} = getYearStartAndEnd(new Date(year, month, 1))
 			pageRange.value[0] = firstDay
 			pageRange.value[1] = lastDay
 		}
@@ -512,5 +553,14 @@
 		justify-content: space-between;
 		align-items: center;
 		padding: 10rpx 20rpx;
+	}
+
+	.sort-container {
+		display: flex;
+		align-items: center;
+		gap: 20rpx;
+	}
+
+	.sort-select {
 	}
 </style>
