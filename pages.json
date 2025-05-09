@@ -196,15 +196,16 @@
 					}
 				},
 				{
-					"path": "points/points-task",
+					"path": "points/task-plan",
 					"style": {
-						"navigationBarTitleText": "积分任务"
+						"navigationBarTitleText": "任务计划",
+						"enablePullDownRefresh": true
 					}
 				},
 				{
-					"path": "points/points-task-add",
+					"path": "points/task-plan-add",
 					"style": {
-						"navigationBarTitleText": "新建积分任务"
+						"navigationBarTitleText": "编辑任务计划"
 					}
 				},
 				{

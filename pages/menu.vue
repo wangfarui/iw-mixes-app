@@ -76,8 +76,8 @@
 				},
 				{
 					url: '/static/menus/points-task.png',
-					text: '积分任务',
-					path: '/pagesPoints/points/points-task'
+					text: '任务计划',
+					path: '/pagesPoints/points/task-plan'
 				},
 				{
 					url: '/static/menus/task-list.png',

@@ -110,7 +110,7 @@
 				<text class="more-link" @click="navigateToRecipes">查看更多</text>
 			</view>
 			<scroll-view class="recipe-scroll" scroll-x style="height: 280rpx;">
-				<view class="recipe-card" v-for="(recipe, index) in recipes" :key="index">
+				<view class="recipe-card" v-for="(recipe, index) in recipes" :key="index" @click="navigateToDishesDetail(recipe.id)">
 					<image class="recipe-image" :src="recipe.image" mode="aspectFill"></image>
 					<text class="recipe-name">{{ recipe.name }}</text>
 				</view>
@@ -202,7 +202,7 @@ const fetchBillRecords = async () => {
 		let records = res?.data?.records || []
 		showBillMore.value = records.length > 3
 		billRecords.value = records.slice(0, 3).map(item => ({
-			time: (item.recordTime || '').slice(6, 11),
+			time: (item.recordTime || '').slice(11, 16),
 			desc: item.recordSource,
 			amount: item.amount
 		}))
@@ -278,6 +278,12 @@ const navigateToQuickBookkeep = () => {
 	})
 }
 
+const navigateToDishesDetail = (id) => {
+	uni.navigateTo({
+		url: '/pagesEat/eat/dishes/dishes-detail?id=' + id
+	});
+}
+
 // 计算截止日期颜色
 const getDeadlineColor = (deadline) => {
 	const today = new Date()
@@ -326,6 +332,7 @@ const fetchRecipes = async () => {
 		const res = await http.get('/bookkeeping-service/dishes/recommendDishes')
 		const arr = res?.data || []
 		recipes.value = arr.map(item => ({
+			id: item.id,
 			name: item.dishesName,
 			image: item.dishesImage
 		}))
