@@ -176,10 +176,7 @@
 		useDictStore
 	} from "@/stores/dict.ts";
 	import { getIconUrl, getIconList} from '@/utils/icon.js'
-	import {
-		baseUrl,
-		tokenHeader
-	} from '@/api/env.js'
+	import { uploadFile } from "@/stores/file.js"
 
 	const dictStore = useDictStore()
 	const items = ['支出', '收入']
@@ -368,7 +365,7 @@
       sourceType: ['camera'],
       success: (res) => {
         const tempFilePaths = res.tempFilePaths;
-        uploadFile(tempFilePaths[0]);
+        uploadFileForBookkeepingFile(tempFilePaths[0]);
       }
     })
   }
@@ -383,47 +380,22 @@
       success: (res) => {
         const tempFilePaths = res.tempFilePaths;
         tempFilePaths.forEach(filePath => {
-          uploadFile(filePath);
+          uploadFileForBookkeepingFile(filePath);
         });
       }
     })
   }
 
   // 上传文件
-  function uploadFile(filePath) {
-    uni.uploadFile({
-      url: baseUrl + '/auth-service/file/upload',
-      filePath: filePath,
-      name: 'file',
-      header: {
-        'Content-Type': 'multipart/form-data',
-        ...tokenHeader()
-      },
-      success: (uploadFileRes) => {
-        if (uploadFileRes.statusCode !== 200 || JSON.parse(uploadFileRes.data).code !== 200) {
-          uni.showToast({
-            icon: 'error',
-            title: `上传失败`
-          })
-        } else {
-          const responseData = JSON.parse(uploadFileRes.data).data;
-          if (!formData.value.fileList) {
-            formData.value.fileList = [];
-          }
-          formData.value.fileList.push({
-            fileName: responseData.fileName,
-            fileUrl: responseData.fileUrl
-          });
-        }
-      },
-      fail: (err) => {
-        console.error('上传失败', err);
-        uni.showToast({
-          icon: 'error',
-          title: '上传失败'
-        });
-      }
-    })
+  async function uploadFileForBookkeepingFile(filePath) {
+    const fileRes = await uploadFile(filePath)
+    if (!formData.value.fileList) {
+      formData.value.fileList = [];
+    }
+    formData.value.fileList.push({
+      fileName: fileRes.fileName,
+      fileUrl: fileRes.fileUrl
+    });
   }
 
   // 预览图片

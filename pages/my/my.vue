@@ -35,15 +35,12 @@
 		onShow
 	} from '@dcloudio/uni-app'
 
-	import {
-		baseUrl,
-		tokenHeader
-	} from '@/api/env.js'
 	import http from '@/api/request.js'
 	import {
 		logout,
 		refreshDictCache
 	} from "@/api/login.js";
+	import { uploadFile } from "@/stores/file.js"
 
 	const userInfo = ref({})
 
@@ -95,7 +92,7 @@
 			sourceType: ['camera'],
 			success: (res) => {
 				const tempFilePaths = res.tempFilePaths;
-				uploadFile(tempFilePaths[0]);
+				uploadFileForAvatar(tempFilePaths[0]);
 			}
 		})
 	}
@@ -108,43 +105,23 @@
 			sourceType: ['album'],
 			success: (res) => {
 				const tempFilePaths = res.tempFilePaths;
-				uploadFile(tempFilePaths[0]);
+				uploadFileForAvatar(tempFilePaths[0]);
 			}
 		})
 	}
 
-	function uploadFile(filePath) {
-		uni.uploadFile({
-			url: baseUrl + '/auth-service/file/upload',
-			filePath: filePath,
-			name: 'file', // 文件参数名，根据你的接口设置
-			header: {
-				'Content-Type': 'multipart/form-data',
-				...tokenHeader()
-			},
-			success: (uploadFileRes) => {
-				if (uploadFileRes.statusCode !== 200 || JSON.parse(uploadFileRes.data).code !== 200) {
-					uni.showToast({
-						icon: 'error',
-						title: `上传失败`
-					})
-				} else {
-					// 调用更新用户头像接口
-					let avatarUrl = JSON.parse(uploadFileRes.data).data.fileUrl
-					http.post('/auth-service/user/editAvatar', {
-							'avatar': avatarUrl
-						})
-						.then(res => {
-							userInfo.value.avatar = avatarUrl;
-							uni.setStorageSync('userInfo', userInfo.value)
-						})
-				}
-			},
-			fail: (err) => {
-				console.error('上传失败', err);
-				// 处理上传失败的逻辑
-			}
-		})
+	async function uploadFileForAvatar(filePath) {
+		const fileRes = await uploadFile(filePath)
+		// 调用更新用户头像接口
+		let avatarUrl = fileRes.fileUrl
+		
+		http.post('/auth-service/user/editAvatar', {
+				'avatar': avatarUrl
+			})
+			.then(res => {
+				userInfo.value.avatar = avatarUrl;
+				uni.setStorageSync('userInfo', userInfo.value)
+			})
 	}
 </script>
 

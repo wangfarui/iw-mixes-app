@@ -147,6 +147,12 @@
 					}
 				},
 				{
+					"path": "eat/dishes/dishes-form",
+					"style": {
+						"navigationBarTitleText": "菜品添加"
+					}
+				},
+				{
 					"path": "eat/dishes/cart-confirm",
 					"style": {
 						"navigationBarTitleText": "确认订单"

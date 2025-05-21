@@ -13,7 +13,7 @@
 			<scroll-view :scroll-top="0" scroll-y="true" style="height: 90vh" refresher-enabled="true"
 				:refresher-triggered="triggered" @refresherrefresh="initSearchData()" @scrolltolower="loadMoreDishes()">
 				<view v-if="dishesPage.list.length > 0">
-					<view v-for="dish in dishesPage.list" :key="dish.id" @click="intoDishDetail(dish.id)">
+					<view v-for="dish in dishesPage.list" :key="dish.id" @click="intoDishDetail(dish.id)" @longpress="showActionSheet(dish)">
 						<uni-row class="demo-uni-row">
 							<uni-col :span="12">
 								<view>
@@ -37,6 +37,11 @@
 				<view v-else>展示没有菜品哦~</view>
 			</scroll-view>
 		</view>
+
+		<!-- 添加按钮 -->
+		<view class="add-btn" @click="navigateToAdd">
+			<uni-icons type="plusempty" size="30" color="#fff"></uni-icons>
+		</view>
 	</view>
 </template>
 
@@ -50,7 +55,7 @@
 	import {
 		onPullDownRefresh,
 		onReachBottom,
-		onLoad
+		onShow
 	} from '@dcloudio/uni-app'
 	import http from '@/api/request.js'
 
@@ -91,7 +96,11 @@
 		list: []
 	})
 
-	onLoad(() => {
+	onShow(() => {
+		dishesTypes.value = [{
+			dictCode: 0,
+			dictName: '全部'
+		}]
 		const types = dictStore.getDictDataArray(dictStore.dictTypeEnum.EAT_DISHES_TYPE)
 		dishesTypes.value.push(...types)
 
@@ -159,8 +168,53 @@
 			url: '/pagesEat/eat/dishes/dishes-detail?id=' + dishId
 		});
 	}
-</script>
 
+	// 跳转到添加菜品页面
+	const navigateToAdd = () => {
+		uni.navigateTo({
+			url: '/pagesEat/eat/dishes/dishes-form'
+		});
+	}
+
+	
+	// 显示操作菜单
+	const showActionSheet = (dish) => {
+		uni.showActionSheet({
+			itemList: ['编辑菜品', '删除菜品'],
+			success: (res) => {
+				switch (res.tapIndex) {
+					case 0: // 编辑菜品
+						uni.navigateTo({
+							url: `/pagesEat/eat/dishes/dishes-form?id=${dish.id}`
+						})
+						break
+					case 1: // 删除菜品
+						uni.showModal({
+							title: '确认删除',
+							content: '确定要删除这个菜品吗？',
+							success: (res) => {
+								if (res.confirm) {
+									deleteDish(dish.id)
+								}
+							}
+						})
+						break
+				}
+			}
+		})
+	}
+
+	// 删除菜品
+	const deleteDish = async (id) => {
+		await http.delete(`/bookkeeping-service/dishes/delete?id=${id}`)
+		uni.showToast({
+			title: '删除成功',
+			icon: 'success'
+		})
+		// 刷新列表
+		initSearchData()
+	}
+</script>
 
 <style lang="scss">
 	.demo-uni-row {
@@ -182,5 +236,19 @@
 	.dishesName {
 		font-weight: bolder;
 		font-size: 18px;
+	}
+
+	.add-btn {
+		position: fixed;
+		right: 20px;
+		bottom: 20px;
+		width: 50px;
+		height: 50px;
+		background-color: #007AFF;
+		border-radius: 25px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 	}
 </style>

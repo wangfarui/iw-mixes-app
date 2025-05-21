@@ -162,10 +162,7 @@ import { useDictStore } from '@/stores/dict'
 import { onShow } from '@dcloudio/uni-app'
 import http from '@/api/request.js'
 import { getIconUrl } from '@/utils/icon.js'
-import {
-		baseUrl,
-		tokenHeader
-	} from '@/api/env.js'
+import { uploadFile } from "@/stores/file.js"
 
 const selectedCategory = ref(1)
 const actions = ref([])
@@ -523,7 +520,7 @@ function takePhoto() {
 		sourceType: ['camera'],
 		success: (res) => {
 			const tempFilePaths = res.tempFilePaths;
-			uploadFile(tempFilePaths[0]);
+			uploadFileForBookkeepingFile(tempFilePaths[0]);
 		}
 	})
 }
@@ -538,47 +535,22 @@ function chooseFromAlbum() {
 		success: (res) => {
 			const tempFilePaths = res.tempFilePaths;
 			tempFilePaths.forEach(filePath => {
-				uploadFile(filePath);
+				uploadFileForBookkeepingFile(filePath);
 			});
 		}
 	})
 }
 
 // 上传文件
-function uploadFile(filePath) {
-	uni.uploadFile({
-		url: baseUrl + '/auth-service/file/upload',
-		filePath: filePath,
-		name: 'file',
-		header: {
-			'Content-Type': 'multipart/form-data',
-			...tokenHeader()
-		},
-		success: (uploadFileRes) => {
-			if (uploadFileRes.statusCode !== 200 || JSON.parse(uploadFileRes.data).code !== 200) {
-				uni.showToast({
-					icon: 'error',
-					title: `上传失败`
-				})
-			} else {
-				const responseData = JSON.parse(uploadFileRes.data).data;
-				if (!formData.value.fileList) {
-					formData.value.fileList = [];
-				}
-				formData.value.fileList.push({
-					fileName: responseData.fileName,
-					fileUrl: responseData.fileUrl
-				});
-			}
-		},
-		fail: (err) => {
-			console.error('上传失败', err);
-			uni.showToast({
-				icon: 'error',
-				title: '上传失败'
-			});
-		}
-	})
+async function uploadFileForBookkeepingFile(filePath) {
+	const fileRes = await uploadFile(filePath)
+	if (!formData.value.fileList) {
+		formData.value.fileList = [];
+	}
+	formData.value.fileList.push({
+		fileName: fileRes.fileName,
+		fileUrl: fileRes.fileUrl
+	});
 }
 
 // 预览图片
