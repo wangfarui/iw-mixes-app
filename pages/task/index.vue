@@ -185,6 +185,31 @@
 				@cancel="closeDeletePopup"
 			></uni-popup-dialog>
 		</uni-popup>
+
+		<!-- 截止日期设置对话框 -->
+		<uni-popup ref="deadlinePopup" type="dialog">
+			<uni-popup-dialog
+				title="设置截止日期"
+				:before-close="true"
+				@confirm="saveDeadline"
+				@close="closeDeadlinePopup"
+				@cancel="closeDeadlinePopup"
+				type="info"
+			>
+				<view class="deadline-form">
+					<picker 
+						mode="date" 
+						:value="deadlineForm.deadlineDate" 
+						@change="onDeadlineDateChange"
+						class="date-picker"
+					>
+						<view class="picker-text">
+							{{ deadlineForm.deadlineDate || '选择截止日期' }}
+						</view>
+					</picker>
+				</view>
+			</uni-popup-dialog>
+		</uni-popup>
 	</view>
 </template>
 
@@ -209,10 +234,15 @@ export default {
 		const newTaskDeadline = ref('')
 		const pointsPopup = ref(null)
 		const deletePopup = ref(null)
+		const deadlinePopup = ref(null)
 		const pointsForm = ref({
 			taskId: null,
 			rewardPoints: '',
 			punishPoints: ''
+		})
+		const deadlineForm = ref({
+			taskId: null,
+			deadlineDate: ''
 		})
 		const currentTask = ref(null)
 
@@ -248,6 +278,7 @@ export default {
 					itemList.push('完成')
 				}
 				itemList.push('设置积分')
+				itemList.push('设置截止日期')
 				itemList.push('删除')
 			}
 			
@@ -263,6 +294,8 @@ export default {
 							showDeleteConfirm(task)
 						} else if (res.tapIndex === 1) {
 							showPointsPopup(task)
+						} else if (res.tapIndex === 2) {
+							showDeadlinePopup(task)
 						}
 					}
 				}
@@ -504,6 +537,54 @@ export default {
 			newTaskDeadline.value = e.detail.value
 		}
 
+		// 显示截止日期设置弹窗
+		const showDeadlinePopup = (task) => {
+			deadlineForm.value = {
+				taskId: task.id,
+				deadlineDate: task.deadlineDate || ''
+			}
+			deadlinePopup.value.open()
+		}
+
+		// 保存截止日期
+		const saveDeadline = async () => {
+			try {
+				await http.put('/bookkeeping-service/task/basics/updateTaskParam', {
+					id: deadlineForm.value.taskId,
+					deadlineDate: deadlineForm.value.deadlineDate
+				})
+				uni.showToast({
+					title: '保存成功',
+					icon: 'success'
+				})
+				deadlinePopup.value.close()
+				if (currentView.value === 'recent') {
+					fetchRecentTasks()
+				} else {
+					fetchInboxTasks()
+				}
+			} catch (error) {
+				uni.showToast({
+					title: '保存失败',
+					icon: 'none'
+				})
+			}
+		}
+
+		// 关闭截止日期设置弹窗
+		const closeDeadlinePopup = () => {
+			deadlineForm.value = {
+				taskId: null,
+				deadlineDate: ''
+			}
+			deadlinePopup.value.close()
+		}
+
+		// 截止日期选择器变化
+		const onDeadlineDateChange = (e) => {
+			deadlineForm.value.deadlineDate = e.detail.value
+		}
+
 		onMounted(() => {
 			fetchRecentTasks()
 		})
@@ -516,7 +597,9 @@ export default {
 			newTaskDeadline,
 			pointsPopup,
 			deletePopup,
+			deadlinePopup,
 			pointsForm,
+			deadlineForm,
 			switchView,
 			onSwiperChange,
 			addTask,
@@ -524,11 +607,14 @@ export default {
 			cancelCompleteTask,
 			deleteTask,
 			onDateChange,
+			onDeadlineDateChange,
 			showActionSheet,
 			savePoints,
 			closePointsPopup,
 			confirmDelete,
-			closeDeletePopup
+			closeDeletePopup,
+			saveDeadline,
+			closeDeadlinePopup
 		}
 	}
 }
@@ -695,6 +781,25 @@ export default {
 			border-radius: 8rpx;
 			padding: 0 20rpx;
 			font-size: 28rpx;
+		}
+	}
+}
+
+.deadline-form {
+	padding: 20rpx;
+
+	.date-picker {
+		width: 100%;
+		height: 80rpx;
+		border: 1rpx solid #ddd;
+		border-radius: 8rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		.picker-text {
+			font-size: 28rpx;
+			color: #666;
 		}
 	}
 }

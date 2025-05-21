@@ -163,15 +163,41 @@
 	}
 
 	function handleLongPress(item) {
+		const itemList = [
+			'编辑',
+			item.status === 1 ? '禁用' : '启用',
+			'删除'
+		]
 		uni.showActionSheet({
-			itemList: ['编辑', '删除'],
+			itemList,
 			success: (res) => {
 				if (res.tapIndex === 0) {
 					handleEdit(item)
 				} else if (res.tapIndex === 1) {
+					handleUpdateStatus(item)
+				} else if (res.tapIndex === 2) {
 					handleDelete(item)
 				}
 			}
+		})
+	}
+
+	function handleUpdateStatus(item) {
+		const newStatus = item.status === 1 ? 0 : 1
+		http.put('/bookkeeping-service/task/plan/updateStatus', {
+			id: item.id,
+			status: newStatus
+		}).then(() => {
+			uni.showToast({
+				icon: 'success',
+				title: newStatus === 1 ? '已启用' : '已禁用'
+			})
+			loadTaskPlanList()
+		}).catch(() => {
+			uni.showToast({
+				icon: 'error',
+				title: '操作失败'
+			})
 		})
 	}
 
