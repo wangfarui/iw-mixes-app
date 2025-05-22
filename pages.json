@@ -122,6 +122,36 @@
 					"style": {
 						"navigationBarTitleText": "账号详情"
 					}
+				},
+				{
+					"path": "my/profile",
+					"style": {
+					  "navigationBarTitleText": "个人信息"
+					}
+				},
+				{
+					"path": "my/security",
+					"style": {
+						"navigationBarTitleText": "账号安全"
+					}
+				},
+				{
+					"path": "my/settings",
+					"style": {
+						"navigationBarTitleText": "系统设置"
+					}
+				},
+				{
+					"path": "my/about",
+					"style": {
+						"navigationBarTitleText": "关于我们"
+					}
+				},
+				{
+					"path": "my/feedback",
+					"style": {
+						"navigationBarTitleText": "意见反馈"
+					}
 				}
 			]
 		},

@@ -55,7 +55,7 @@
 	import {
 		onPullDownRefresh,
 		onReachBottom,
-		onShow
+		onLoad
 	} from '@dcloudio/uni-app'
 	import http from '@/api/request.js'
 
@@ -96,7 +96,7 @@
 		list: []
 	})
 
-	onShow(() => {
+	onLoad(() => {
 		dishesTypes.value = [{
 			dictCode: 0,
 			dictName: '全部'

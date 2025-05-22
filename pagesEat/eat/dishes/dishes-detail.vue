@@ -1,7 +1,7 @@
 <template>
 	<view class="container">
 		<view>
-			<image :src="dishDetail.dishesImage" :alt="dishDetail.dishesName" style="width: 100vw;height: 20vh;" />
+			<image :src="dishDetail.dishesImage" :alt="dishDetail.dishesName" style="width: 100vw;height: 20vh;" @click="previewImage" mode="aspectFill" />
 		</view>
 		<view class="container-item" style="font-weight: bolder;font-size: 18px;">
 			<uni-row>
@@ -104,6 +104,15 @@
 				dishDetail.value = res.data
 			})
 	})
+
+	// 预览图片
+	function previewImage() {
+		if (!dishDetail.value.dishesImage) return;
+		uni.previewImage({
+			urls: [dishDetail.value.dishesImage],
+			current: dishDetail.value.dishesImage
+		});
+	}
 </script>
 
 <style>
