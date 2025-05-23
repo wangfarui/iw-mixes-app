@@ -91,6 +91,12 @@
 					"style": {
 						"navigationBarTitleText": "预算"
 					}
+				},
+				{
+					"path": "bookkeeping/bookkeeping-wallet",
+					"style": {
+						"navigationBarTitleText": "钱包"
+					}
 				}
 			]
 		},
