@@ -84,7 +84,7 @@
 
 	function searchPage() {
 		accountListStatus.value = 'loading'
-		http.post('/auth-service/applicationAccount/page', page)
+		http.post('/auth-service/application/account/page', page)
 			.then(res => {
 				const data = res.data
 				if (data.records && data.records.length == page.pageSize) {
@@ -115,7 +115,7 @@
 	}
 
 	function handleViewPassword(item) {
-		http.get('/auth-service/applicationAccount/viewPassword?id=' + item.id)
+		http.get('/auth-service/application/account/viewPassword?id=' + item.id)
 			.then(res => {
 				uni.showModal({
 					title: '密码信息',

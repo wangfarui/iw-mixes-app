@@ -92,7 +92,7 @@
 	})
 
 	function getAccountDetail(id) {
-		http.get('/auth-service/applicationAccount/detail?id=' + id)
+		http.get('/auth-service/application/account/detail?id=' + id)
 			.then(res => {
 				const data = res.data
 				formData.id = data.id
@@ -116,7 +116,7 @@
 		}
 
 		form.value.validate().then(res => {
-			const url = isEdit.value ? '/auth-service/applicationAccount/update' : '/auth-service/applicationAccount/add'
+			const url = isEdit.value ? '/auth-service/application/account/update' : '/auth-service/application/account/add'
 			const method = isEdit.value ? 'put' : 'post'
 			
 			http[method](url, formData)
@@ -138,7 +138,7 @@
 			content: '确认删除该账号吗？',
 			success: (res) => {
 				if (res.confirm) {
-					http.delete('/auth-service/applicationAccount/delete?id=' + formData.id)
+					http.delete('/auth-service/application/account/delete?id=' + formData.id)
 						.then(res => {
 							uni.showToast({
 								title: '删除成功',
