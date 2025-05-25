@@ -396,7 +396,7 @@ export default {
 			try {
 				const endDate = new Date()
 				endDate.setDate(endDate.getDate() + 7)
-				const response = await http.post('/bookkeeping-service/task/basics/list', {
+				const response = await http.post('/bookkeeping-service/points/task/basics/list', {
 					endDeadlineDate: formatDate(endDate)
 				})
 				taskList.value = response.data
@@ -411,7 +411,7 @@ export default {
 		// 获取收集箱任务
 		const fetchInboxTasks = async () => {
 			try {
-				const response = await http.post('/bookkeeping-service/task/basics/list', {
+				const response = await http.post('/bookkeeping-service/points/task/basics/list', {
 					taskGroupId: 0
 				})
 				taskList.value = response.data
@@ -426,7 +426,7 @@ export default {
 		// 获取已完成任务
 		const fetchDoneTasks = async () => {
 			try {
-				const response = await http.get('/bookkeeping-service/task/basics/doneList')
+				const response = await http.get('/bookkeeping-service/points/task/basics/doneList')
 				taskList.value = response.data
 			} catch (error) {
 				uni.showToast({
@@ -440,7 +440,7 @@ export default {
 		const addTask = async () => {
 			if (!newTaskName.value) return
 			try {
-				await http.post('/bookkeeping-service/task/basics/add', {
+				await http.post('/bookkeeping-service/points/task/basics/add', {
 					taskGroupId: 0,
 					taskName: newTaskName.value,
 					deadlineDate: newTaskDeadline.value
@@ -467,7 +467,7 @@ export default {
 		// 完成任务
 		const completeTask = async (task) => {
 			try {
-				await http.put('/bookkeeping-service/task/basics/updateStatus', {
+				await http.put('/bookkeeping-service/points/task/basics/updateStatus', {
 					id: task.id,
 					taskStatus: 1
 				})
@@ -491,7 +491,7 @@ export default {
 		// 取消完成任务
 		const cancelCompleteTask = async (task) => {
 			try {
-				await http.put('/bookkeeping-service/task/basics/updateStatus', {
+				await http.put('/bookkeeping-service/points/task/basics/updateStatus', {
 					id: task.id,
 					taskStatus: 0
 				})
@@ -511,7 +511,7 @@ export default {
 		// 删除任务
 		const deleteTask = async (task) => {
 			try {
-				await http.put('/bookkeeping-service/task/basics/updateStatus', {
+				await http.put('/bookkeeping-service/points/task/basics/updateStatus', {
 					id: task.id,
 					taskStatus: 3
 				})
@@ -549,7 +549,7 @@ export default {
 		// 保存截止日期
 		const saveDeadline = async () => {
 			try {
-				await http.put('/bookkeeping-service/task/basics/updateTaskParam', {
+				await http.put('/bookkeeping-service/points/task/basics/updateTaskParam', {
 					id: deadlineForm.value.taskId,
 					deadlineDate: deadlineForm.value.deadlineDate
 				})

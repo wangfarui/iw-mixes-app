@@ -66,7 +66,7 @@
 
 	// 获取待完成任务列表
 	function getTodoList() {
-		http.post('/bookkeeping-service/task/basics/list', {
+		http.post('/bookkeeping-service/points/task/basics/list', {
 			taskGroupId: 0
 		}).then(res => {
 			todoList.value = res.data.map(item => ({
@@ -79,7 +79,7 @@
 	// 获取已完成任务列表
 	function getDoneList() {
 		loadMoreStatus.value = 'loading'
-		http.get('/bookkeeping-service/task/basics/doneList?taskGroupId=0&currentPage=' + page.currentPage).then(res => {
+		http.get('/bookkeeping-service/points/task/basics/doneList?taskGroupId=0&currentPage=' + page.currentPage).then(res => {
 			const data = res.data
 			if (page.currentPage === 1) {
 				doneList.value = data
@@ -102,7 +102,7 @@
 			return
 		}
 		
-		http.post('/bookkeeping-service/task/basics/add', {
+		http.post('/bookkeeping-service/points/task/basics/add', {
 			taskGroupId: 0,
 			taskName: taskName.value
 		}).then(() => {
@@ -118,7 +118,7 @@
 		
 		// 等待动画完成后执行接口调用
 		setTimeout(() => {
-			http.put('/bookkeeping-service/task/basics/updateStatus', {
+			http.put('/bookkeeping-service/points/task/basics/updateStatus', {
 				id: item.id,
 				taskStatus: 1
 			}).then(() => {
@@ -135,7 +135,7 @@
 
 	// 已完成任务取消勾选
 	function handleDoneCheck(item) {
-		http.put('/bookkeeping-service/task/basics/updateStatus', {
+		http.put('/bookkeeping-service/points/task/basics/updateStatus', {
 			id: item.id,
 			taskStatus: 0
 		}).then(() => {
