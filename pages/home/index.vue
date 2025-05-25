@@ -178,7 +178,7 @@ const getToday = () => {
 const fetchBillTotalAmount = async () => {
 	const today = getToday()
 	try {
-		const res = await http.post('/bookkeeping-service/consume/totalStatistics', {
+		const res = await http.post('/bookkeeping-service/bookkeeping/consume/totalStatistics', {
 			recordCategory: 1,
 			currentStartMonth: today,
 			currentEndMonth: today

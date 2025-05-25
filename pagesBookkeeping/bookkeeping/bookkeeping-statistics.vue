@@ -232,7 +232,7 @@
 		// 加载上个月和当前月数据
 		if (compareLastMonth.value && !loadedLastMonth.value) {
 			statistics.pageDto.isQueryLastMonth = compareLastMonth.value
-			http.post('/bookkeeping-service/consume/categoryStatistics', statistics.pageDto)
+			http.post('/bookkeeping-service/bookkeeping/consume/categoryStatistics', statistics.pageDto)
 				.then(res => {
 					categoryData.categoryList = res.data.map(item => ({
 						recordTypeName: dictStore.getDictNameByCode(dictStore.dictTypeEnum
@@ -268,7 +268,7 @@
 
 	function loadTotalStatisticsData() {
 		return new Promise((resolve) => {
-			http.post('/bookkeeping-service/consume/totalStatistics', statistics.pageDto)
+			http.post('/bookkeeping-service/bookkeeping/consume/totalStatistics', statistics.pageDto)
 				.then(res => {
 					statistics.totalAmount = res.data.totalAmount
 					statistics.totalRecordNum = res.data.totalRecordNum
@@ -279,7 +279,7 @@
 
 	function loadRankStatisticsData() {
 		return new Promise((resolve) => {
-			http.post('/bookkeeping-service/consume/rankStatistics', statistics.pageDto)
+			http.post('/bookkeeping-service/bookkeeping/consume/rankStatistics', statistics.pageDto)
 				.then(res => {
 					statistics.rankList = res.data
 					resolve(true)
@@ -289,7 +289,7 @@
 
 	function loadCategoryStatisticsData() {
 		return new Promise((resolve) => {
-			http.post('/bookkeeping-service/consume/categoryStatistics', statistics.pageDto)
+			http.post('/bookkeeping-service/bookkeeping/consume/categoryStatistics', statistics.pageDto)
 				.then(res => {
 					categoryData.categoryList = res.data.map(item => ({
 						recordTypeName: dictStore.getDictNameByCode(dictStore.dictTypeEnum
