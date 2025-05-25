@@ -85,11 +85,11 @@
 	const alertDialog = ref(null)
 
 	onLoad((option) => {
-		http.get('/eat-service/meal/detail?id=' + option.id)
+		http.get('/eat-service/eat/meal/detail?id=' + option.id)
 			.then(res => {
 				mealDetail.value = res.data
 			})
-		http.get('/eat-service/meal/dishes/materialDetail?id=' + option.id)
+		http.get('/eat-service/eat/meal/dishes/materialDetail?id=' + option.id)
 			.then(res => {
 				dishesMaterialDetail.value = res.data
 			})
@@ -106,7 +106,7 @@
 	}
 
 	function dialogConfirm() {
-		http.delete('/eat-service/meal/delete?id=' + mealDetail.value.id)
+		http.delete('/eat-service/eat/meal/delete?id=' + mealDetail.value.id)
 			.then(res => {
 				uni.switchTab({
 					url: '/pagesEat/eat/meal/index'

@@ -136,7 +136,7 @@
 			})
 		}
 
-		http.post('/eat-service/meal/add', formData.value)
+		http.post('/eat-service/eat/meal/add', formData.value)
 			.then(res => {
 				initFormData()
 				cartStore.initCart()

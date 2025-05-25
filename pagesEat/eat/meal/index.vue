@@ -65,7 +65,7 @@
 
 	function searchPage() {
 		mealListStatus.value = 'loading'
-		http.post('/eat-service/meal/page', page.dto)
+		http.post('/eat-service/eat/meal/page', page.dto)
 			.then(res => {
 				const data = res.data
 				if (data.records && data.records.length == page.dto.pageSize) {
