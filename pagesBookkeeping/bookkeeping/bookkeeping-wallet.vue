@@ -17,7 +17,7 @@ const newBalance = ref('')
 
 const getWalletBalance = async () => {
     try {
-        const res = await http.get('/bookkeeping-service/wallet/balance')
+        const res = await http.get('/bookkeeping-service/bookkeeping/wallet/balance')
         if (res.data) {
             walletBalance.value = res.data.walletBalance
         }
@@ -34,7 +34,7 @@ const showUpdateDialog = () => {
         success: async (res) => {
             if (res.confirm && res.content) {
                 try {
-                    await http.put('/bookkeeping-service/wallet/updateBalance', {
+                    await http.put('/bookkeeping-service/bookkeeping/wallet/updateBalance', {
                         walletBalance: res.content
                     })
                     uni.showToast({
