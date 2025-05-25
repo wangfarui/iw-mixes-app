@@ -331,7 +331,7 @@
 	 */
 	function searchStatistics() {
 		return new Promise((resolve) => {
-			http.post('/bookkeeping-service/bookkeepingRecords/statistics', page.dto)
+			http.post('/bookkeeping-service/bookkeeping/records/statistics', page.dto)
 				.then(res => {
 					page.statistics = res.data
 					resolve(true)
@@ -344,7 +344,7 @@
 	 */
 	function searchPage() {
 		return new Promise((resolve) => {
-			http.post('/bookkeeping-service/bookkeepingRecords/page', page.dto)
+			http.post('/bookkeeping-service/bookkeeping/records/page', page.dto)
 				.then(res => {
 					const data = res.data
 					if (data.records && data.records.length == page.dto.pageSize) {

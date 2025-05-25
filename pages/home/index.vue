@@ -193,7 +193,7 @@ const fetchBillTotalAmount = async () => {
 const fetchBillRecords = async () => {
 	const today = getToday()
 	try {
-		const res = await http.post('/bookkeeping-service/bookkeepingRecords/page', {
+		const res = await http.post('/bookkeeping-service/bookkeeping/records/page', {
 			recordStartDate: today,
 			recordEndDate: today,
 			recordCategory: 1,

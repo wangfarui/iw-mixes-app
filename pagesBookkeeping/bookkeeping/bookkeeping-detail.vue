@@ -101,7 +101,7 @@
 	})
 	
 	onShow(() => {
-		http.get('/bookkeeping-service/bookkeepingRecords/detail?id=' + detailId.value)
+		http.get('/bookkeeping-service/bookkeeping/records/detail?id=' + detailId.value)
 			.then(res => {
 				detail.value = res.data
 			})
@@ -114,7 +114,7 @@
 	}
 	
 	function deleteRecord() {
-		http.delete('/bookkeeping-service/bookkeepingRecords/delete?id=' + detail.value.id)
+		http.delete('/bookkeeping-service/bookkeeping/records/delete?id=' + detail.value.id)
 			.then(res => {
 				uni.navigateBack({});
 			})

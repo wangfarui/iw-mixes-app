@@ -133,7 +133,7 @@
 	// 获取统计数据
 	function getStatistics() {
 		const dateRange = getMonthRange(currentDate.value)
-		http.post('/bookkeeping-service/bookkeepingRecords/statistics', {
+		http.post('/bookkeeping-service/bookkeeping/records/statistics', {
 			recordStartDate: dateRange.start,
 			recordEndDate: dateRange.end
 		}).then(res => {
@@ -147,7 +147,7 @@
 	function getBillList() {
 		loadMoreStatus.value = 'loading'
 		const dateRange = getMonthRange(currentDate.value)
-		http.post('/bookkeeping-service/bookkeepingRecords/page', {
+		http.post('/bookkeeping-service/bookkeeping/records/page', {
 			currentPage: page.currentPage,
 			pageSize: page.pageSize,
 			recordStartDate: dateRange.start,

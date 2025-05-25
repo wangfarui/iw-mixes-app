@@ -219,7 +219,7 @@
 
 	function initFormData() {
 		if (isUpdateForm.value) {
-			http.get('/bookkeeping-service/bookkeepingRecords/detail?id=' + updateFormId.value)
+			http.get('/bookkeeping-service/bookkeeping/records/detail?id=' + updateFormId.value)
 				.then(res => {
 					isExcitationRecord.value = res.data.isExcitationRecord == 1
 					isNotStatistics.value = res.data.isStatistics == 0
@@ -249,7 +249,7 @@
 	}
 
 	function loadTodayConsume() {
-		http.post('/bookkeeping-service/bookkeepingRecords/list', {})
+		http.post('/bookkeeping-service/bookkeeping/records/list', {})
 			.then(res => {
 				toDayRecords.value = res.data
 				if (res.data != null) {
@@ -313,9 +313,9 @@
 		}
 		formData.value.isStatistics = isNotStatistics.value ? 0 : 1
 
-		let url = '/bookkeeping-service/bookkeepingRecords/add';
+		let url = '/bookkeeping-service/bookkeeping/records/add';
 		if (isUpdateForm.value) {
-			url = '/bookkeeping-service/bookkeepingRecords/update';
+			url = '/bookkeeping-service/bookkeeping/records/update';
 		}
 		const method = isUpdateForm.value ? 'put' : 'post';
 		http.request(url, method, formData.value)

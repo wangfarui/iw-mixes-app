@@ -373,7 +373,7 @@ function submitBookkeeping() {
 		fileList: formData.value.fileList
 	}
 
-	http.post('/bookkeeping-service/bookkeepingRecords/add', submitData)
+	http.post('/bookkeeping-service/bookkeeping/records/add', submitData)
 		.then(() => {
 			uni.showToast({
 				title: '保存成功',
