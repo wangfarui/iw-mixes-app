@@ -67,7 +67,7 @@ function selectCategory(category) {
 }
 
 function fetchActions() {
-	http.get(`/bookkeeping-service/actions/list?recordCategory=${selectedCategory.value}`)
+	http.get(`/bookkeeping-service/bookkeeping/actions/list?recordCategory=${selectedCategory.value}`)
 		.then(res => {
 			actions.value = res.data
 		})
@@ -154,7 +154,7 @@ function endDrag(event) {
 			newSort = currentAction.sort
 		}
 		
-		http.put('/bookkeeping-service/actions/update', {
+		http.put('/bookkeeping-service/bookkeeping/actions/update', {
 			...currentAction,
 			sort: newSort
 		})
@@ -169,7 +169,7 @@ function confirmDelete(action) {
 
 function deleteAction() {
 	if (actionToDelete.value) {
-		http.delete(`/bookkeeping-service/actions/delete?id=${actionToDelete.value.id}`)
+		http.delete(`/bookkeeping-service/bookkeeping/actions/delete?id=${actionToDelete.value.id}`)
 			.then(() => {
 				fetchActions()
 				closeDeletePopup()

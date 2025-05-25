@@ -118,7 +118,7 @@ onMounted(() => {
 
 // 获取详情
 function fetchDetail(id) {
-	http.get(`/bookkeeping-service/actions/detail?id=${id}`)
+	http.get(`/bookkeeping-service/bookkeeping/actions/detail?id=${id}`)
 		.then(res => {
 			formData.value = res.data
 		})
@@ -156,7 +156,7 @@ function submitForm() {
 			submitData.id = detailId.value
 		}
 		
-		const url = detailId.value ? '/bookkeeping-service/actions/update' : '/bookkeeping-service/actions/add'
+		const url = detailId.value ? '/bookkeeping-service/bookkeeping/actions/update' : '/bookkeeping-service/bookkeeping/actions/add'
 		const method = detailId.value ? 'put' : 'post'
 		
 		http[method](url, submitData).then(() => {

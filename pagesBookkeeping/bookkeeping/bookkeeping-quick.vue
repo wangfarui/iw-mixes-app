@@ -231,7 +231,7 @@ function selectCategory(category) {
 }
 
 function fetchActions() {
-	http.get(`/bookkeeping-service/actions/list?recordCategory=${selectedCategory.value}`)
+	http.get(`/bookkeeping-service/bookkeeping/actions/list?recordCategory=${selectedCategory.value}`)
 		.then(res => {
 			actions.value = res.data
 		})
