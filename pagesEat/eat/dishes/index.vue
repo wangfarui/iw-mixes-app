@@ -137,7 +137,7 @@
 	const fetchDishes = (dishesType) => {
 		triggered.value = true
 		dishesListStatus.value = 'loading'
-		http.post('/eat-service/dishes/page', dishesPage.pageParam)
+		http.post('/eat-service/eat/dishes/page', dishesPage.pageParam)
 			.then(res => {
 				if (res.data.records && res.data.records.length == dishesPage.pageParam.pageSize) {
 					dishesListStatus.value = 'more'
