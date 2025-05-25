@@ -221,7 +221,7 @@ onLoad((options) => {
 // 获取菜品详情
 const getDishDetail = async (id) => {
   try {
-    const res = await http.get(`/bookkeeping-service/dishes/detail?id=${id}`)
+    const res = await http.get(`/bookkeeping-service/eat/dishes/detail?id=${id}`)
     const detail = res.data
     
     // 填充表单数据
@@ -355,10 +355,10 @@ const submitForm = async () => {
     if (formData.id) {
       // 编辑模式
       requestData.id = formData.id
-      await http.put('/bookkeeping-service/dishes/update', requestData)
+      await http.put('/bookkeeping-service/eat/dishes/update', requestData)
     } else {
       // 新增模式
-      await http.post('/bookkeeping-service/dishes/add', requestData)
+      await http.post('/bookkeeping-service/eat/dishes/add', requestData)
     }
     
     uni.showToast({

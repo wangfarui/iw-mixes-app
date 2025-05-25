@@ -99,7 +99,7 @@
 		if (option.operate && option.operate == 'edit') {
 			isEditOperate.value = true
 		}
-		http.get('/eat-service/dishes/detail?id=' + option.id)
+		http.get('/eat-service/eat/dishes/detail?id=' + option.id)
 			.then(res => {
 				dishDetail.value = res.data
 			})

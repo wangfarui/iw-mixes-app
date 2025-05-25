@@ -206,7 +206,7 @@
 
 	// 删除菜品
 	const deleteDish = async (id) => {
-		await http.delete(`/bookkeeping-service/dishes/delete?id=${id}`)
+		await http.delete(`/bookkeeping-service/eat/dishes/delete?id=${id}`)
 		uni.showToast({
 			title: '删除成功',
 			icon: 'success'

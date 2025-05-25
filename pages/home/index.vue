@@ -329,7 +329,7 @@ const fetchPointsRecords = async () => {
 
 const fetchRecipes = async () => {
 	try {
-		const res = await http.get('/bookkeeping-service/dishes/recommendDishes')
+		const res = await http.get('/bookkeeping-service/eat/dishes/recommendDishes')
 		const arr = res?.data || []
 		recipes.value = arr.map(item => ({
 			id: item.id,
