@@ -62,7 +62,7 @@
 								步骤 {{ index + 1 }}
 						</view>
 						<view v-if="item.stepImage" style="margin-bottom: 10px;">
-							<image :src="item.stepImage" mode="heightFix"  />
+							<image :src="item.stepImage" mode="heightFix" @click="previewStepImage(item.stepImage)" />
 						</view>
 						<view style="font-size: 14px;">
 							{{item.stepContent}}
@@ -111,6 +111,19 @@
 		uni.previewImage({
 			urls: [dishDetail.value.dishesImage],
 			current: dishDetail.value.dishesImage
+		});
+	}
+
+	// 预览步骤图片
+	function previewStepImage(currentImage) {
+		if (!currentImage) return;
+		const allStepImages = dishDetail.value.dishesCreationMethodList
+			.filter(step => step.stepImage)
+			.map(step => step.stepImage);
+		
+		uni.previewImage({
+			urls: allStepImages,
+			current: currentImage
 		});
 	}
 </script>

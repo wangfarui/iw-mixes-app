@@ -108,9 +108,13 @@
 	function dialogConfirm() {
 		http.delete('/eat-service/eat/meal/delete?id=' + mealDetail.value.id)
 			.then(res => {
-				uni.switchTab({
-					url: '/pagesEat/eat/meal/index'
-				});
+				uni.showToast({
+					title: '删除成功',
+					icon: 'success'
+				})
+				setTimeout(() => {
+					uni.navigateBack()
+				}, 1500)
 			})
 	}
 </script>

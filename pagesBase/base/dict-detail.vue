@@ -12,6 +12,13 @@
 								placeholder="请选择字典类型"
 							/>
 						</uni-forms-item>
+						<uni-forms-item label="字典编码">
+							<uni-easyinput
+								v-model="formData.dictCode"
+								type="number"
+								placeholder="请输入字典编码"
+							/>
+						</uni-forms-item>
 						<uni-forms-item label="字典名称" required>
 							<uni-easyinput
 								v-model="formData.dictName"
@@ -29,7 +36,7 @@
 				</view>
                 <!-- 底部按钮 -->
                 <view class="popup-footer">
-                    <button class="cancel-button" @click="handleDelete">删除</button>
+                    <button v-if="isEdit" class="cancel-button" @click="handleDelete">删除</button>
 					<button class="confirm-button" @click="handleSave">保存</button>
 				</view>
 			</uni-section>
@@ -44,6 +51,9 @@
 	import {
 		useDictStore
 	} from "@/stores/dict.ts"
+	import {
+		refreshDictCache
+	} from "@/api/login.js";
 
 	const dictStore = useDictStore()
 	const form = ref(null)
@@ -53,7 +63,8 @@
 		id: '',
 		dictType: '',
 		dictName: '',
-		dictStatus: '1'
+		dictStatus: '1',
+		dictCode: ''
 	})
 
 	const dictTypeOptions = ref(dictStore.getDictTypeArray().map(item => ({
@@ -101,6 +112,7 @@
 				formData.dictType = data.dictType
 				formData.dictName = data.dictName
 				formData.dictStatus = data.dictStatus
+				formData.dictCode = data.dictCode
 			})
 	}
 
@@ -115,6 +127,7 @@
 						title: '保存成功',
 						icon: 'success'
 					})
+					refreshDictCache()
 					setTimeout(() => {
 						uni.navigateBack()
 					}, 1500)
@@ -153,6 +166,9 @@
 		padding: 10px;
 		border-radius: 5px;
 		margin-bottom: 10px;
+	}
+	:deep(.uni-forms-item__label) {
+		width: 100px !important;
 	}
 	.button-section {
 		display: flex;
