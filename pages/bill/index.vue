@@ -180,7 +180,11 @@
 
 	// 功能按钮点击
 	function handleFunctionClick(item) {
-		if (item.text === '明细') {
+		if (item.text === '记账') {
+			uni.navigateTo({
+				url: '/pagesBookkeeping/bookkeeping/bookkeeping-quick'
+			})
+		} else if (item.text === '明细') {
 			uni.navigateTo({
 				url: '/pagesBookkeeping/bookkeeping/bookkeeping-records'
 			})
@@ -188,13 +192,13 @@
 			uni.navigateTo({
 				url: '/pagesBookkeeping/bookkeeping/bookkeeping-statistics'
 			})
-		} else if (item.text === '记账') {
-			uni.navigateTo({
-				url: '/pagesBookkeeping/bookkeeping/bookkeeping-quick'
-			})
 		} else if (item.text === '预算') {
 			uni.navigateTo({
 				url: '/pagesBookkeeping/bookkeeping/bookkeeping-budget'
+			})
+		} else if (item.text === '收入统计') {
+			uni.navigateTo({
+				url: '/pagesBookkeeping/bookkeeping/bookkeeping-income-statistics'
 			})
 		} else {
 			uni.showToast({
