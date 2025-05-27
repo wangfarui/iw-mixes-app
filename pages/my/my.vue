@@ -131,9 +131,9 @@
 			content: '确定要退出登录吗？',
 			success: (res) => {
 				if (res.confirm) {
+					logout()
 					uni.removeStorageSync('iwtoken')
 					uni.removeStorageSync('userInfo')
-					logout()
 					uni.reLaunch({
 						url: '/pages/login'
 					})

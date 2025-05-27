@@ -397,7 +397,8 @@ export default {
 				const endDate = new Date()
 				endDate.setDate(endDate.getDate() + 7)
 				const response = await http.post('/bookkeeping-service/points/task/basics/list', {
-					endDeadlineDate: formatDate(endDate)
+					endDeadlineDate: formatDate(endDate),
+					sortDeadline: true
 				})
 				taskList.value = response.data
 			} catch (error) {
@@ -412,7 +413,8 @@ export default {
 		const fetchInboxTasks = async () => {
 			try {
 				const response = await http.post('/bookkeeping-service/points/task/basics/list', {
-					taskGroupId: 0
+					taskGroupId: 0,
+					sortDeadline: true
 				})
 				taskList.value = response.data
 			} catch (error) {

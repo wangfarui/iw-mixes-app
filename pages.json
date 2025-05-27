@@ -83,7 +83,13 @@
 				{
 					"path": "bookkeeping/bookkeeping-statistics",
 					"style": {
-						"navigationBarTitleText": "收支分析"
+						"navigationBarTitleText": "支出统计"
+					}
+				},
+				{
+					"path": "bookkeeping/bookkeeping-income-statistics",
+					"style": {
+						"navigationBarTitleText": "收入统计"
 					}
 				},
 				{

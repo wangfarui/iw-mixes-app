@@ -69,8 +69,13 @@ const menuList = [{
 			},
 			{
 				url: '/static/menus/bookkeeping-statistics.png',
-				text: '收支分析',
+				text: '支出统计',
 				path: '/pagesBookkeeping/bookkeeping/bookkeeping-statistics'
+			},
+			{
+				url: '/static/menus/bookkeeping-income-statistics.png',
+				text: '收入统计',
+				path: '/pagesBookkeeping/bookkeeping/bookkeeping-income-statistics'
 			},
 			{
 				url: '/static/menus/bookkeeping-wallet.png',
