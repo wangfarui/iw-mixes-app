@@ -190,7 +190,7 @@
 			})
 		} else if (item.text === '支出统计') {
 			uni.navigateTo({
-				url: '/pagesBookkeeping/bookkeeping/bookkeeping-statistics'
+				url: '/pagesBookkeeping/bookkeeping/bookkeeping-consume-statistics'
 			})
 		} else if (item.text === '预算') {
 			uni.navigateTo({

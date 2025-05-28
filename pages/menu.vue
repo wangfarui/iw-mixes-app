@@ -70,7 +70,7 @@ const menuList = [{
 			{
 				url: '/static/menus/bookkeeping-statistics.png',
 				text: '支出统计',
-				path: '/pagesBookkeeping/bookkeeping/bookkeeping-statistics'
+				path: '/pagesBookkeeping/bookkeeping/bookkeeping-consume-statistics'
 			},
 			{
 				url: '/static/menus/bookkeeping-income-statistics.png',

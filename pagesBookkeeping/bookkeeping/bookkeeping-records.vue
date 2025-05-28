@@ -217,6 +217,7 @@
 		page.list = []
 		page.dto.currentPage = 1;
 		page.dto.pageSize = 20;
+		page.dto.isSearchAll = ignoreNotStatistics.value ? 0 : 1
 	}
 	
 	onLoad((option) => {

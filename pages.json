@@ -81,7 +81,7 @@
 					}
 				},
 				{
-					"path": "bookkeeping/bookkeeping-statistics",
+					"path": "bookkeeping/bookkeeping-consume-statistics",
 					"style": {
 						"navigationBarTitleText": "支出统计"
 					}

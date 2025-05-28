@@ -68,6 +68,7 @@
                     class="ranking-item" 
                     v-for="(item, index) in incomeRanking" 
                     :key="index"
+                    @tap="goToDetail(item)"
                 >
                     <text class="rank">{{ index + 1 }}</text>
                     <text class="name">{{ item.recordSource }}</text>
@@ -300,6 +301,13 @@ const fetchIncomeData = async () => {
         // 渲染空图表
         renderChart();
     }
+};
+
+// 跳转到账单详情
+const goToDetail = (item) => {
+    uni.navigateTo({
+        url: '/pagesBookkeeping/bookkeeping/bookkeeping-detail?id=' + item.id
+    });
 };
 
 // 监听统计维度和日期变化，自动刷新数据和图表
