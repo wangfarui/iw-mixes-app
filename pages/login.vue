@@ -3,14 +3,17 @@
 		<view class="login-container">
 			<view class="logo">IW服务平台</view>
 			<uni-forms ref="valiForm" :modelValue="loginForm" class="login-form">
-				<uni-forms-item name="account">
-					<uni-easyinput prefixIcon="person" v-model="loginForm.account" maxlength="11"
-						:placeholder="loginWay == '1' ? '请输入用户名或手机号' : '请输入手机号'" />
+				<uni-forms-item v-if="loginWay == '3'" name="account">
+					<uni-easyinput prefixIcon="person" v-model="loginForm.account" maxlength="11" placeholder="请输入用户名或手机号" />
 				</uni-forms-item>
-				<uni-forms-item v-if="loginWay == '1'" name="password">
+				<uni-forms-item v-else name="account">
+					<uni-easyinput prefixIcon="person" v-model="loginForm.account" :maxlength="loginWay == '1' ? 11 : 64"
+						:placeholder="loginWay == '1' ? '请输入手机号' : '请输入邮箱'" />
+				</uni-forms-item>
+				<uni-forms-item v-if="loginWay == '3'" name="password">
 					<uni-easyinput type="password" prefixIcon="locked" v-model="loginForm.password" placeholder="请输入密码" />
 				</uni-forms-item>
-				<uni-forms-item v-if="loginWay != '1'" name="verificationCode">
+				<uni-forms-item v-if="loginWay != '3'" name="verificationCode">
 					<uni-easyinput v-model="loginForm.verificationCode" placeholder="请输入验证码" maxlength="6">
 						<template #left>
 							<uni-icons custom-prefix="iconfont" type="icon-yanzhengma" size="24" color="#cccccc"
@@ -30,24 +33,26 @@
 						</template>
 					</uni-easyinput>
 				</uni-forms-item>
-				<uni-forms-item v-if="loginWay == '3'" name="password">
-					<uni-easyinput type="password" prefixIcon="locked" v-model="loginForm.password" placeholder="请输入密码" />
-				</uni-forms-item>
 			</uni-forms>
-			<button type="primary" class="login-btn" @click="loginFun('valiForm')">{{loginWay == '3' ? '注册/登录' : '登录'}}</button>
+			<button type="primary" class="login-btn" @click="loginFun('valiForm')">登录</button>
 			<view class="login-options">
-				<uni-row>
+				<uni-row v-if="loginWay == '3'">
+					<uni-col :span="12">
+						<view class="option-item" @click="clickLoginWay(1)">手机号登录</view>
+					</uni-col>
+					<uni-col :span="12">
+						<view class="option-item right" @click="clickLoginWay(2)">邮箱登录</view>
+					</uni-col>
+				</uni-row>
+				<uni-row v-if="loginWay == '1' || loginWay == '2'">
+					<uni-col :span="12">
+						<view class="option-item" @click="clickLoginWay(3)">账号登录</view>
+					</uni-col>
 					<uni-col v-if="loginWay == '1'" :span="12">
-						<view class="option-item" @click="clickLoginWay(2)">验证码登录</view>
+						<view class="option-item right" @click="clickLoginWay(2)">邮箱登录</view>
 					</uni-col>
-					<uni-col v-if="loginWay != '1'" :span="12">
-						<view class="option-item" @click="clickLoginWay(1)">账号登录</view>
-					</uni-col>
-					<uni-col v-if="loginWay == '3'" :span="12">
-						<view class="option-item right" @click="clickLoginWay(2)">验证码登录</view>
-					</uni-col>
-					<uni-col v-if="loginWay != '3'" :span="12">
-						<view class="option-item right" @click="clickLoginWay(3)">注册账号</view>
+					<uni-col v-if="loginWay == '2'" :span="12">
+						<view class="option-item right" @click="clickLoginWay(1)">手机号登录</view>
 					</uni-col>
 				</uni-row>
 			</view>
@@ -76,10 +81,9 @@
 	import {
 		loginByPasswordApi,
 		loginByVerificationCodeApi,
-		registerAndLoginApi,
 		refreshDictCache,
-		getVerificationCodeApi,
-		getVerificationCodeByActionApi
+		getPhoneVerificationCodeApi,
+		getEmailVerificationCodeApi
 	} from "@/api/login.js";
 
 	import {
@@ -95,7 +99,7 @@
 		verificationCode: ''
 	})
 
-	const loginWay = ref('1') // 登录方式 1密码登录 2验证码登录 3注册账号
+	const loginWay = ref('3') // 登录方式 1手机号登录 2邮箱登录 3账号登录
 	const isCountingDown = ref(false) // 标记是否处于倒计时状态
 	const count = ref(60) // 初始倒计时时间
 	const showLoading = ref(false)
@@ -143,21 +147,35 @@
 		if (loginForm.account == '') {
 			uni.showToast({
 				icon: 'error',
-				title: `请输入手机号`
+				title: `请输入${loginWay.value == '2' ? '邮箱' : '手机号'}`
 			})
 			return
 		}
-		if (isValidPhoneNumber(loginForm.account) === false) {
-			uni.showToast({
-				icon: 'error',
-				title: `手机号格式错误`
-			})
-			return
+		if (loginWay.value == '2') {
+			if (!isValidEmail(loginForm.account)) {
+				uni.showToast({
+					icon: 'error',
+					title: `邮箱格式错误`
+				})
+				return
+			}
+		} else {
+			if (!isValidPhoneNumber(loginForm.account)) {
+				uni.showToast({
+					icon: 'error',
+					title: `手机号格式错误`
+				})
+				return
+			}
 		}
 		
 		try {
 			isGettingCode.value = true
-			await getVerificationCodeApi(loginForm.account)
+			if (loginWay.value == '2') {
+				await getEmailVerificationCodeApi(loginForm.account)
+			} else {
+				await getPhoneVerificationCodeApi(loginForm.account)
+			}
 			uni.showToast({
 				icon: 'success',
 				title: `验证码已发送`
@@ -176,6 +194,11 @@
 	function isValidPhoneNumber(phone) {
 		const regex = /^1[3-9]\d{9}$/;
 		return regex.test(phone);
+	}
+
+	function isValidEmail(email) {
+		const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+		return regex.test(email);
 	}
 
 	function startCountdown() {
@@ -197,7 +220,7 @@
 		uni.showLoading({
 			title: '登录中'
 		});
-		if (loginWay.value == '1') {
+		if (loginWay.value == '3') {
 			// 检查是否与保存的账号密码一致
 			if (!checkSavedCredentials()) {
 				// 如果不一致，弹出提示框
@@ -217,22 +240,14 @@
 				// 如果一致，直接登录
 				doLogin()
 			}
-		} else if (loginWay.value == '2') {
-			loginForm.phoneNumber = loginForm.account
+		} else if (loginWay.value == '1' || loginWay.value == '2') {
+			if (loginWay.value == '1') {
+				loginForm.phoneNumber = loginForm.account
+			} else {
+				loginForm.emailAddress = loginForm.account
+			}
+			loginForm.loginWay = loginWay.value
 			loginByVerificationCodeApi(loginForm).then(res => {
-				loginSuccessAfter(res)
-			}).catch(err => {
-				setTimeout(() => {
-					uni.hideLoading();
-				}, 1500);
-			}).finally(() => {
-				if (uni.getStorageSync('loading')) {
-					uni.hideLoading();
-				}
-			})
-		} else if (loginWay.value == '3') {
-			loginForm.phoneNumber = loginForm.account
-			registerAndLoginApi(loginForm).then(res => {
 				loginSuccessAfter(res)
 			}).catch(err => {
 				setTimeout(() => {
