@@ -131,7 +131,7 @@
 		}
 		
 		try {
-			const res = await http.post('/bookkeeping-service/task/plan/page', params)
+			const res = await http.post('/bookkeeping-service/points/task/plan/page', params)
 			const { records, total: totalCount } = res.data
 			
 			if (isLoadMore) {
@@ -184,7 +184,7 @@
 
 	function handleUpdateStatus(item) {
 		const newStatus = item.status === 1 ? 0 : 1
-		http.put('/bookkeeping-service/task/plan/updateStatus', {
+		http.put('/bookkeeping-service/points/task/plan/updateStatus', {
 			id: item.id,
 			status: newStatus
 		}).then(() => {
@@ -212,7 +212,7 @@
 			content: `是否删除【${item.taskName}】任务计划？`,
 			success: function (res) {
 				if (res.confirm) {
-					http.delete(`/bookkeeping-service/task/plan/delete?id=${item.id}`)
+					http.delete(`/bookkeeping-service/points/task/plan/delete?id=${item.id}`)
 						.then(() => {
 							uni.showToast({
 								icon: 'success',

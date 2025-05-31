@@ -129,7 +129,7 @@ onMounted(() => {
 
 async function loadTaskDetail() {
 	try {
-		const res = await http.get(`/bookkeeping-service/task/plan/detail?id=${taskId.value}`)
+		const res = await http.get(`/bookkeeping-service/points/task/plan/detail?id=${taskId.value}`)
 		const detail = res.data
 		
 		// 更新表单数据
@@ -168,9 +168,9 @@ async function handleSubmit() {
 		
 		if (isEdit.value) {
 			submitData.id = taskId.value
-			await http.put('/bookkeeping-service/task/plan/update', submitData)
+			await http.put('/bookkeeping-service/points/task/plan/update', submitData)
 		} else {
-			await http.post('/bookkeeping-service/task/plan/add', submitData)
+			await http.post('/bookkeeping-service/points/task/plan/add', submitData)
 		}
 		
 		uni.showToast({
