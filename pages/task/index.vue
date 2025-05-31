@@ -327,7 +327,7 @@ export default {
 		// 显示积分设置弹窗
 		const showPointsPopup = async (task) => {
 			try {
-				const response = await http.get('/bookkeeping-service/task/relation/getByTaskId?taskId=' + task.id)
+				const response = await http.get('/bookkeeping-service/points/task/relation/getByTaskId?taskId=' + task.id)
 				pointsForm.value = {
 					taskId: task.id,
 					rewardPoints: response?.data?.rewardPoints || '',
@@ -363,7 +363,7 @@ export default {
 			}
 
 			try {
-				await http.post('/bookkeeping-service/task/relation/save', {
+				await http.post('/bookkeeping-service/points/task/relation/save', {
 					taskId,
 					rewardPoints: rewardPoints ? Number(rewardPoints) : 0,
 					punishPoints: punishPoints ? Number(punishPoints) : 0
