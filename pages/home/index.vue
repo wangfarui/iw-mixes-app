@@ -226,7 +226,7 @@ const get7DaysLater = () => {
 const fetchTaskRecords = async () => {
 	try {
 		const endDeadlineDate = get7DaysLater()
-		const res = await http.post('/bookkeeping-service/points/task/basics/list', {
+		const res = await http.post('/points-service/points/task/basics/list', {
 			endDeadlineDate
 		})
 		const records = res?.data || []
@@ -298,7 +298,7 @@ const getDeadlineColor = (deadline) => {
 
 const fetchPointsBalance = async () => {
 	try {
-		const res = await http.get('/bookkeeping-service/points/total/getPointsBalance')
+		const res = await http.get('/points-service/points/total/getPointsBalance')
 		pointsBalance.value = res?.data ?? 0
 	} catch (e) {
 		pointsBalance.value = 0
@@ -308,7 +308,7 @@ const fetchPointsBalance = async () => {
 const fetchPointsRecords = async () => {
 	const today = getToday()
 	try {
-		const res = await http.post('/bookkeeping-service/points/records/page', {
+		const res = await http.post('/points-service/points/records/page', {
 			createStartTime: today,
 			createEndTime: today,
 			pageSize: 4
@@ -329,7 +329,7 @@ const fetchPointsRecords = async () => {
 
 const fetchRecipes = async () => {
 	try {
-		const res = await http.get('/bookkeeping-service/eat/dishes/recommendDishes')
+		const res = await http.get('/eat-service/eat/dishes/recommendDishes')
 		const arr = res?.data || []
 		recipes.value = arr.map(item => ({
 			id: item.id,
