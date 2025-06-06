@@ -102,14 +102,14 @@ const menuList = [{
 				path: '/pagesPoints/points/task-plan'
 			},
 			{
+				url: '/static/menus/task-list.png',
+				text: '常用任务',
+				path: '/pagesPoints/points/task-list'
+			},
+			{
 				url: '/static/menus/points-statistics.png',
 				text: '积分分析',
 				path: '/pagesPoints/points/points-statistics'
-			},
-			{
-				url: '/static/menus/task-list.png',
-				text: '任务列表',
-				path: '/pagesPoints/points/task-list'
 			}
 		],
 	},

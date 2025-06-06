@@ -259,7 +259,7 @@
 				{
 					"path": "points/task-list",
 					"style": {
-						"navigationBarTitleText": "任务列表",
+						"navigationBarTitleText": "常用任务",
 						"enablePullDownRefresh": true
 					}
 				}
