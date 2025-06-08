@@ -33,7 +33,7 @@
 				</view>
 				<view class="form-item">
 					<text class="label">任务积分</text>
-					<uni-easyinput v-model="formData.taskPoints" type="number" placeholder="请输入积分（可以是正数或负数）" />
+					<uni-easyinput v-model="formData.taskPoints" placeholder="请输入积分（可以是正数或负数）" />
 				</view>
 				<view class="form-item">
 					<text class="label">任务备注</text>
