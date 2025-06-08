@@ -227,6 +227,7 @@ const fetchTaskRecords = async () => {
 	try {
 		const endDeadlineDate = get7DaysLater()
 		const res = await http.post('/points-service/points/task/basics/list', {
+			sortDeadline: true,
 			endDeadlineDate
 		})
 		const records = res?.data || []
