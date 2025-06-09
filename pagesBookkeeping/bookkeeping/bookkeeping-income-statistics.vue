@@ -8,7 +8,7 @@
                     v-if="currentTab === 'month'" 
                     mode="date" 
                     fields="month" 
-                    :value="selectedDate" 
+                    :value="formatDateForPicker(selectedDate)" 
                     @change="onMonthChange"
                 >
                     <view class="picker-content">
@@ -20,7 +20,7 @@
                     v-else 
                     mode="date" 
                     fields="year" 
-                    :value="selectedDate" 
+                    :value="formatDateForPicker(selectedDate)" 
                     @change="onYearChange"
                 >
                     <view class="picker-content">
@@ -104,6 +104,14 @@ function formatDate(date) {
     const month = String(date.getMonth() + 1).padStart(2, '0')
     return currentTab.value === 'month' ? `${year}年${month}月` : `${year}年`
 }
+
+// 在 script setup 部分添加新的格式化函数
+const formatDateForPicker = (dateStr) => {
+    // 处理 "yyyy年MM月" 或 "yyyy年" 格式
+    const year = dateStr.split('年')[0];
+    const month = dateStr.includes('月') ? dateStr.split('年')[1].replace('月', '') : '01';
+    return currentTab.value === 'month' ? `${year}-${month.padStart(2, '0')}` : `${year}`;
+};
 
 // 获取请求参数
 const getRequestParams = () => {

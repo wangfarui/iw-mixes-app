@@ -29,7 +29,7 @@
                 </view>
                 <view class="security-item">
                     <text class="item-label">当前手机号</text>
-                    <text class="item-value">138****8888</text>
+                    <text class="item-value">{{ phoneNumber ? phoneNumber.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : '未绑定' }}</text>
                 </view>
             </view>
         </view>
@@ -46,7 +46,7 @@
                 </view>
                 <view class="security-item">
                     <text class="item-label">当前邮箱</text>
-                    <text class="item-value">exa****@example.com</text>
+                    <text class="item-value">{{ emailAddress ? emailAddress.replace(/(.{3}).*(@.*)/, '$1****$2') : '未绑定' }}</text>
                 </view>
             </view>
         </view>
@@ -187,7 +187,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import http from '@/api/request.js'
 
 const twoFactorEnabled = ref(false)
@@ -200,6 +200,8 @@ const newPassword = ref('')
 const confirmPassword = ref('')
 const countdown = ref(0)
 const isSending = ref(false)
+const phoneNumber = ref('')
+const emailAddress = ref('')
 
 const verifyTypes = [
     { label: '原密码验证', value: 'password' },
@@ -361,6 +363,20 @@ const handleSecurityQuestions = () => {
 const handleDeleteAccount = () => {
     // 处理注销账号
 }
+
+// 获取用户信息
+const getUserInfo = () => {
+    const userInfo = uni.getStorageSync('userInfo')
+    if (userInfo) {
+        phoneNumber.value = userInfo.phoneNumber || ''
+        emailAddress.value = userInfo.emailAddress || ''
+    }
+}
+
+// 在组件挂载时获取用户信息
+onMounted(() => {
+    getUserInfo()
+})
 </script>
 
 <style lang="scss">

@@ -1,46 +1,46 @@
 <!-- 食谱 -->
 <template>
-	<view>
-		<view>
+	<view class="recipe-container">
+		<!-- 搜索栏 -->
+		<view class="search-section">
 			<uni-search-bar @confirm="initSearchData()" v-model="dishesName" @clear="initSearchData()" maxlength="32"
-				placeholder="请输入菜品名称" cancelButton="none"></uni-search-bar>
+				placeholder="搜索菜品" cancelButton="none" radius="100" bgColor="#f5f5f5"></uni-search-bar>
 		</view>
-		<view style="margin-bottom: 10px;">
-			<uni-tag v-for="(item, index) in dishesTypes" :circle="true" :text="item.dictName" :type="dishesTypeStyle(item)"
-				@click="() => clickDishesType(index)" style="margin-left: 5px" />
-		</view>
-		<view style="margin-left: 5px">
-			<scroll-view :scroll-top="0" scroll-y="true" style="height: 90vh" refresher-enabled="true"
-				:refresher-triggered="triggered" @refresherrefresh="initSearchData()" @scrolltolower="loadMoreDishes()">
-				<view v-if="dishesPage.list.length > 0">
-					<view v-for="dish in dishesPage.list" :key="dish.id" @click="intoDishDetail(dish.id)" @longpress="showActionSheet(dish)">
-						<uni-row class="demo-uni-row">
-							<uni-col :span="12">
-								<view>
-									<image :src="dish.dishesImage" :alt="dish.dishesName"
-										style="width: 20vh;height: 20vh;border-radius: 10%;" />
-								</view>
-							</uni-col>
-							<uni-col :span="12">
-								<view class='dishes'>
-									<p class='dishesName'>{{ dish.dishesName }}</p>
-									<p>难度系数: {{ dish.difficultyFactor }}</p>
-									<p>用时: {{ dish.useTime }}分钟</p>
-								</view>
-							</uni-col>
-						</uni-row>
-					</view>
-					<view>
-						<uni-load-more :status="dishesListStatus" :contentText="contentTextObj" />
+
+		<!-- 分类标签 -->
+		<scroll-view class="category-scroll" scroll-x="true" show-scrollbar="false">
+			<view class="category-list">
+				<view v-for="(item, index) in dishesTypes" :key="index" class="category-item"
+					:class="{ active: dishesTypeStyle(item) === 'primary' }" @click="() => clickDishesType(index)">
+					{{ item.dictName }}
+				</view>
+			</view>
+		</scroll-view>
+
+		<!-- 菜品列表 -->
+		<scroll-view class="dishes-scroll" scroll-y="true" refresher-enabled="true" :refresher-triggered="triggered"
+			@refresherrefresh="initSearchData()" @scrolltolower="loadMoreDishes()">
+			<view v-if="dishesPage.list.length > 0" class="dishes-grid">
+				<view v-for="dish in dishesPage.list" :key="dish.id" class="dish-card" @click="intoDishDetail(dish.id)"
+					@longpress="showActionSheet(dish)">
+					<image :src="dish.dishesImage" :alt="dish.dishesName" class="dish-image" mode="aspectFill" />
+					<view class="dish-info">
+						<view class="dish-header">
+							<text class="dish-name">{{ dish.dishesName }}</text>
+							<view v-if="dish.userId === currentUserId" class="self-maintain-tag">
+								<uni-icons type="person" size="12" color="#007AFF"></uni-icons>
+								<text>我的</text>
+							</view>
+						</view>
 					</view>
 				</view>
-				<view v-else>展示没有菜品哦~</view>
-			</scroll-view>
-		</view>
+			</view>
+			<uni-load-more :status="dishesListStatus" :contentText="contentTextObj" />
+		</scroll-view>
 
 		<!-- 添加按钮 -->
 		<view class="add-btn" @click="navigateToAdd">
-			<uni-icons type="plusempty" size="30" color="#fff"></uni-icons>
+			<uni-icons type="plusempty" size="24" color="#fff"></uni-icons>
 		</view>
 	</view>
 </template>
@@ -96,7 +96,15 @@
 		list: []
 	})
 
+	const currentUserId = ref(null)
+
 	onLoad(() => {
+		// 获取当前登录用户信息
+		const userInfo = uni.getStorageSync('userInfo')
+		if (userInfo) {
+			currentUserId.value = userInfo.id
+		}
+		
 		dishesTypes.value = [{
 			dictCode: 0,
 			dictName: '全部'
@@ -134,6 +142,9 @@
 
 	// 加载更多菜品数据
 	const loadMoreDishes = () => {
+		if (dishesListStatus.value === 'noMore') {
+			return
+		}
 		dishesPage.pageParam.currentPage++
 		fetchDishes()
 	}
@@ -179,29 +190,37 @@
 	
 	// 显示操作菜单
 	const showActionSheet = (dish) => {
-		uni.showActionSheet({
-			itemList: ['编辑菜品', '删除菜品'],
-			success: (res) => {
-				switch (res.tapIndex) {
-					case 0: // 编辑菜品
-						uni.navigateTo({
-							url: `/pagesEat/eat/dishes/dishes-form?id=${dish.id}`
-						})
-						break
-					case 1: // 删除菜品
-						uni.showModal({
-							title: '确认删除',
-							content: '确定要删除这个菜品吗？',
-							success: (res) => {
-								if (res.confirm) {
-									deleteDish(dish.id)
+		if (dish.userId === currentUserId.value) {
+			uni.showActionSheet({
+				itemList: ['编辑菜品', '删除菜品'],
+				success: (res) => {
+					switch (res.tapIndex) {
+						case 0: // 编辑菜品
+							uni.navigateTo({
+								url: `/pagesEat/eat/dishes/dishes-form?id=${dish.id}`
+							})
+							break
+						case 1: // 删除菜品
+							uni.showModal({
+								title: '确认删除',
+								content: '确定要删除这个菜品吗？',
+								success: (res) => {
+									if (res.confirm) {
+										deleteDish(dish.id)
+									}
 								}
-							}
-						})
-						break
+							})
+							break
+					}
 				}
-			}
-		})
+			})
+		} else {
+			uni.showToast({
+				title: '无法操作他人维护的菜品',
+				icon: 'none',
+				duration: 2000
+			})
+		}
 	}
 
 	// 删除菜品
@@ -217,38 +236,135 @@
 </script>
 
 <style lang="scss">
-	.demo-uni-row {
-		margin-bottom: 10px;
+.recipe-container {
+	min-height: 100vh;
+	background-color: #ffffff;
+}
 
-		// 组件在小程序端display为inline
-		// QQ、抖音小程序文档写有 :host，但实测不生效
-		// 百度小程序没有 :host
-		/* #ifdef MP-TOUTIAO || MP-QQ || MP-BAIDU */
-		display: block;
-		/* #endif */
+.search-section {
+	padding: 16px;
+	background-color: #ffffff;
+
+	:deep(.uni-searchbar) {
+		padding: 0 !important;
 	}
+}
 
-	.dishes {
-		font-size: 14px;
-		font-weight: normal;
-	}
+.category-scroll {
+	white-space: nowrap;
+	padding: 0 16px;
+}
 
-	.dishesName {
-		font-weight: bolder;
-		font-size: 18px;
-	}
+.category-list {
+	display: inline-flex;
+	padding: 4px 0;
+}
 
-	.add-btn {
-		position: fixed;
-		right: 20px;
-		bottom: 20px;
-		width: 50px;
-		height: 50px;
+.category-item {
+	padding: 8px 16px;
+	margin-right: 12px;
+	border-radius: 20px;
+	font-size: 14px;
+	background-color: #f5f5f5;
+	color: #666;
+	transition: all 0.3s ease;
+
+	&.active {
 		background-color: #007AFF;
-		border-radius: 25px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+		color: #ffffff;
 	}
+}
+
+.dishes-scroll {
+	height: calc(100vh - 180px);
+}
+
+.dishes-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 16px;
+	padding: 16px;
+}
+
+.dish-card {
+	background: #ffffff;
+	border-radius: 12px;
+	overflow: hidden;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+	transition: transform 0.2s ease;
+
+	&:active {
+		transform: scale(0.98);
+	}
+}
+
+.dish-image {
+	width: 100%;
+	height: 160px;
+	object-fit: cover;
+}
+
+.dish-info {
+	padding: 12px;
+}
+
+.dish-header {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.dish-name {
+	font-size: 16px;
+	font-weight: 600;
+	color: #333;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	line-height: 1.4;
+}
+
+.self-maintain-tag {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	background-color: rgba(0, 122, 255, 0.1);
+	padding: 4px 8px;
+	border-radius: 12px;
+	width: fit-content;
+	
+	text {
+		font-size: 12px;
+		color: #007AFF;
+	}
+}
+
+.empty-state {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 200px;
+	color: #999;
+	font-size: 14px;
+}
+
+.add-btn {
+	position: fixed;
+	right: 24px;
+	bottom: 24px;
+	width: 56px;
+	height: 56px;
+	background-color: #007AFF;
+	border-radius: 28px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+	transition: transform 0.2s ease;
+
+	&:active {
+		transform: scale(0.95);
+	}
+}
 </style>

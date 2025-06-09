@@ -122,7 +122,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import http from '@/api/request.js'
-import { onPullDownRefresh } from '@dcloudio/uni-app'
+import { onPullDownRefresh, onShow } from '@dcloudio/uni-app'
 
 const currentDate = ref('')
 const billTotalAmount = ref('0.00')
@@ -355,7 +355,7 @@ const refreshAll = async () => {
 	uni.stopPullDownRefresh()
 }
 
-onMounted(() => {
+onShow(() => {
 	updateCurrentDate()
 	refreshAll()
 })
