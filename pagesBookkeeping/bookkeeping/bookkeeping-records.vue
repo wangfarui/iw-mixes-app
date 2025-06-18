@@ -16,8 +16,25 @@
 			</view>
 		</view>
 		<view class="container">
-			<uni-datetime-picker v-model="pageRange" type="daterange" start-placeholder="记账开始日期"
-				end-placeholder="记账结束日期" @change="changeRange" />
+			<view class="date-picker-container">
+				<uni-datetime-picker 
+					v-model="startDate" 
+					type="date" 
+					placeholder="选择开始日期"
+					:clear-icon="false"
+					@change="onStartDateChange" 
+				/>
+				<uni-datetime-picker 
+					v-model="endDate" 
+					type="date" 
+					placeholder="选择结束日期"
+					:clear-icon="false"
+					@change="onEndDateChange" 
+				/>
+				<view class="clear-date-btn" @click="clearDates" v-if="startDate || endDate">
+					清空
+				</view>
+			</view>
 			<view style="padding-top: 10px;">
 				<uni-row>
 					<uni-col :span="12"><template
@@ -169,7 +186,8 @@
 	// 筛选的标签
 	const tagIdList = ref([])
 	
-	const pageRange = ref(['', ''])
+	const startDate = ref('')
+	const endDate = ref('')
 	const page = reactive({
 		dto: {
 			currentPage: 1,
@@ -224,14 +242,14 @@
 		if (option.recordDate) {
 			const [year, month] = option.recordDate.split("-").map(Number);
 			const {firstDay, lastDay} = getMonthStartAndEnd(new Date(year, month, 1))
-			pageRange.value[0] = firstDay
-			pageRange.value[1] = lastDay
+			startDate.value = firstDay
+			endDate.value = lastDay
 		}
 		if (option.recordYear) {
 			const [year, month] = option.recordYear.split("-").map(Number);
 			const {firstDay, lastDay} = getYearStartAndEnd(new Date(year, month, 1))
-			pageRange.value[0] = firstDay
-			pageRange.value[1] = lastDay
+			startDate.value = firstDay
+			endDate.value = lastDay
 		}
 		if (option.recordType) {
 			selectedButtonCode.value = option.recordType
@@ -242,10 +260,11 @@
 	})
 	
 	onReady(() => {
-		if (pageRange.value[0] != '') {
-			const firstDate = new Date(pageRange.value[0]);
-			const lastDate = new Date(pageRange.value[1]);
-			pageRange.value = [formatDate(firstDate), formatDate(lastDate)]
+		if (startDate.value != '') {
+			const firstDate = new Date(startDate.value);
+			const lastDate = new Date(endDate.value);
+			startDate.value = formatDate(firstDate);
+			endDate.value = formatDate(lastDate);
 		}
 		
 		selectedButtonCode.value = selectedButtonCode.value - 1 + 1
@@ -316,15 +335,94 @@
 	/**
 	 * 日期选择的change⌚事件
 	 */
-	function changeRange(arr) {
-		if (arr == undefined || arr.length == 0) {
-			pageRange.value = ['', '']
-			showCurrentMonth.value = true
-		} else {
-			showCurrentMonth.value = false
+	function onStartDateChange(value) {
+		startDate.value = value;
+		showCurrentMonth.value = false;
+		
+		// 如果结束日期为空，则自动赋值为开始日期
+		if (startDate.value && !endDate.value) {
+			endDate.value = startDate.value;
 		}
-		// 日期筛选值变化后，初始化分页数据
-		initPage()
+		
+		// 验证开始日期不能大于结束日期
+		if (startDate.value && endDate.value && startDate.value > endDate.value) {
+			uni.showToast({
+				title: '开始日期不能大于结束日期',
+				icon: 'none'
+			});
+			startDate.value = '';
+			// 清空列表和统计数据
+			page.list = [];
+			page.statistics = {consume: 0, income: 0};
+			return;
+		}
+		
+		// 验证日期范围不能超过一年
+		if (startDate.value && endDate.value) {
+			const start = new Date(startDate.value);
+			const end = new Date(endDate.value);
+			const diffTime = Math.abs(end - start);
+			const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+			
+			if (diffDays > 365) {
+				uni.showToast({
+					title: '日期范围不能超过一年',
+					icon: 'none'
+				});
+				startDate.value = '';
+				// 清空列表和统计数据
+				page.list = [];
+				page.statistics = {consume: 0, income: 0};
+				return;
+			}
+		}
+		
+		initPage();
+	}
+
+	function onEndDateChange(value) {
+		endDate.value = value;
+		showCurrentMonth.value = false;
+		
+		// 如果开始日期为空，则自动赋值为结束日期
+		if (endDate.value && !startDate.value) {
+			startDate.value = endDate.value;
+		}
+		
+		// 验证结束日期不能小于开始日期
+		if (startDate.value && endDate.value && startDate.value > endDate.value) {
+			uni.showToast({
+				title: '结束日期不能小于开始日期',
+				icon: 'none'
+			});
+			endDate.value = '';
+			// 清空列表和统计数据
+			page.list = [];
+			page.statistics = {consume: 0, income: 0};
+			return;
+		}
+		
+		// 验证日期范围不能超过一年
+		if (startDate.value && endDate.value) {
+			const start = new Date(startDate.value);
+			const end = new Date(endDate.value);
+			const diffTime = Math.abs(end - start);
+			const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+			
+			if (diffDays > 365) {
+				uni.showToast({
+					title: '日期范围不能超过一年',
+					icon: 'none'
+				});
+				endDate.value = '';
+				// 清空列表和统计数据
+				page.list = [];
+				page.statistics = {consume: 0, income: 0};
+				return;
+			}
+		}
+		
+		initPage();
 	}
 
 	/**
@@ -375,8 +473,8 @@
 	 */
 	function searchData() {
 		// 记录日期
-		page.dto.recordStartDate = pageRange.value[0]
-		page.dto.recordEndDate = pageRange.value[1]
+		page.dto.recordStartDate = startDate.value
+		page.dto.recordEndDate = endDate.value
 		// 记录分类
 		page.dto.recordType = selectedButtonCode.value == -1 ? '' : selectedButtonCode.value
 		
@@ -410,6 +508,16 @@
 		page.dto.currentPage++
 		searchData()
 	})
+
+	function clearDates() {
+		startDate.value = '';
+		endDate.value = '';
+		showCurrentMonth.value = true;
+		// 清空列表和统计数据
+		page.list = [];
+		page.statistics = {consume: 0, income: 0};
+		initPage();
+	}
 </script>
 
 <style>
@@ -563,5 +671,31 @@
 	}
 
 	.sort-select {
+	}
+
+	.date-picker-container {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.date-picker-item {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.date-label {
+		font-size: 14px;
+		min-width: 70px;
+	}
+
+	.clear-date-btn {
+		padding: 5px 10px;
+		background-color: #007aff;
+		color: #fff;
+		border-radius: 4px;
+		cursor: pointer;
 	}
 </style>

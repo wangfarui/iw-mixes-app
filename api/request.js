@@ -1,5 +1,5 @@
-
 import {baseUrl, token_key, getTokenValue, tokenHeader} from './env.js'
+import { stopVersionPolling } from './login.js'
 
 
 const http = (url, method, data) => {
@@ -33,6 +33,7 @@ const http = (url, method, data) => {
 						icon: 'error',
 						title: '登录状态失效'
 					});
+					stopVersionPolling()
 					uni.removeStorageSync(token_key)
 					uni.reLaunch({
 						url: '/pages/login'

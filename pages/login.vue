@@ -75,7 +75,8 @@
 	import {
 		ref,
 		reactive,
-		onMounted
+		onMounted,
+		onUnmounted
 	} from 'vue';
 
 	import {
@@ -83,7 +84,10 @@
 		loginByVerificationCodeApi,
 		refreshDictCache,
 		getPhoneVerificationCodeApi,
-		getEmailVerificationCodeApi
+		getEmailVerificationCodeApi,
+		getDictVersionApi,
+		startVersionPolling,
+		stopVersionPolling
 	} from "@/api/login.js";
 
 	import {
@@ -286,6 +290,9 @@
 		const userInfo = res.data
 		uni.setStorageSync('iwtoken', userInfo.tokenValue)
 		uni.setStorageSync('userInfo', userInfo)
+		
+		// 启动版本号轮询
+		startVersionPolling()
 		
 		if (userInfo.newUser) {
 			// 显示自定义加载提示

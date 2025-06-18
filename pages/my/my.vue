@@ -99,7 +99,8 @@
 	import http from '@/api/request.js'
 	import {
 		logout,
-		refreshDictCache
+		refreshDictCache,
+		stopVersionPolling
 	} from "@/api/login.js";
 	import { uploadFile } from "@/stores/file.js"
 
@@ -131,6 +132,8 @@
 			content: '确定要退出登录吗？',
 			success: (res) => {
 				if (res.confirm) {
+					stopVersionPolling()
+					
 					logout()
 					uni.removeStorageSync('iwtoken')
 					uni.removeStorageSync('userInfo')
