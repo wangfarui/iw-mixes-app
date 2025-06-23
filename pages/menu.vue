@@ -271,12 +271,17 @@ function connectWebSocket(onConnected) {
 		if (dialogList.value.length > 0) {
 			dialogList.value[dialogList.value.length - 1].answer = '连接失败，请重试'
 		}
+		uni.showToast({ title: '连接失败', icon: 'none' })
 	})
 }
 
 function sendMessage(message) {
 	if (ws && ws.readyState === 1) {
 		ws.send({
+			data: message,
+			fail: (res) => {
+				uni.showToast({ title: res, icon: 'none' })
+			}
 		})
 	}
 }
