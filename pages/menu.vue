@@ -58,6 +58,7 @@
 <script setup>
 import { ref, computed, nextTick } from 'vue'
 import http from '@/api/request.js'
+import { baseUrl, tokenHeader } from '@/api/env.js'
 import MarkdownIt from 'markdown-it'
 
 const searchValue = ref('')
@@ -68,8 +69,26 @@ const lastQuestion = ref('')
 const dialogList = ref([])
 const scrollViewRef = ref(null)
 const scrollToId = ref('')
+let ws = null
 
 const md = new MarkdownIt()
+
+function parseMarkdown(text) {
+	if (!text) return ''
+	// 先将Unicode转义字符（如\uD83D\uDCCC）转为真实字符
+	text = text.replace(/\\u([a-fA-F0-9]{4})/g, (m, g1) => String.fromCharCode(parseInt(g1, 16)))
+	// 处理代理对（高低位代理）
+	text = text.replace(/\\u\{([a-fA-F0-9]+)\}/g, (m, g1) => String.fromCodePoint(parseInt(g1, 16)))
+	// markdown-it渲染
+	let html = md.render(text)
+	// 换行符替换为<br>
+	html = html.replace(/\\n|\\r\\n|\\r|\n/g, '<br>')
+	// 如果字符串以<br>结尾，则删除它
+	if (html.endsWith('<br>')) {
+		html = html.slice(0, -4)
+	}
+	return html
+}
 
 const menuList = [{
 		title: '餐饮服务',
@@ -194,20 +213,72 @@ function handleAsk(e) {
 	nextTick(() => {
 		scrollToId.value = `dialog-item-${dialogList.value.length - 1}`
 	})
-	http.get("/auth-service/user/answer?t=" + value).then(res => {
+	
+	// 如果WebSocket未连接，先建立连接
+	if (!ws || ws.readyState !== 1) {
+		connectWebSocket(() => {
+			// 连接成功后发送消息
+			sendMessage(value)
+		})
+	} else {
+		// 已连接，直接发送消息
+		sendMessage(value)
+	}
+}
+
+function connectWebSocket(onConnected) {
+	// 关闭之前的连接
+	if (ws) {
+		ws.close()
+	}
+
+	const domain = baseUrl.replace('http://', 'ws://').replace('https://', 'wss://')
+	
+	ws = uni.connectSocket({
+		url: `${domain}/external-service/wb/chat-ws`,
+		header: tokenHeader(),
+		success: () => {
+		}
+	})
+	
+	ws.onOpen(() => {
 		loading.value = false
-		const ans = res.data?.data || res.data || '无返回内容'
-		answer.value = ans
+		// 连接成功后回调
+		if (onConnected) {
+			onConnected()
+		}
+	})
+	
+	ws.onMessage((res) => {
+		loading.value = false
+		// 更新当前对话的answer内容
 		if (dialogList.value.length > 0) {
-			dialogList.value[dialogList.value.length - 1].answer = ans
+			const currentDialog = dialogList.value[dialogList.value.length - 1]
+			currentDialog.answer += res.data
+			// 滚动到底部
+			nextTick(() => {
+				scrollToId.value = `dialog-item-${dialogList.value.length - 1}`
+			})
+		}
+	})
+	
+	ws.onClose((res) => {
+		loading.value = false
+	})
+	
+	ws.onError((err) => {
+		// 显示错误信息
+		if (dialogList.value.length > 0) {
+			dialogList.value[dialogList.value.length - 1].answer = '连接失败，请重试'
 		}
 	})
 }
 
-function handleNavigate(path) {
-	uni.navigateTo({
-		url: path
-	})
+function sendMessage(message) {
+	if (ws && ws.readyState === 1) {
+		ws.send({
+		})
+	}
 }
 
 function exitDialog() {
@@ -216,19 +287,11 @@ function exitDialog() {
 	answer.value = ''
 	lastQuestion.value = ''
 	dialogList.value = []
-}
-
-function parseMarkdown(text) {
-	if (!text) return ''
-	// 先将Unicode转义字符（如\uD83D\uDCCC）转为真实字符
-	text = text.replace(/\\u([a-fA-F0-9]{4})/g, (m, g1) => String.fromCharCode(parseInt(g1, 16)))
-	// 处理代理对（高低位代理）
-	text = text.replace(/\\u\{([a-fA-F0-9]+)\}/g, (m, g1) => String.fromCodePoint(parseInt(g1, 16)))
-	// markdown-it渲染
-	let html = md.render(text)
-	// 换行符替换为<br>
-	html = html.replace(/\\n|\\r\\n|\\r|\n/g, '<br>')
-	return html
+	// 关闭WebSocket连接
+	if (ws) {
+		ws.close()
+		ws = null
+	}
 }
 
 function copyText(text) {
@@ -238,6 +301,12 @@ function copyText(text) {
 		success() {
 			uni.showToast({ title: '已复制', icon: 'none' })
 		}
+	})
+}
+
+function handleNavigate(path) {
+	uni.navigateTo({
+		url: path
 	})
 }
 </script>
