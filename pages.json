@@ -1,15 +1,17 @@
 {
 	"pages": [
 		{
-			"path": "pages/menu",
+			"path": "pages/home/index",
 			"style": {
-				"navigationBarTitleText": "菜单"
+				"navigationBarTitleText": "首页",
+				"enablePullDownRefresh": true
 			}
 		},
 		{
-			"path": "pages/my/my",
+			"path": "pages/bill/index",
 			"style": {
-				"navigationBarTitleText": "我的"
+				"navigationBarTitleText": "账单",
+				"enablePullDownRefresh": true
 			}
 		},
 		{
@@ -19,138 +21,269 @@
 			}
 		},
 		{
-			"path": "pages/eat/recipe/index",
+			"path": "pages/menu",
 			"style": {
-				"navigationBarTitleText": "食谱"
+				"navigationBarTitleText": "菜单"
 			}
 		},
 		{
-			"path": "pages/eat/dishes/index",
+			"path": "pages/task/index",
 			"style": {
-				"navigationBarTitleText": "点餐"
+				"navigationBarTitleText": "任务"
 			}
 		},
 		{
-			"path": "pages/eat/dishes/dishes-detail",
+			"path": "pages/my/my",
 			"style": {
-				"navigationBarTitleText": "菜品详情"
+				"navigationBarTitleText": "我的"
 			}
-		},
-		{
-			"path": "pages/eat/dishes/cart-confirm",
-			"style": {
-				"navigationBarTitleText": "确认订单"
-			}
-		},
-		{
-			"path": "pages/eat/meal/index",
-			"style": {
-				"navigationBarTitleText": "用餐记录",
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/eat/meal/meal-detail",
-			"style": {
-				"navigationBarTitleText": "用餐详情"
-			}
-		},
-		{
-			"path": "pages/bookkeeping/bookkeeping-action",
-			"style": {
-				"navigationBarTitleText": "记账"
-			}
-		},
-		{
-			"path": "pages/bookkeeping/bookkeeping-records",
-			"style": {
-				"navigationBarTitleText": "记账记录",
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/bookkeeping/bookkeeping-detail",
-			"style": {
-				"navigationBarTitleText": "记录详情"
-			}
-		},
-		{
-			"path": "pages/bookkeeping/bookkeeping-statistics",
-			"style": {
-				"navigationBarTitleText": "收支分析"
-			}
-		},
-		{
-			"path": "pages/points/points-action",
-			"style": {
-				"navigationBarTitleText": "新增积分"
-			}
-		},
-		{
-			"path": "pages/points/points-records",
-			"style": {
-				"navigationBarTitleText": "积分记录",
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/points/points-statistics",
-			"style": {
-				"navigationBarTitleText": "积分分析"
-			}
-		},
-		{
-			"path": "pages/points/points-detail",
-			"style": {
-				"navigationBarTitleText": "记录详情"
-			}
-		},
-		{
-			"path": "pages/points/points-task",
-			"style": {
-				"navigationBarTitleText": "积分任务"
-			}
-		},
-		{
-			"path": "pages/points/points-task-add",
-			"style": {
-				"navigationBarTitleText": "新建积分任务"
-			}
-		},
-		{
-			"path": "pages/base/dict-manage",
-			"style": {
-				"navigationBarTitleText": "字典管理",
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/base/dict-detail",
-			"style": {
-				"navigationBarTitleText": "字典详情"
-			}
-		},
-		{
-			"path": "pages/base/account-manage",
-			"style": {
-				"navigationBarTitleText": "账号管理",
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/base/account-detail",
-			"style": {
-				"navigationBarTitleText": "账号详情"
-			}
-		},
-		{
-			"path": "pages/points/task-list",
-			"style": {
-				"navigationBarTitleText": "任务列表",
-				"enablePullDownRefresh": true
-			}
-		}	
+		}
 	],
+	"subPackages": [
+		{
+			"root": "pagesBookkeeping",
+			"pages": [
+				{
+					"path": "bookkeeping/bookkeeping-quick",
+					"style": {
+						"navigationBarTitleText": "记账"
+					}
+				},
+				{
+					"path": "bookkeeping/bookkeeping-action",
+					"style": {
+						"navigationBarTitleText": "表单记账"
+					}
+				},
+				{
+					"path": "bookkeeping/bookkeeping-action-setting",
+					"style": {
+						"navigationBarTitleText": "类别设置"
+					}
+				},
+				{
+					"path": "bookkeeping/bookkeeping-action-edit",
+					"style": {
+						"navigationBarTitleText": "编辑类别"
+					}
+				},
+				{
+					"path": "bookkeeping/bookkeeping-records",
+					"style": {
+						"navigationBarTitleText": "记账记录",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "bookkeeping/bookkeeping-detail",
+					"style": {
+						"navigationBarTitleText": "记录详情"
+					}
+				},
+				{
+					"path": "bookkeeping/bookkeeping-consume-statistics",
+					"style": {
+						"navigationBarTitleText": "支出统计"
+					}
+				},
+				{
+					"path": "bookkeeping/bookkeeping-income-statistics",
+					"style": {
+						"navigationBarTitleText": "收入统计"
+					}
+				},
+				{
+					"path": "bookkeeping/bookkeeping-budget",
+					"style": {
+						"navigationBarTitleText": "预算"
+					}
+				},
+				{
+					"path": "bookkeeping/bookkeeping-wallet",
+					"style": {
+						"navigationBarTitleText": "钱包"
+					}
+				}
+			]
+		},
+		{
+			"root": "pagesBase",
+			"pages": [
+				{
+					"path": "base/dict-manage",
+					"style": {
+						"navigationBarTitleText": "字典管理",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "base/dict-detail",
+					"style": {
+						"navigationBarTitleText": "字典详情"
+					}
+				},
+				{
+					"path": "base/account-manage",
+					"style": {
+						"navigationBarTitleText": "账号管理",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "base/account-detail",
+					"style": {
+						"navigationBarTitleText": "账号详情"
+					}
+				},
+				{
+					"path": "my/profile",
+					"style": {
+					  "navigationBarTitleText": "个人信息"
+					}
+				},
+				{
+					"path": "my/security",
+					"style": {
+						"navigationBarTitleText": "账号安全"
+					}
+				},
+				{
+					"path": "my/settings",
+					"style": {
+						"navigationBarTitleText": "系统设置"
+					}
+				},
+				{
+					"path": "my/about",
+					"style": {
+						"navigationBarTitleText": "关于我们"
+					}
+				},
+				{
+					"path": "my/feedback",
+					"style": {
+						"navigationBarTitleText": "意见反馈"
+					}
+				}
+			]
+		},
+		{
+			"root": "pagesEat",
+			"pages": [
+				{
+					"path": "eat/recipe/index",
+					"style": {
+						"navigationBarTitleText": "食谱"
+					}
+				},
+				{
+					"path": "eat/dishes/index",
+					"style": {
+						"navigationBarTitleText": "点餐"
+					}
+				},
+				{
+					"path": "eat/dishes/dishes-detail",
+					"style": {
+						"navigationBarTitleText": "菜品详情"
+					}
+				},
+				{
+					"path": "eat/dishes/dishes-form",
+					"style": {
+						"navigationBarTitleText": "菜品添加"
+					}
+				},
+				{
+					"path": "eat/dishes/cart-confirm",
+					"style": {
+						"navigationBarTitleText": "确认订单"
+					}
+				},
+				{
+					"path": "eat/meal/index",
+					"style": {
+						"navigationBarTitleText": "用餐记录",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "eat/meal/meal-detail",
+					"style": {
+						"navigationBarTitleText": "用餐详情"
+					}
+				}
+			]
+		},
+		{
+			"root": "pagesPoints",
+			"pages": [
+				{
+					"path": "points/points-action",
+					"style": {
+						"navigationBarTitleText": "新增积分"
+					}
+				},
+				{
+					"path": "points/points-records",
+					"style": {
+						"navigationBarTitleText": "积分记录",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "points/points-statistics",
+					"style": {
+						"navigationBarTitleText": "积分分析"
+					}
+				},
+				{
+					"path": "points/points-detail",
+					"style": {
+						"navigationBarTitleText": "记录详情"
+					}
+				},
+				{
+					"path": "points/task-plan",
+					"style": {
+						"navigationBarTitleText": "任务计划",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "points/task-plan-add",
+					"style": {
+						"navigationBarTitleText": "编辑任务计划"
+					}
+				},
+				{
+					"path": "points/task-list",
+					"style": {
+						"navigationBarTitleText": "常用任务",
+						"enablePullDownRefresh": true
+					}
+				}
+			]
+		}
+	],
+	"preLoadRule": {
+		"pagesBookkeeping/bookkeeping/bookkeeping-quick": {
+			"network": "all",
+			"packages": ["__APP__"]
+		},
+		"pagesBase/base/dict-manage": {
+			"network": "all",
+			"packages": ["pages/menu"]
+		},
+		"pagesBase/base/account-manage": {
+			"network": "all",
+			"packages": ["pages/menu"]
+		},
+		"pagesPoints/points/task-list": {
+			"network": "all",
+			"packages": ["pages/menu"]
+		}
+	},
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-app",
@@ -164,17 +297,51 @@
 		"color": "#7A7E83",
 		"selectedColor": "#007AFF",
 		"borderStyle": "black",
-		"backgroundColor": "#FFFFFF",
-		"list": [{
-			"pagePath": "pages/menu",
-			"iconPath": "static/tabbar/menu_unselect.png",
-			"selectedIconPath": "static/tabbar/menu_selected.png",
-			"text": "菜单"
-		}, {
-			"pagePath": "pages/my/my",
-			"iconPath": "static/tabbar/my_unselect.png",
-			"selectedIconPath": "static/tabbar/my_selected.png",
-			"text": "我的"
-		}]
+		"backgroundColor": "#ffffff",
+		"list": [
+			{
+				"pagePath": "pages/home/index",
+				"iconPath": "static/tabbar/home.png",
+				"selectedIconPath": "static/tabbar/home-active.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/bill/index",
+				"iconPath": "static/tabbar/bill.png",
+				"selectedIconPath": "static/tabbar/bill-active.png",
+				"text": "账单"
+			},
+			{
+				"pagePath": "pages/menu",
+				"iconPath": "static/tabbar/menu.png",
+				"selectedIconPath": "static/tabbar/menu-active.png",
+				"text": "菜单"
+			},
+			{
+				"pagePath": "pages/task/index",
+				"iconPath": "static/tabbar/task.png",
+				"selectedIconPath": "static/tabbar/task-active.png",
+				"text": "任务"
+			},
+			{
+				"pagePath": "pages/my/my",
+				"iconPath": "static/tabbar/my.png",
+				"selectedIconPath": "static/tabbar/my-active.png",
+				"text": "我的"
+			}
+		]
+	},
+	"mp-weixin": {
+		"setting": {
+			"urlCheck": false
+		},
+		"usingComponents": {},
+		"permission": {},
+		"staticResources": {
+			"static": [
+				"static/bookkeeping/**/*.svg",
+				"static/bookkeeping/*.svg"
+			]
+		}
 	}
 }
