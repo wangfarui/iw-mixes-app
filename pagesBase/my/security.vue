@@ -29,7 +29,7 @@
                 </view>
                 <view class="security-item">
                     <text class="item-label">当前手机号</text>
-                    <text class="item-value">{{ phoneNumber ? phoneNumber.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : '未绑定' }}</text>
+                    <text class="item-value">{{ phoneNumber ? phoneNumber : '未绑定' }}</text>
                 </view>
             </view>
         </view>
@@ -46,7 +46,7 @@
                 </view>
                 <view class="security-item">
                     <text class="item-label">当前邮箱</text>
-                    <text class="item-value">{{ emailAddress ? emailAddress.replace(/(.{3}).*(@.*)/, '$1****$2') : '未绑定' }}</text>
+                    <text class="item-value">{{ emailAddress ? emailAddress : '未绑定' }}</text>
                 </view>
             </view>
         </view>
