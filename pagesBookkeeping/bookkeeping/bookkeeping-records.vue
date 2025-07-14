@@ -32,15 +32,13 @@
 					@change="onEndDateChange" 
 				/>
 				<view class="clear-date-btn" @click="clearDates" v-if="startDate || endDate">
-					清空
+					重置
 				</view>
 			</view>
 			<view style="padding-top: 10px;">
 				<uni-row>
-					<uni-col :span="12"><template
-							v-if="showCurrentMonth">本月</template>支出：{{page.statistics.consume}}元</uni-col>
-					<uni-col :span="12"><template
-							v-if="showCurrentMonth">本月</template>收入：{{page.statistics.income}}元</uni-col>
+					<uni-col :span="12">支出：{{page.statistics.consume}}元</uni-col>
+					<uni-col :span="12">收入：{{page.statistics.income}}元</uni-col>
 				</uni-row>
 			</view>
 		</view>
@@ -176,8 +174,6 @@
 
 	const mealListStatus = ref('more')
 
-	const showCurrentMonth = ref(true)
-
 	const buttonList = ['全部', '支出', '收入']
 	const selectedButtonCode = ref(-1)
 	const filterDialog = ref(null);
@@ -235,7 +231,7 @@
 		page.list = []
 		page.dto.currentPage = 1;
 		page.dto.pageSize = 20;
-		page.dto.isSearchAll = ignoreNotStatistics.value ? 0 : 1
+		page.dto.isSearchAll = ignoreNotStatistics.value ? 0 : 1;
 	}
 	
 	onLoad((option) => {
@@ -254,21 +250,32 @@
 		if (option.recordType) {
 			selectedButtonCode.value = option.recordType
 		}
-		if (option.ignoreNotStatistics) {
-			ignoreNotStatistics.value = option.ignoreNotStatistics
+		
+		if (option.ignoreNotStatistics !== undefined) {
+			ignoreNotStatistics.value = option.ignoreNotStatistics === 'true'
 		}
 	})
 	
+	function setCurrentMonthRange() {
+		const now = new Date();
+		const year = now.getFullYear();
+		const month = now.getMonth();
+		const firstDay = new Date(year, month, 1);
+		const lastDay = new Date(year, month + 1, 0); // 本月最后一天
+		startDate.value = formatDate(firstDay);
+		endDate.value = formatDate(lastDay);
+	}
+
 	onReady(() => {
-		if (startDate.value != '') {
+		if (startDate.value == '' && endDate.value == '') {
+			setCurrentMonthRange();
+		} else {
 			const firstDate = new Date(startDate.value);
 			const lastDate = new Date(endDate.value);
 			startDate.value = formatDate(firstDate);
 			endDate.value = formatDate(lastDate);
 		}
-		
 		selectedButtonCode.value = selectedButtonCode.value - 1 + 1
-		
 		initPage()
 	})
 
@@ -337,44 +344,17 @@
 	 */
 	function onStartDateChange(value) {
 		startDate.value = value;
-		showCurrentMonth.value = false;
-		
-		// 如果结束日期为空，则自动赋值为开始日期
-		if (startDate.value && !endDate.value) {
-			endDate.value = startDate.value;
-		}
-		
+
 		// 验证开始日期不能大于结束日期
 		if (startDate.value && endDate.value && startDate.value > endDate.value) {
 			uni.showToast({
 				title: '开始日期不能大于结束日期',
 				icon: 'none'
 			});
-			startDate.value = '';
 			// 清空列表和统计数据
 			page.list = [];
 			page.statistics = {consume: 0, income: 0};
 			return;
-		}
-		
-		// 验证日期范围不能超过一年
-		if (startDate.value && endDate.value) {
-			const start = new Date(startDate.value);
-			const end = new Date(endDate.value);
-			const diffTime = Math.abs(end - start);
-			const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-			
-			if (diffDays > 365) {
-				uni.showToast({
-					title: '日期范围不能超过一年',
-					icon: 'none'
-				});
-				startDate.value = '';
-				// 清空列表和统计数据
-				page.list = [];
-				page.statistics = {consume: 0, income: 0};
-				return;
-			}
 		}
 		
 		initPage();
@@ -382,12 +362,6 @@
 
 	function onEndDateChange(value) {
 		endDate.value = value;
-		showCurrentMonth.value = false;
-		
-		// 如果开始日期为空，则自动赋值为结束日期
-		if (endDate.value && !startDate.value) {
-			startDate.value = endDate.value;
-		}
 		
 		// 验证结束日期不能小于开始日期
 		if (startDate.value && endDate.value && startDate.value > endDate.value) {
@@ -395,31 +369,10 @@
 				title: '结束日期不能小于开始日期',
 				icon: 'none'
 			});
-			endDate.value = '';
 			// 清空列表和统计数据
 			page.list = [];
 			page.statistics = {consume: 0, income: 0};
 			return;
-		}
-		
-		// 验证日期范围不能超过一年
-		if (startDate.value && endDate.value) {
-			const start = new Date(startDate.value);
-			const end = new Date(endDate.value);
-			const diffTime = Math.abs(end - start);
-			const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-			
-			if (diffDays > 365) {
-				uni.showToast({
-					title: '日期范围不能超过一年',
-					icon: 'none'
-				});
-				endDate.value = '';
-				// 清空列表和统计数据
-				page.list = [];
-				page.statistics = {consume: 0, income: 0};
-				return;
-			}
 		}
 		
 		initPage();
@@ -510,9 +463,7 @@
 	})
 
 	function clearDates() {
-		startDate.value = '';
-		endDate.value = '';
-		showCurrentMonth.value = true;
+		setCurrentMonthRange();
 		// 清空列表和统计数据
 		page.list = [];
 		page.statistics = {consume: 0, income: 0};

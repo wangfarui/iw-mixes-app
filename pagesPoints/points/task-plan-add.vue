@@ -157,39 +157,35 @@ function handleDateChange(value) {
 }
 
 async function handleSubmit() {
-	try {
-		await form.value.validate()
-		
-		// 转换日期格式
-		const submitData = {
-			...formData,
-			planDate: formData.planDate.split(' ')[0] // 只保留日期部分
-		}
-		
-		if (isEdit.value) {
-			submitData.id = taskId.value
-			await http.put('/points-service/points/task/plan/update', submitData)
-		} else {
-			await http.post('/points-service/points/task/plan/add', submitData)
-		}
-		
-		uni.showToast({
-			icon: 'success',
-			title: '保存成功'
-		})
-		
-		// 返回上一页
-		setTimeout(() => {
-			uni.navigateBack()
-		}, 1500)
-	} catch (error) {
-		if (error.message) {
-			uni.showToast({
-				icon: 'error',
-				title: error.message
-			})
-		}
+	await form.value.validate()
+
+	// 处理默认值
+	const submitData = {
+		...formData,
+		planDate: formData.planDate.split(' ')[0] // 只保留日期部分
 	}
+	// 如果为null、undefined或空字符串，则赋值为0
+	submitData.remindDays = submitData.remindDays == null || submitData.remindDays === '' ? 0 : submitData.remindDays
+	submitData.deadlineDays = submitData.deadlineDays == null || submitData.deadlineDays === '' ? 0 : submitData.deadlineDays
+	submitData.rewardPoints = submitData.rewardPoints == null || submitData.rewardPoints === '' ? 0 : submitData.rewardPoints
+	submitData.punishPoints = submitData.punishPoints == null || submitData.punishPoints === '' ? 0 : submitData.punishPoints
+
+	if (isEdit.value) {
+		submitData.id = taskId.value
+		await http.put('/points-service/points/task/plan/update', submitData)
+	} else {
+		await http.post('/points-service/points/task/plan/add', submitData)
+	}
+
+	uni.showToast({
+		icon: 'success',
+		title: '保存成功'
+	})
+
+	// 返回上一页
+	setTimeout(() => {
+		uni.navigateBack()
+	}, 1500)
 }
 
 function handleCancel() {

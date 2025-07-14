@@ -118,8 +118,11 @@
 		form.value.validate().then(res => {
 			const url = isEdit.value ? '/auth-service/application/account/update' : '/auth-service/application/account/add'
 			const method = isEdit.value ? 'put' : 'post'
-			
-			http[method](url, formData)
+
+			// 新增判断密码是否不为空，设置updatePassword参数
+			const params = { ...formData, updatePassword: formData.password ? true : false }
+
+			http[method](url, params)
 				.then(res => {
 					uni.showToast({
 						title: '保存成功',
