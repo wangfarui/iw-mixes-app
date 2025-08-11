@@ -27,6 +27,14 @@
               <text class="label">{{ budgetType === 1 ? '本月预算：' : '年度预算：' }}</text>
               <text class="value">{{ formatAmount(totalBudget.budgetAmount) }}</text>
             </view>
+            <view class="info-item" v-if="budgetType === 1 && totalBudget.rewardPoints !== null && totalBudget.rewardPoints !== undefined">
+              <text class="label">奖励积分：</text>
+              <text class="value">{{ totalBudget.rewardPoints }}</text>
+            </view>
+            <view class="info-item" v-if="budgetType === 1 && totalBudget.punishPoints !== null && totalBudget.punishPoints !== undefined">
+              <text class="label">处罚积分：</text>
+              <text class="value">{{ totalBudget.punishPoints }}</text>
+            </view>
           </view>
         </view>
       </view>
@@ -98,6 +106,24 @@
               class="input"
             >
           </view>
+          <view class="form-item" v-if="budgetType === 1">
+            <view class="label">奖励积分:</view>
+            <input 
+              type="number" 
+              v-model="budgetForm.rewardPoints"
+              placeholder="请输入奖励积分（可正负数）"
+              class="input"
+            >
+          </view>
+          <view class="form-item" v-if="budgetType === 1">
+            <view class="label">处罚积分:</view>
+            <input 
+              type="number" 
+              v-model="budgetForm.punishPoints"
+              placeholder="请输入处罚积分（可正负数）"
+              class="input"
+            >
+          </view>
         </view>
         <view class="popup-footer">
           <button class="btn cancel" @click="closeAddBudgetPopup">取消</button>
@@ -147,7 +173,9 @@ const isAddingCategory = ref(false)
 const isEditing = ref(false)
 const budgetForm = ref({
   recordType: null,
-  budgetAmount: ''
+  budgetAmount: '',
+  rewardPoints: '',
+  punishPoints: ''
 })
 const currentBudget = ref(null)
 const isCategoryBudget = ref(false)
@@ -301,7 +329,9 @@ const closeAddBudgetPopup = () => {
 const resetBudgetForm = () => {
   budgetForm.value = {
     recordType: null,
-    budgetAmount: ''
+    budgetAmount: '',
+    rewardPoints: '',
+    punishPoints: ''
   }
 }
 
@@ -323,15 +353,34 @@ const closeBudgetActions = () => {
   isCategoryBudget.value = false
 }
 
-const editBudget = () => {
+const editBudget = async () => {
   budgetActionsPopup.value.close()
   isEditing.value = true
-  budgetForm.value = {
-    budgetAmount: currentBudget.value.budgetAmount,
-    recordType: isCategoryBudget.value ? currentBudget.value.recordType : null
+  
+  try {
+    // 先根据id查询详情
+    const detailRes = await http.get(`/bookkeeping-service/bookkeeping/budget/detail?id=${currentBudget.value.id}`)
+    const budgetDetail = detailRes.data
+    
+    // 用详情数据填充表单
+    budgetForm.value = {
+      budgetAmount: budgetDetail.budgetAmount,
+      recordType: isCategoryBudget.value ? budgetDetail.recordType : null,
+      rewardPoints: budgetDetail.rewardPoints || '',
+      punishPoints: budgetDetail.punishPoints || ''
+    }
+    
+    isAddingCategory.value = isCategoryBudget.value
+    addBudgetPopup.value.open()
+  } catch (error) {
+    uni.showToast({
+      title: '获取预算详情失败',
+      icon: 'none'
+    })
+    // 如果获取详情失败，重置编辑状态
+    isEditing.value = false
+    currentBudget.value = null
   }
-  isAddingCategory.value = isCategoryBudget.value
-  addBudgetPopup.value.open()
 }
 
 const deleteBudget = async () => {
@@ -386,6 +435,34 @@ const saveBudget = async () => {
     return
   }
   
+  // 验证奖励积分（月度预算时）
+  if (budgetType.value === 1) {
+    const rewardPoints = budgetForm.value.rewardPoints
+    if (rewardPoints !== '' && rewardPoints !== null) {
+      const rewardPointsNum = Number(rewardPoints)
+      if (isNaN(rewardPointsNum) || !Number.isInteger(rewardPointsNum)) {
+        uni.showToast({
+          title: '奖励积分必须为整数',
+          icon: 'none'
+        })
+        return
+      }
+    }
+    
+    // 验证处罚积分（月度预算时）
+    const punishPoints = budgetForm.value.punishPoints
+    if (punishPoints !== '' && punishPoints !== null) {
+      const punishPointsNum = Number(punishPoints)
+      if (isNaN(punishPointsNum) || !Number.isInteger(punishPointsNum)) {
+        uni.showToast({
+          title: '处罚积分必须为整数',
+          icon: 'none'
+        })
+        return
+      }
+    }
+  }
+  
   // 如果是分类预算，验证分类
   if ((isAddingCategory.value && !isEditing.value) && !budgetForm.value.recordType) {
     uni.showToast({
@@ -403,6 +480,16 @@ const saveBudget = async () => {
   // 如果是分类预算，添加recordType参数
   if (isAddingCategory.value) {
     params.recordType = budgetForm.value.recordType
+  }
+  
+  // 如果是月度预算，添加积分参数
+  if (budgetType.value === 1) {
+    if (budgetForm.value.rewardPoints !== '' && budgetForm.value.rewardPoints !== null) {
+      params.rewardPoints = Number(budgetForm.value.rewardPoints)
+    }
+    if (budgetForm.value.punishPoints !== '' && budgetForm.value.punishPoints !== null) {
+      params.punishPoints = Number(budgetForm.value.punishPoints)
+    }
   }
   
   // 如果是编辑，添加id参数
