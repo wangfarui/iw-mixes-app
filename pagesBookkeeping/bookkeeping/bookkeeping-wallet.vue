@@ -226,13 +226,13 @@ const showUpdateDialog = (type) => {
                             
                             // 计算变动后的金额
                             const newAmount = parseFloat(currentAmount) + changeAmount
-                            if (newAmount < 0 || newAmount > 99999999) {
-                                uni.showToast({
-                                    title: '变动后的金额超出范围',
-                                    icon: 'none'
-                                })
-                                return
-                            }
+                            // if (newAmount < 0 || newAmount > 99999999) {
+                            //     uni.showToast({
+                            //         title: '变动后的金额超出范围',
+                            //         icon: 'none'
+                            //     })
+                            //     return
+                            // }
                             
                             try {
                                 await http.put('/bookkeeping-service/bookkeeping/wallet/updateAmount', {
