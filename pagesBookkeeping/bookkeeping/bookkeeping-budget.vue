@@ -111,7 +111,7 @@
             <input 
               type="number" 
               v-model="budgetForm.rewardPoints"
-              placeholder="请输入奖励积分（可正负数）"
+              placeholder="请输入奖励积分"
               class="input"
             >
           </view>
@@ -120,7 +120,7 @@
             <input 
               type="number" 
               v-model="budgetForm.punishPoints"
-              placeholder="请输入处罚积分（可正负数）"
+              placeholder="请输入处罚积分"
               class="input"
             >
           </view>
