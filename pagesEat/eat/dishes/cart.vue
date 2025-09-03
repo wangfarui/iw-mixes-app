@@ -13,8 +13,8 @@
 						<uni-row class="demo-uni-row">
 							<uni-col :span="12">
 								<view>
-									<image :src="dish.dishesImage" :alt="dish.dishesName"
-										style="width: 20vh;height: 20vh;" />
+									<image :src="dish.dishesImage" :alt="dish.dishesName" mode="widthFix"
+										style="width: 100%;" />
 								</view>
 							</uni-col>
 							<uni-col :span="12">
@@ -85,6 +85,21 @@
 		height: 100vh;
 		padding: 10px 12px 16px 12px;
 		box-sizing: border-box;
+	}
+	.demo-uni-row {
+		margin-bottom: 12px;
+	}
+	.dishes {
+		padding-left: 8px;
+		word-break: break-all;
+	}
+	.dishes p {
+		margin: 4px 0;
+		line-height: 1.4;
+	}
+	.dishes .dishesName {
+		font-weight: 600;
+		margin-bottom: 6px;
 	}
 	.goods-carts {
 		/* #ifndef APP-NVUE */
