@@ -2,7 +2,7 @@
 	<view>
 		<view>
 			<uni-drawer ref="showShoppingCart" mode="right" :width="300">
-				<view>
+				<scroll-view scroll-y :show-scrollbar="true" class="drawer-scroll">
 					<view v-if="cartStore.cartItems.length > 0">
 						已下单{{cartStore.cartItems.length}}个菜品哦~
 					</view>
@@ -39,7 +39,7 @@
 							</uni-col>
 						</uni-row>
 					</view>
-				</view>
+				</scroll-view>
 			</uni-drawer>
 		</view>
 		<view class="goods-carts">
@@ -81,6 +81,11 @@
 </script>
 
 <style lang="scss">
+	.drawer-scroll {
+		height: 100vh;
+		padding: 10px 12px 16px 12px;
+		box-sizing: border-box;
+	}
 	.goods-carts {
 		/* #ifndef APP-NVUE */
 		display: flex;
