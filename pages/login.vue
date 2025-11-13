@@ -307,7 +307,7 @@
 					clearInterval(timer);
 					showLoading.value = false;
 					// 加载字典缓存
-					refreshDictCache();
+					refreshDictCache(true);
 					// 跳转到首页
 					uni.switchTab({
 						url: '/pages/home/index'
@@ -316,7 +316,7 @@
 			}, 50); // 5秒内完成100次更新，每次间隔50ms
 		} else {
 			// 非新用户直接加载字典缓存并跳转
-			refreshDictCache();
+			refreshDictCache(refreshDictCache);
 			uni.switchTab({
 				url: '/pages/home/index'
 			});

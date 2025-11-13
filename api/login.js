@@ -44,12 +44,12 @@ export const getDictTypeList = () => {
 }
 
 // 查询所有数据字典集合
-export const getAllDictList = () => {
-	return http.get('/auth-service/dict/getAllDictList');
+export const getAllDictList = (latest) => {
+	return http.get('/auth-service/dict/getAllDictList?latest=' + (latest ? 'true' : 'false'));
 }
 
 // 刷新字典缓存
-export const refreshDictCache = () => {
+export const refreshDictCache = (latest) => {
 	const dictStore = useDictStore()
 	
 	// 加载字典类型
@@ -58,7 +58,7 @@ export const refreshDictCache = () => {
 	})
 
 	// 加载所有数据字典
-	getAllDictList().then(res => {
+	getAllDictList(latest).then(res => {
 		dictStore.setDictDataArrayMap(res.data)
 	})
 }
@@ -107,7 +107,7 @@ async function checkDictVersion() {
 		// 如果版本号发生变化，刷新字典缓存
 		if (currentDictVersion !== newVersion) {
 			currentDictVersion = newVersion
-			refreshDictCache()
+			refreshDictCache(true)
 		}
 	} catch (error) {
 		// 静默处理错误，不输出日志

@@ -121,7 +121,7 @@
 
 	function refreshCache() {
 		uni.showLoading({ title: '刷新中...' })
-		refreshDictCache()
+		refreshDictCache(true)
 		uni.hideLoading()
 		uni.showToast({ title: '刷新成功', icon: 'success' })
 	}

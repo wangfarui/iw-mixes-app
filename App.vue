@@ -32,7 +32,7 @@
 			}
 			
 			// 加载字典缓存
-			refreshDictCache()
+			refreshDictCache(true)
 		})
 
 	})
