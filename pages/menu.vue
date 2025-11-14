@@ -135,6 +135,11 @@ const menuList = [{
 				url: '/static/menus/bookkeeping-wallet.png',
 				text: '钱包',
 				path: '/pagesBookkeeping/bookkeeping/bookkeeping-wallet'
+			},
+			{
+				url: '/static/menus/bookkeeping-membership-subscription.png',
+				text: '会员订阅',
+				path: '/pagesBookkeeping/bookkeeping/bookkeeping-membership-subscription'
 			}
 		],
 	},

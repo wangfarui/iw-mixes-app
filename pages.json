@@ -103,6 +103,12 @@
 					"style": {
 						"navigationBarTitleText": "钱包"
 					}
+				},
+				{
+					"path": "bookkeeping/bookkeeping-membership-subscription",
+					"style": {
+						"navigationBarTitleText": "会员订阅"
+					}
 				}
 			]
 		},

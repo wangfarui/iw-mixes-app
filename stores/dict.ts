@@ -38,7 +38,10 @@ export const useDictStore = defineStore('dict', () => {
 		EAT_DISHES_STATUS: '3004', // 餐饮-菜品状态 code
 		BOOKKEEPING_RECORD_TAG: '4001', // 记账-记录标签 id
 		BOOKKEEPING_RECORD_TYPE: '4002', // 记账-记录分类 code
-		BOOKKEEPING_RECORD_CATEGORY: '4003' // 记账-记录类型 code
+		BOOKKEEPING_RECORD_CATEGORY: '4003', // 记账-记录类型 code
+		BOOKKEEPING_MEMBERSHIP_TYPE: '4004', // 记账-会员类型 code
+		BOOKKEEPING_MEMBERSHIP_BILLING_CYCLE: '4005', // 记账-会员计费周期 code
+		BOOKKEEPING_MEMBERSHIP_CYCLE_UNIT: '4006' // 记账-会员计费周期单位 code
 	});
 
 	/**
