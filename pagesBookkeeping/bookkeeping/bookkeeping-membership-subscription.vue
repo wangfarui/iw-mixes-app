@@ -119,7 +119,6 @@
 import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { useDictStore } from '@/stores/dict.ts'
 import http from '@/api/request.js'
-import {p} from "../../unpackage/dist/dev/mp-weixin/common/vendor";
 
 const dictStore = useDictStore()
 const STORAGE_KEY = 'membership_subscriptions'

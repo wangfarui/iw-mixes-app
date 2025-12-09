@@ -81,7 +81,7 @@
 				<view class="popup-body">
 					<!-- 过滤不计入统计的账单 -->
 					<view class="filter-item">
-						<view class="switch-container" style="color: #bfbfbf; font-size: 12px;">
+						<view class="switch-container">
 							<view style="text-align: start;">
 								<text class="filter-label">过滤不计入统计的账单：</text>
 							</view>
@@ -91,24 +91,18 @@
 						</view>
 					</view>
 					<!-- 记录来源模糊查询 -->
-					<view class="filter-item">
+					<view class="filter-item source-row">
 						<text class="filter-label">记录来源：</text>
-						<uni-row>
-							<uni-easyinput v-model="page.dto.recordSource" maxlength="64"></uni-easyinput>
-						</uni-row>
+						<uni-easyinput v-model="page.dto.recordSource" maxlength="64" style="width: 200rpx;"></uni-easyinput>
 					</view>
 					<!-- 金额范围输入 -->
-					<view class="filter-item">
+					<view class="filter-item amount-row">
 						<text class="filter-label">金额范围：</text>
-						<uni-row>
-							<uni-col :span="10">
-								<input class="filter-input" v-model="page.dto.mixAmount" placeholder="最低金额" type="number" />
-							</uni-col>
-							<uni-col :span="4" style="text-align: center;">-</uni-col>
-							<uni-col :span="10">
-								<input class="filter-input" v-model="page.dto.maxAmount" placeholder="最高金额" type="number" />
-							</uni-col>
-						</uni-row>
+						<view class="amount-input-group">
+							<input class="filter-input" v-model="page.dto.mixAmount" placeholder="最低金额" type="number" />
+							<text style="color: #999; margin: 0 8px;">-</text>
+							<input class="filter-input" v-model="page.dto.maxAmount" placeholder="最高金额" type="number" />
+						</view>
 					</view>
 					<!-- 标签选择 -->
 					<view class="filter-item">
@@ -122,8 +116,19 @@
 							</view>
 						</scroll-view>
 					</view>
+					<!-- 记账类型选择 -->
+					<view class="filter-item category-row">
+						<text class="filter-label">记账类型：</text>
+						<uni-data-select
+							v-model="page.dto.recordCategory"
+							:localdata="recordCategoryOptions"
+							class="sort-select"
+							placement="top"
+							style="width: 200rpx;"
+						></uni-data-select>
+					</view>
 					<!-- 排序选择 -->
-					<view class="filter-item">
+					<view class="filter-item sort-row">
 						<text class="filter-label">排序：</text>
 						<view class="sort-container">
 							<uni-data-select
@@ -196,12 +201,18 @@
 			maxAmount: '', // 最大金额
 			tagIdList: [], // 记账标签id集合
 			isSearchAll: '', // 是否查询所有记录
+			recordCategory: '', // 记录类型
 			sortType: 0, // 排序类型
 			sortWay: 0, // 排序方式
 		},
 		list: [],
 		statistics: {}
 	})
+	
+	const recordCategoryOptions = [
+		{ value: 1, text: '支出' },
+		{ value: 2, text: '收入' }
+	]
 	
 	const sortTypeOptions = [
 		{ value: 0, text: '默认' },
@@ -223,6 +234,7 @@
 		page.dto.maxAmount = ''; // 最大金额
 		page.dto.tagIdList = []; // 记账标签id集合
 		page.dto.isSearchAll = ''; // 是否查询所有记录
+		page.dto.recordCategory = ''; // 记录类型
 		page.dto.sortType = 0; // 排序类型
 		page.dto.sortWay = 0; // 排序方式
 	}
@@ -533,11 +545,15 @@
 		border-top-left-radius: 10px;
 		border-top-right-radius: 10px;
 		overflow: hidden;
+		max-height: 75vh;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.popup-header {
 		padding: 15px;
 		border-bottom: 1px solid #eee;
+		flex-shrink: 0;
 	}
 
 	.popup-title {
@@ -547,6 +563,9 @@
 
 	.popup-body {
 		padding: 15px;
+		flex: 1;
+		overflow-y: auto;
+		min-height: 0;
 	}
 
 	.filter-item {
@@ -557,6 +576,64 @@
 		font-size: 14px;
 		margin-bottom: 5px;
 		display: block;
+	}
+
+	.filter-item.category-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 10px;
+	}
+
+	.filter-item.category-row .filter-label {
+		margin-bottom: 0;
+		display: inline-block;
+		flex-shrink: 0;
+	}
+
+	.filter-item.sort-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 10px;
+	}
+
+	.filter-item.sort-row .filter-label {
+		margin-bottom: 0;
+		display: inline-block;
+		flex-shrink: 0;
+	}
+
+	.filter-item.source-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 10px;
+	}
+
+	.filter-item.source-row .filter-label {
+		margin-bottom: 0;
+		display: inline-block;
+		flex-shrink: 0;
+	}
+
+	.filter-item.amount-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 10px;
+	}
+
+	.filter-item.amount-row .filter-label {
+		margin-bottom: 0;
+		display: inline-block;
+		flex-shrink: 0;
+	}
+
+	.amount-input-group {
+		display: flex;
+		align-items: center;
+		gap: 8px;
 	}
 
 	.category-group {
@@ -585,6 +662,7 @@
 		justify-content: space-between;
 		padding: 10px;
 		border-top: 1px solid #eee;
+		flex-shrink: 0;
 	}
 
 	.cancel-button,
@@ -612,7 +690,6 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 10rpx 20rpx;
 	}
 
 	.sort-container {
