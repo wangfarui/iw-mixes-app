@@ -530,6 +530,9 @@ const goToRecords = (item) => {
     } else {
         url += '&recordYear=' + formatDateForApi(selectedDate.value);
     }
+
+    // 固定只查支出
+    url += '&recordCategory=1'
     
     uni.navigateTo({ url });
 };

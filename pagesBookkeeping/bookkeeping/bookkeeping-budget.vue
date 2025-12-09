@@ -556,6 +556,9 @@ const navigateToRecords = (item) => {
     // 年预算
     url += '&recordYear=' + currentDate
   }
+
+  // 固定只查支出
+  url += '&recordCategory=1'
   
   uni.navigateTo({
     url: url

@@ -186,7 +186,7 @@
 	const ignoreNotStatistics = ref(false)
 	// 筛选的标签
 	const tagIdList = ref([])
-	
+
 	const startDate = ref('')
 	const endDate = ref('')
 	const page = reactive({
@@ -263,9 +263,13 @@
 			selectedButtonCode.value = option.recordType
 		}
 		
-		if (option.ignoreNotStatistics !== undefined) {
-			ignoreNotStatistics.value = option.ignoreNotStatistics === 'true'
-		}
+	if (option.ignoreNotStatistics !== undefined) {
+		ignoreNotStatistics.value = option.ignoreNotStatistics === 'true'
+	}
+
+    if (option.recordCategory !== undefined) {
+      page.dto.recordCategory = Number(option.recordCategory)
+    }
 	})
 	
 	function setCurrentMonthRange() {
@@ -319,7 +323,7 @@
 		ignoreNotStatistics.value = false;
 		// 并且重置查询表单
 		initFormSearchDto();
-		
+
 		filterDialog.value.close();
 		
 		initPage()
@@ -331,7 +335,7 @@
 		page.dto.tagIdList = tagIdList.value
 		
 		filterDialog.value.close();
-		
+
 		initPage()
 	}
 
@@ -368,7 +372,7 @@
 			page.statistics = {consume: 0, income: 0};
 			return;
 		}
-		
+
 		initPage();
 	}
 
@@ -386,7 +390,7 @@
 			page.statistics = {consume: 0, income: 0};
 			return;
 		}
-		
+
 		initPage();
 	}
 
