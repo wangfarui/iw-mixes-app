@@ -140,7 +140,12 @@ const menuList = [{
 				url: '/static/menus/bookkeeping-membership-subscription.png',
 				text: '会员订阅',
 				path: '/pagesBookkeeping/bookkeeping/bookkeeping-membership-subscription'
-			}
+			},
+      {
+        url: '/static/menus/bookkeeping-yearly-statistics.png',
+        text: '年度统计',
+        path: '/pagesBookkeeping/bookkeeping/bookkeeping-yearly-statistics'
+      }
 		],
 	},
 	{

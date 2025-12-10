@@ -109,7 +109,31 @@
 					"style": {
 						"navigationBarTitleText": "会员订阅"
 					}
-				}
+				},
+                {
+                  "path": "bookkeeping/bookkeeping-yearly-statistics",
+                  "style": {
+                    "navigationBarTitleText": "年度统计"
+                  }
+                },
+                {
+                  "path": "bookkeeping/bookkeeping-yearly-overview-statistics",
+                  "style": {
+                    "navigationBarTitleText": "年度总览统计"
+                  }
+                },
+                {
+                  "path": "bookkeeping/bookkeeping-yearly-consume-statistics",
+                  "style": {
+                    "navigationBarTitleText": "年度支出统计"
+                  }
+                },
+                {
+                  "path": "bookkeeping/bookkeeping-yearly-income-statistics",
+                  "style": {
+                    "navigationBarTitleText": "年度收入统计"
+                  }
+                }
 			]
 		},
 		{
