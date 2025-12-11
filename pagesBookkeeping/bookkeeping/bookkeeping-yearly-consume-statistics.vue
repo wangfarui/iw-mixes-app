@@ -54,24 +54,48 @@
 
         <!-- 4. 支出标签占比（饼图） -->
         <view class="chart-container">
-            <view class="chart-title">支出标签占比</view>
+            <view class="chart-title-wrapper">
+                <view class="chart-title">支出标签占比</view>
+                <view class="view-toggle-btn" @tap="switchTagViewType">
+                    <text>{{ tagViewType === 'count' ? '按次数' : '按金额' }}</text>
+                </view>
+            </view>
             <l-echart ref="tagPieChartRef" style="width:100%;height:400rpx"></l-echart>
 
             <view class="tag-list">
-                <view class="tag-item" v-for="item in consumeTags" :key="item.name">
+                <view
+                    class="tag-item"
+                    v-for="item in getDisplayTags(consumeTags)"
+                    :key="item.name"
+                >
                     <view class="tag-header">
                         <view class="tag-name">{{ item.name }}</view>
                         <view class="tag-info">
-                            <text class="tag-ratio">{{ item.ratio }}%</text>
-                            <text class="tag-count">{{ item.count }}次</text>
+                            <text class="tag-ratio" v-if="tagViewType === 'count'">
+                                {{ item.ratio }}% ({{ item.count }}次)
+                            </text>
+                            <text class="tag-ratio" v-else>
+                                {{ item.amountRatio }}% (¥{{ item.amount }})
+                            </text>
                         </view>
                     </view>
                     <view class="progress-bar-bg">
                         <view
                             class="progress-bar"
-                            :style="{ width: item.ratio + '%', backgroundColor: item.color }"
+                            :style="{
+                                width: (tagViewType === 'count' ? item.ratio : item.amountRatio) + '%',
+                                backgroundColor: item.color
+                            }"
                         ></view>
                     </view>
+                </view>
+                <view
+                    v-if="consumeTags.length > 5"
+                    class="expand-btn"
+                    @tap="showAllTags = !showAllTags"
+                >
+                    <text>{{ showAllTags ? '收起' : '展开全部' }}</text>
+                    <text :class="['arrow', showAllTags ? 'up' : 'down']"></text>
                 </view>
             </view>
         </view>
@@ -167,8 +191,10 @@ const monthChartRef = ref(null)
 const categoryPieChartRef = ref(null)
 const tagPieChartRef = ref(null)
 const showAllCategory = ref(false)
+const showAllTags = ref(false)
 const expandTopList = ref(false)
-const ignoreNotStatistics = ref(true)
+const ignoreNotStatistics = ref(false)
+const tagViewType = ref('count') // 'count' or 'amount'
 
 
 // 年度统计数据
@@ -210,6 +236,28 @@ const getDisplayCategory = (categories) => {
     return categories.slice(0, 5)
 }
 
+// 获取显示的标签 (按照当前视图类型排序，最多显示5个)
+const getDisplayTags = (tags) => {
+    let sortedTags = [...tags]
+    // 按照当前视图类型排序 (倒序)
+    if (tagViewType.value === 'count') {
+        sortedTags.sort((a, b) => b.count - a.count)
+    } else {
+        sortedTags.sort((a, b) => (b.amount || 0) - (a.amount || 0))
+    }
+
+    if (showAllTags.value) {
+        return sortedTags
+    }
+    return sortedTags.slice(0, 5)
+}
+
+// 切换标签视图类型
+const switchTagViewType = () => {
+    tagViewType.value = tagViewType.value === 'count' ? 'amount' : 'count'
+    renderTagPieChart()
+}
+
 // 忽略不计入统计的账单
 const switchIgnoreStatistics = (e) => {
     ignoreNotStatistics.value = e.detail.value
@@ -243,7 +291,7 @@ const fetchConsumeData = async () => {
         const year = props.selectedYear.replace('年', '')
         const params = {
             year: parseInt(year),
-            ignoreNotStatistics: ignoreNotStatistics.value ? 1 : 0
+            ignoreNotStatistics: ignoreNotStatistics.value ? 0 : 1
         }
 
         const response = await http.post('/bookkeeping-service/bookkeeping/records/yearStatistics/consume', params)
@@ -269,7 +317,9 @@ const fetchConsumeData = async () => {
         consumeTags.value = response.data.consumeTags.map((item, index) => ({
             ...item,
             count: parseInt(item.count) || 0,
+            amount: parseFloat(item.amount) || 0,
             ratio: parseInt(item.ratio) || 0,
+            amountRatio: parseInt(item.amountRatio) || 0,
             color: chartColors[index % chartColors.length]
         }))
 
@@ -329,9 +379,9 @@ const mockConsumeData = () => {
 
     // 支出标签
     consumeTags.value = [
-        { name: '必需', count: 156, ratio: 54, color: chartColors[0] },
-        { name: '娱乐', count: 89, ratio: 31, color: chartColors[1] },
-        { name: '投资', count: 42, ratio: 15, color: chartColors[2] }
+        { name: '必需', count: 156, amount: 5200, ratio: 54, amountRatio: 34, color: chartColors[0] },
+        { name: '娱乐', count: 89, amount: 3800, ratio: 31, amountRatio: 25, color: chartColors[1] },
+        { name: '投资', count: 42, amount: 6234.56, ratio: 15, amountRatio: 41, color: chartColors[2] }
     ]
 
     // 支出Top10
@@ -503,24 +553,43 @@ const renderTagPieChart = () => {
     if (!tagPieChartRef.value) return
 
     try {
-        const pieData = consumeTags.value.map((item, index) => ({
-            value: item.count,
-            name: item.name,
-            itemStyle: {
-                color: chartColors[index % chartColors.length]
+        let pieData, tooltipFormatter, seriesName
+
+        if (tagViewType.value === 'count') {
+            pieData = consumeTags.value.map((item, index) => ({
+                value: item.count,
+                name: item.name,
+                itemStyle: {
+                    color: chartColors[index % chartColors.length]
+                }
+            }))
+            tooltipFormatter = function(params) {
+                if (!params) return ''
+                return `${params.name} ${params.value}次\n占比 ${params.percent}%`
             }
-        }))
+            seriesName = '支出标签'
+        } else {
+            pieData = consumeTags.value.map((item, index) => ({
+                value: item.amount,
+                name: item.name,
+                itemStyle: {
+                    color: chartColors[index % chartColors.length]
+                }
+            }))
+            tooltipFormatter = function(params) {
+                if (!params) return ''
+                return `${params.name} ¥${params.value}\n占比 ${params.percent}%`
+            }
+            seriesName = '支出标签金额'
+        }
 
         const option = {
             tooltip: {
                 trigger: 'item',
-                formatter: function(params) {
-                    if (!params) return ''
-                    return `${params.name} ${params.value}次\n占比 ${params.percent}%`
-                }
+                formatter: tooltipFormatter
             },
             series: [{
-                name: '支出标签',
+                name: seriesName,
                 type: 'pie',
                 radius: ['30%', '60%'],
                 data: pieData,
@@ -604,6 +673,27 @@ const renderTagPieChart = () => {
     font-weight: bold;
     color: #333;
     margin-bottom: 20rpx;
+}
+
+.chart-title-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20rpx;
+}
+
+.view-toggle-btn {
+    padding: 8rpx 16rpx;
+    background-color: #f0f0f0;
+    border-radius: 6rpx;
+    font-size: 22rpx;
+    color: #5470c6;
+    border: 1rpx solid #e0e0e0;
+    transition: all 0.3s ease;
+
+    &:active {
+        background-color: #e8e8e8;
+    }
 }
 
 .category-list {

@@ -114,7 +114,7 @@ const props = defineProps({
     }
 })
 
-const ignoreNotStatistics = ref(true)
+const ignoreNotStatistics = ref(false)
 const trendChartRef = ref(null)
 
 // 年度统计数据
@@ -129,11 +129,14 @@ const yearStatistics = ref({
 // 趋势数据 (12个月)
 const consumeTrendData = ref(Array(12).fill(0))
 const incomeTrendData = ref(Array(12).fill(0))
+const netIncomeTrendData = ref(Array(12).fill(0))
 
 // 记账习惯数据
 const recordingHabits = ref({
     recordingDays: 0,
     maxContinuousDays: 0,
+    maxContinuousStartDate: '',
+    maxContinuousEndDate: '',
     peakMonth: '',
     peakCount: 0,
     missingCount: 0,
@@ -175,7 +178,7 @@ const fetchYearStatistics = async () => {
         const year = props.selectedYear.replace('年', '')
         const params = {
             year: parseInt(year),
-            ignoreNotStatistics: ignoreNotStatistics.value ? 1 : 0
+            ignoreNotStatistics: ignoreNotStatistics.value ? 0 : 1
         }
 
         const response = await http.post('/bookkeeping-service/bookkeeping/records/yearStatistics/overview', params)
@@ -186,6 +189,7 @@ const fetchYearStatistics = async () => {
         // 赋值月度趋势数据
         consumeTrendData.value = response.data.monthlyData.consumeTrendData
         incomeTrendData.value = response.data.monthlyData.incomeTrendData
+        netIncomeTrendData.value = response.data.monthlyData.netIncomeTrendData
 
         // 赋值记账习惯数据
         recordingHabits.value = response.data.recordingHabits
@@ -215,11 +219,14 @@ const mockYearStatistics = () => {
     // 月度趋势
     consumeTrendData.value = [1200, 1400, 1100, 1300, 1500, 1600, 1400, 1200, 1800, 1900, 1700, 1300]
     incomeTrendData.value = [1500, 1600, 1400, 1700, 1800, 2000, 1900, 1700, 2100, 2200, 2000, 1600]
+    netIncomeTrendData.value = [100, 100, 100, 100, 180, 200, 100, 170, 210, 220, 200, 100]
 
     // 记账习惯数据
     recordingHabits.value = {
         recordingDays: 287,
         maxContinuousDays: 45,
+        maxContinuousStartDate: '2024-03-01',
+        maxContinuousEndDate: '2024-04-14',
         peakMonth: '12月',
         peakCount: 28,
         missingCount: 78,
@@ -242,11 +249,6 @@ const renderTrendChart = () => {
     }
 
     try {
-        // 计算净收入数据 (收入 - 支出)
-        const netIncomeData = incomeTrendData.value.map((income, idx) => {
-            return income - consumeTrendData.value[idx]
-        })
-
         const option = {
             tooltip: {
                 trigger: 'axis',
@@ -318,7 +320,7 @@ const renderTrendChart = () => {
                 },
                 {
                     name: '每月净收入',
-                    data: netIncomeData,
+                    data: netIncomeTrendData.value,
                     type: 'line',
                     smooth: true,
                     itemStyle: {

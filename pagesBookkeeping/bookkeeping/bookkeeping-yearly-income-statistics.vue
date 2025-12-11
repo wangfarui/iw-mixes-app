@@ -105,6 +105,14 @@
                 </view>
             </view>
         </view>
+
+        <!-- 忽略不计入统计的账单开关 -->
+        <view class="settings-container">
+            <view class="switch-item">
+                <text>忽略不计入统计的账单</text>
+                <switch :checked="ignoreNotStatistics" @change="switchIgnoreStatistics" style="transform:scale(0.6)" />
+            </view>
+        </view>
     </view>
 </template>
 
@@ -127,6 +135,7 @@ const props = defineProps({
 const monthChartRef = ref(null)
 const incomePieChartRef = ref(null)
 const showAllIncomeCategory = ref(false)
+const ignoreNotStatistics = ref(false)
 
 // 年度统计数据
 const yearStatistics = ref({
@@ -162,6 +171,12 @@ const getDisplayIncomeCategory = () => {
     return incomeCategories.value.slice(0, 5)
 }
 
+// 忽略不计入统计的账单
+const switchIgnoreStatistics = (e) => {
+    ignoreNotStatistics.value = e.detail.value
+    // 重新获取数据
+    fetchIncomeData()
+}
 
 // 初始化图表
 onReady(() => {
@@ -186,7 +201,7 @@ const fetchIncomeData = async () => {
         const year = props.selectedYear.replace('年', '')
         const params = {
             year: parseInt(year),
-            ignoreNotStatistics: 0
+            ignoreNotStatistics: ignoreNotStatistics.value ? 0 : 1
         }
 
         const response = await http.post('/bookkeeping-service/bookkeeping/records/yearStatistics/income', params)
@@ -679,6 +694,22 @@ const renderIncomePieChart = () => {
             transform: rotate(135deg);
         }
     }
+}
+
+.settings-container {
+    background-color: white;
+    margin: 20rpx;
+    padding: 20rpx;
+    border-radius: 12rpx;
+    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+}
+
+.switch-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 28rpx;
+    color: #333;
 }
 </style>
 
