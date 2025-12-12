@@ -64,8 +64,8 @@
             <!-- 详细信息 -->
             <view class="habits-details">
                 <view class="details-item">
-                    <view class="details-label">记账频率</view>
-                    <view class="details-value">{{ recordingHabits.recordingDays }}/365天</view>
+                    <view class="details-label">全年记账次数</view>
+                    <view class="details-value">{{ recordingHabits.recordingCount }}</view>
                 </view>
                 <view class="details-item">
                     <view class="details-label">平均每天记账次数</view>
@@ -141,6 +141,7 @@ const recordingHabits = ref({
     peakCount: 0,
     missingCount: 0,
     missingRate: 0,
+    recordingCount: 0,
     avgPerDay: 0,
     evaluation: ''
 })
@@ -231,6 +232,7 @@ const mockYearStatistics = () => {
         peakCount: 28,
         missingCount: 78,
         missingRate: 21.4,
+		recordingCount: 300,
         avgPerDay: 2.1,
         evaluation: '坚持记账的好习惯！连续记账超过40天是值得表扬的成就。保持这个节奏，你会更好地掌握自己的财务状况。💪'
     }
