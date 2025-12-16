@@ -110,7 +110,7 @@
 						<scroll-view scroll-y class="category-group">
 							<view class="category-button"
 								:class="{ selected: tagIdList.includes(category.id) }"
-								v-for="category in dictStore.getDictDataArray(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG)"
+								v-for="category in bookkeepingRecordTags"
 								:key="category.id" @click="toggleCategory(category.id)">
 								{{ category.dictName }}
 							</view>
@@ -179,7 +179,7 @@
 
 	const mealListStatus = ref('more')
 
-	const buttonList = ['全部', '支出', '收入']
+	const bookkeepingRecordTags = ref([])
 	const selectedButtonCode = ref(-1)
 	const filterDialog = ref(null);
 	// 忽略不计入统计数据
@@ -263,9 +263,9 @@
 			selectedButtonCode.value = option.recordType
 		}
 		
-	if (option.ignoreNotStatistics !== undefined) {
-		ignoreNotStatistics.value = option.ignoreNotStatistics === 'true'
-	}
+    if (option.ignoreNotStatistics !== undefined) {
+      ignoreNotStatistics.value = option.ignoreNotStatistics === 'true'
+    }
 
     if (option.recordCategory !== undefined) {
       page.dto.recordCategory = Number(option.recordCategory)
@@ -292,6 +292,11 @@
 			endDate.value = formatDate(lastDate);
 		}
 		selectedButtonCode.value = selectedButtonCode.value - 1 + 1
+
+    const consumeTags = dictStore.getDictDataArray(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG_CONSUME);
+    const incomeTags = dictStore.getDictDataArray(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG_INCOME);
+    bookkeepingRecordTags.value = [...consumeTags, ...incomeTags];
+
 		initPage()
 	})
 

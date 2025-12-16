@@ -33,7 +33,7 @@
 				<uni-data-checkbox
 					multiple
 					v-model="formData.recordTags"
-					:localdata="dictStore.getDictDataWithDataSelectId(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG)"
+					:localdata="formData.recordCategory === 2 ? dictStore.getDictDataWithDataSelectId(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG_INCOME) : dictStore.getDictDataWithDataSelectId(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG_CONSUME)"
 				/>
 			</uni-forms-item>
 		</uni-forms>
@@ -78,7 +78,7 @@ const iconPopup = ref(null)
 const iconList = ref([])
 
 const formData = ref({
-	recordCategory: null,
+	recordCategory: 1,
 	recordSource: '',
 	recordType: null,
 	recordIcon: '',

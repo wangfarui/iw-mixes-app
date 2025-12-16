@@ -36,7 +36,8 @@ export const useDictStore = defineStore('dict', () => {
 		EAT_MEAL_TIME: '3002', // 餐饮-用餐时间 code
 		EAT_DISHES_TYPE: '3003', // 餐饮-菜品分类 code
 		EAT_DISHES_STATUS: '3004', // 餐饮-菜品状态 code
-		BOOKKEEPING_RECORD_TAG: '4001', // 记账-记录标签 id
+        BOOKKEEPING_RECORD_TAG_CONSUME: '4001', // 记账-记录标签-支出 id
+        BOOKKEEPING_RECORD_TAG_INCOME: '4011', // 记账-记录标签-收入 id
 		BOOKKEEPING_RECORD_TYPE: '4002', // 记账-记录分类 code
 		BOOKKEEPING_RECORD_CATEGORY: '4003', // 记账-记录类型 code
 		BOOKKEEPING_MEMBERSHIP_TYPE: '4004', // 记账-会员类型 code

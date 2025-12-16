@@ -26,10 +26,14 @@
 		      <view class="item">
 		        <text class="label">标签</text>
 		        <text class="value">
-					<text v-for="(item, index) in detail.recordTags">
-						{{ index != 0 ? '、' : ''}}
-						{{ dictStore.getDictNameById(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG, item) }}
-					</text>
+            <text v-for="(item, index) in detail.recordTags">
+              {{ index != 0 ? '、' : ''}}
+              {{
+                detail.recordCategory == '2'
+                ? dictStore.getDictNameById(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG_INCOME, item)
+                : dictStore.getDictNameById(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG_CONSUME, item)
+              }}
+            </text>
 				</text>
 		      </view>
 		      <view class="item">

@@ -42,8 +42,8 @@
       <switch :checked="isExcitationRecord" @change="switchExcitationRecord" />
     </view>
 
-    <!-- 不计入统计（仅支出） -->
-    <view v-if="formData.recordCategory === 1" class="form-item">
+    <!-- 不计入统计 -->
+    <view class="form-item">
       <view class="label">不计入统计:</view>
       <switch :checked="isNotStatistics" @change="switchNotStatistics" size="20px" />
     </view>
@@ -74,7 +74,7 @@
         <uni-data-checkbox
           multiple
           v-model="formData.recordTags"
-          :localdata="dictStore.getDictDataWithDataSelectId(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG)"
+          :localdata="formData.recordCategory === 2 ? dictStore.getDictDataWithDataSelectId(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG_INCOME) : dictStore.getDictDataWithDataSelectId(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG_CONSUME)"
         />
     </view>
 
@@ -223,7 +223,8 @@
 				.then(res => {
 					isExcitationRecord.value = res.data.isExcitationRecord == 1
 					isNotStatistics.value = res.data.isStatistics == 0
-					formData.value = res.data			
+					formData.value = res.data
+          current.value = res.data.recordCategory - 1
 				})
 		} else {
 			isExcitationRecord.value = false

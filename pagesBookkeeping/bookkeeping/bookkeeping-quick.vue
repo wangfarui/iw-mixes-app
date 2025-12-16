@@ -97,8 +97,8 @@
 				<uni-data-checkbox
 					multiple
 					v-model="formData.recordTags"
-					:localdata="dictStore.getDictDataWithDataSelectId(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG)"
-				/>
+          :localdata="selectedCategory === 2 ? dictStore.getDictDataWithDataSelectId(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG_INCOME) : dictStore.getDictDataWithDataSelectId(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TAG_CONSUME)"
+        />
 			</view>
 		</uni-popup>
 
@@ -111,8 +111,8 @@
 					<switch :checked="formData.isExcitationRecord === 1" @change="switchExcitationRecord" />
 				</view>
 
-				<!-- 不计入统计（仅支出） -->
-				<view v-if="selectedCategory === 1" class="more-item">
+				<!-- 不计入统计 -->
+				<view class="more-item">
 					<text class="more-label">不计入统计:</text>
 					<switch :checked="formData.isStatistics === 0" @change="switchStatistics" />
 				</view>
