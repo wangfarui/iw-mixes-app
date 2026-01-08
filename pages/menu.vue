@@ -91,7 +91,7 @@ function parseMarkdown(text) {
 }
 
 const menuList = [{
-		title: '餐饮服务',
+		title: '厨房重地',
 		components: [{
 				url: '/static/menus/eat-recipe.png',
 				text: '食谱',
@@ -110,27 +110,27 @@ const menuList = [{
 		]
 	},
 	{
-		title: '记账服务',
+		title: '财务记账',
 		components: [{
 				url: '/static/menus/bookkeeping-action.png',
 				text: '记账',
 				path: '/pagesBookkeeping/bookkeeping/bookkeeping-action'
 			},
-			{
-				url: '/static/menus/bookkeeping-records.png',
-				text: '记账记录',
-				path: '/pagesBookkeeping/bookkeeping/bookkeeping-records'
-			},
-			{
-				url: '/static/menus/bookkeeping-statistics.png',
-				text: '支出统计',
-				path: '/pagesBookkeeping/bookkeeping/bookkeeping-consume-statistics'
-			},
-			{
-				url: '/static/menus/bookkeeping-income-statistics.png',
-				text: '收入统计',
-				path: '/pagesBookkeeping/bookkeeping/bookkeeping-income-statistics'
-			},
+			// {
+			// 	url: '/static/menus/bookkeeping-records.png',
+			// 	text: '记账记录',
+			// 	path: '/pagesBookkeeping/bookkeeping/bookkeeping-records'
+			// },
+			// {
+			// 	url: '/static/menus/bookkeeping-statistics.png',
+			// 	text: '支出统计',
+			// 	path: '/pagesBookkeeping/bookkeeping/bookkeeping-consume-statistics'
+			// },
+			// {
+			// 	url: '/static/menus/bookkeeping-income-statistics.png',
+			// 	text: '收入统计',
+			// 	path: '/pagesBookkeeping/bookkeeping/bookkeeping-income-statistics'
+			// },
 			{
 				url: '/static/menus/bookkeeping-wallet.png',
 				text: '钱包',
@@ -149,7 +149,7 @@ const menuList = [{
 		],
 	},
 	{
-		title: '积分服务',
+		title: '积分任务',
 		components: [{
 				url: '/static/menus/points-action.png',
 				text: '新增积分',
@@ -169,16 +169,16 @@ const menuList = [{
 				url: '/static/menus/task-list.png',
 				text: '常用任务',
 				path: '/pagesPoints/points/task-list'
-			},
-			{
-				url: '/static/menus/points-statistics.png',
-				text: '积分分析',
-				path: '/pagesPoints/points/points-statistics'
 			}
+			// {
+			// 	url: '/static/menus/points-statistics.png',
+			// 	text: '积分分析',
+			// 	path: '/pagesPoints/points/points-statistics'
+			// }
 		],
 	},
 	{
-		title: '基础服务',
+		title: '基础功能',
 		components: [{
 				url: '/static/menus/dict-manage.png',
 				text: '字典管理',
