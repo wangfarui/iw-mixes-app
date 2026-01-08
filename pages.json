@@ -242,8 +242,14 @@
 					"style": {
 						"navigationBarTitleText": "用餐详情"
 					}
-				}
-			]
+				},
+                {
+                  "path": "eat/fridge/index",
+                  "style": {
+                    "navigationBarTitleText": "冰箱"
+                  }
+                }
+            ]
 		},
 		{
 			"root": "pagesPoints",

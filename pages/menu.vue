@@ -106,7 +106,12 @@ const menuList = [{
 				url: '/static/menus/eat-meal.png',
 				text: '用餐记录',
 				path: '/pagesEat/eat/meal/index'
-			}
+			},
+      {
+        url: '/static/menus/eat-fridge.png',
+        text: '冰箱',
+        path: '/pagesEat/eat/fridge/index'
+      }
 		]
 	},
 	{
