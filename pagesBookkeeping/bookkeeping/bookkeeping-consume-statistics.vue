@@ -110,17 +110,23 @@
                     <text :class="['arrow', showAllCategory ? 'up' : 'down']"></text>
                 </view>
             </view>
-
-            <!-- 年度趋势图 (仅在年度统计时显示) -->
-            <view v-show="currentTab === 'year'" class="year-trend">
-                <view class="chart-title-container">
-                    <view class="chart-title">年度支出趋势</view>
-                </view>
-                <l-echart ref="trendChartRef" style="width:100%;height:750rpx"></l-echart>
-            </view>
         </view>
 
-        <!-- 支出排行 -->
+        <!-- 年度趋势图 (仅在年度统计时显示) -->
+        <view v-show="currentTab === 'year'" class="chart-section year-trend">
+            <view class="chart-title-container">
+                <view class="chart-title">年度支出趋势</view>
+            </view>
+            <l-echart ref="trendChartRef" style="width:100%;height:750rpx"></l-echart>
+        </view>
+
+        <!-- 月度每日消费图表 (仅在月度统计时显示) -->
+        <view v-show="currentTab === 'month'" class="chart-section month-daily-trend">
+            <view class="chart-title-container">
+                <view class="chart-title">月度每日消费</view>
+            </view>
+            <l-echart ref="monthlyDailyChartRef" style="width:100%;height:750rpx"></l-echart>
+        </view>
         <view class="consume-ranking">
             <view class="ranking-title">支出排行 TOP 10</view>
             <view class="ranking-list">
@@ -156,6 +162,9 @@ const myChart = ref(null)
 const trendChartRef = ref(null)
 const trendChart = ref(null)
 const trendChartData = ref([])
+const monthlyDailyChartRef = ref(null)
+const monthlyDailyChart = ref(null)
+const monthlyDailyChartData = ref([])
 const echarts = require('../../uni_modules/lime-echart/static/echarts.min')
 
 // 忽略不计入统计数据开关状态
@@ -325,10 +334,10 @@ const renderTrendChart = () => {
         },
         grid: {
             left: '0%',
-            right: '0%',
+            right: '5%',
             bottom: 20,
             top: 30,
-            containLabel: false
+            containLabel: true
         },
         xAxis: {
             type: 'category',
@@ -338,11 +347,31 @@ const renderTrendChart = () => {
                 fontSize: 12
             },
             axisTick: { show: false },
-            axisLine: { show: false },
+            axisLine: { show: true },
             boundaryGap: true
         },
         yAxis: {
-            show: false
+            type: 'value',
+            show: true,
+            axisLabel: {
+                show: true,
+                fontSize: 12,
+                formatter: function(value) {
+                    if (value >= 10000) {
+                        return (value / 10000).toFixed(0) + 'w';
+                    }
+                    return value;
+                }
+            },
+            axisTick: { show: true },
+            axisLine: { show: true },
+            splitLine: {
+                show: true,
+                lineStyle: {
+                    color: '#f0f0f0',
+                    type: 'dashed'
+                }
+            }
         },
         series: [{
             data: trendChartData.value,
@@ -393,6 +422,122 @@ const renderTrendChart = () => {
     }
 };
 
+// 渲染月度每日消费柱状图
+const renderMonthlyDailyChart = () => {
+    if (!monthlyDailyChartRef.value || !monthlyDailyChart.value) {
+        return;
+    }
+
+    if (!monthlyDailyChartData.value || monthlyDailyChartData.value.length === 0) {
+        monthlyDailyChartRef.value.setOption({
+            tooltip: { trigger: 'axis' },
+            xAxis: { type: 'category', data: [] },
+            yAxis: { type: 'value' },
+            series: [{ data: [], type: 'bar' }]
+        }, true);
+        return;
+    }
+
+    const maxIndex = monthlyDailyChartData.value.indexOf(Math.max(...monthlyDailyChartData.value));
+
+    const option = {
+        tooltip: {
+            trigger: 'axis',
+            formatter: function(params) {
+                const dayNumber = params[0].name;
+                return `${dayNumber}日：¥${params[0].value.toLocaleString()}`;
+            }
+        },
+        grid: {
+            left: '0%',
+            right: '5%',
+            bottom: 20,
+            top: 30,
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            data: Array.from({length: monthlyDailyChartData.value.length}, (_, i) => `${i + 1}`),
+            axisLabel: {
+                show: true,
+                fontSize: 12
+            },
+            axisTick: { show: false },
+            axisLine: { show: true },
+            boundaryGap: true
+        },
+        yAxis: {
+            type: 'value',
+            show: true,
+            axisLabel: {
+                show: true,
+                fontSize: 12,
+                formatter: function(value) {
+                    if (value >= 10000) {
+                        return (value / 10000).toFixed(0) + 'w';
+                    }
+                    return value;
+                }
+            },
+            axisTick: { show: true },
+            axisLine: { show: true },
+            splitLine: {
+                show: true,
+                lineStyle: {
+                    color: '#f0f0f0',
+                    type: 'dashed'
+                }
+            }
+        },
+        series: [{
+            data: monthlyDailyChartData.value,
+            type: 'bar',
+            barWidth: '70%',
+            itemStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    { offset: 0, color: '#83bff6' },
+                    { offset: 0.5, color: '#188df0' },
+                    { offset: 1, color: '#188df0' }
+                ])
+            },
+            emphasis: {
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: '#2378f7' },
+                        { offset: 0.7, color: '#2378f7' },
+                        { offset: 1, color: '#83bff6' }
+                    ])
+                }
+            },
+            label: {
+                show: true,
+                position: 'top',
+                formatter: function(params) {
+                    if (!monthlyDailyChartData.value || monthlyDailyChartData.value.length === 0) return '';
+                    return params.dataIndex === maxIndex ? `¥${params.value}` : '';
+                },
+                fontWeight: 'bold',
+                color: '#2378f7',
+                fontSize: 14
+            },
+            barCategoryGap: '10%'
+        }]
+    };
+
+    monthlyDailyChartRef.value.setOption(option, true);
+
+    // 高亮最大值
+    if (monthlyDailyChartData.value && monthlyDailyChartData.value.length > 0) {
+        setTimeout(() => {
+            monthlyDailyChart.value.dispatchAction({
+                type: 'highlight',
+                seriesIndex: 0,
+                dataIndex: maxIndex
+            });
+        }, 500);
+    }
+};
+
 // 获取支出数据
 const fetchConsumeData = async () => {
     const params = getRequestParams();
@@ -407,7 +552,7 @@ const fetchConsumeData = async () => {
             http.post('/bookkeeping-service/bookkeeping/consume/totalStatistics', params),
             http.post(pieChartApi, params),
             http.post('/bookkeeping-service/bookkeeping/consume/rankStatistics', params),
-            currentTab.value === 'year' ? http.post(barChartApi, params) : Promise.resolve({ data: [] })
+            http.post(barChartApi, params)
         ]);
 
         // 处理总支出结果
@@ -436,13 +581,24 @@ const fetchConsumeData = async () => {
             renderChart();
         }
 
-        // 处理年度趋势图数据
-        if (currentTab.value === 'year' && barChartRes.data && Array.isArray(barChartRes.data)) {
-            trendChartData.value = barChartRes.data;
-            renderTrendChart();
+        // 处理年度趋势图数据或月度每日消费数据
+        if (barChartRes.data && Array.isArray(barChartRes.data)) {
+            if (currentTab.value === 'year') {
+                trendChartData.value = barChartRes.data;
+                renderTrendChart();
+            } else {
+                // 月度统计时使用barChartRes数据作为每日消费数据
+                monthlyDailyChartData.value = barChartRes.data;
+                renderMonthlyDailyChart();
+            }
         } else {
-            trendChartData.value = [];
-            renderTrendChart();
+            if (currentTab.value === 'year') {
+                trendChartData.value = [];
+                renderTrendChart();
+            } else {
+                monthlyDailyChartData.value = [];
+                renderMonthlyDailyChart();
+            }
         }
 
         // 处理支出排行结果
@@ -458,10 +614,12 @@ const fetchConsumeData = async () => {
         totalRecordNum.value = 0;
         chartData.value = [];
         trendChartData.value = [];
+        monthlyDailyChartData.value = [];
         consumeRanking.value = [];
         // 渲染空图表
         renderChart();
         renderTrendChart();
+        renderMonthlyDailyChart();
     }
 };
 
@@ -480,6 +638,13 @@ onReady(() => {
      if (trendChartRef.value) {
         trendChartRef.value.init(echarts, chart => {
             trendChart.value = chart;
+        });
+    }
+
+    // 初始化月度每日消费图表
+    if (monthlyDailyChartRef.value) {
+        monthlyDailyChartRef.value.init(echarts, chart => {
+            monthlyDailyChart.value = chart;
         });
     }
 
@@ -502,6 +667,10 @@ onUnmounted(() => {
     if (trendChart.value) {
         trendChart.value.dispose();
         trendChart.value = null;
+    }
+    if (monthlyDailyChart.value) {
+        monthlyDailyChart.value.dispose();
+        monthlyDailyChart.value = null;
     }
 });
 
@@ -803,9 +972,63 @@ const goToRecords = (item) => {
     }
 
     .year-trend {
-        margin-top: 30rpx;
-        padding-top: 30rpx;
-        border-top: 1rpx solid #eee;
+        background-color: #fff;
+        padding: 30rpx;
+        border-radius: 20rpx;
+        margin-bottom: 30rpx;
+        box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.1);
+
+        .chart-title-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20rpx;
+
+            .chart-title {
+                font-size: 32rpx;
+                font-weight: bold;
+            }
+        }
+    }
+
+    .month-daily-trend {
+        background-color: #fff;
+        padding: 30rpx;
+        border-radius: 20rpx;
+        margin-bottom: 30rpx;
+        box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.1);
+
+        .chart-title-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20rpx;
+
+            .chart-title {
+                font-size: 32rpx;
+                font-weight: bold;
+            }
+        }
+    }
+
+    .chart-section {
+        background-color: #fff;
+        padding: 30rpx;
+        border-radius: 20rpx;
+        margin-bottom: 30rpx;
+        box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.1);
+
+        .chart-title-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20rpx;
+
+            .chart-title {
+                font-size: 32rpx;
+                font-weight: bold;
+            }
+        }
     }
 }
 </style>
