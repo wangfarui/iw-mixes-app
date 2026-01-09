@@ -41,6 +41,7 @@
 							:key="task.id" 
 							class="task-item"
 							@longpress="showActionSheet(task)"
+							@tap="navigateToDetail(task)"
 						>
 							<view class="task-content">
 								<view class="task-name">{{ task.taskName }}</view>
@@ -71,6 +72,7 @@
 							:key="task.id" 
 							class="task-item"
 							@longpress="showActionSheet(task)"
+							@tap="navigateToDetail(task)"
 						>
 							<view class="task-content">
 								<view class="task-name">{{ task.taskName }}</view>
@@ -101,6 +103,7 @@
 							:key="task.id" 
 							class="task-item"
 							@longpress="showActionSheet(task)"
+							@tap="navigateToDetail(task)"
 						>
 							<view class="task-content">
 								<view class="task-name">{{ task.taskName }}</view>
@@ -587,6 +590,13 @@ export default {
 			deadlineForm.value.deadlineDate = e.detail.value
 		}
 
+		// 导航到任务详情页面
+		const navigateToDetail = (task) => {
+			uni.navigateTo({
+				url: `/pagesPoints/task/task-edit-detail?taskId=${task.id}`
+			})
+		}
+
 		onMounted(() => {
 			fetchRecentTasks()
 		})
@@ -616,7 +626,8 @@ export default {
 			confirmDelete,
 			closeDeletePopup,
 			saveDeadline,
-			closeDeadlinePopup
+			closeDeadlinePopup,
+			navigateToDetail
 		}
 	}
 }

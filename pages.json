@@ -298,7 +298,13 @@
 						"navigationBarTitleText": "常用任务",
 						"enablePullDownRefresh": true
 					}
-				}
+				},
+                {
+                  "path": "task/task-edit-detail",
+                  "style": {
+                    "navigationBarTitleText": "任务详情"
+                  }
+                }
 			]
 		}
 	],
