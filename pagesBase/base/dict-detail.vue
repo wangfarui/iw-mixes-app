@@ -25,13 +25,16 @@
 								placeholder="请输入字典名称"
 							/>
 						</uni-forms-item>
-						<uni-forms-item label="字典状态" required>
-							<uni-data-select
-								v-model="formData.dictStatus"
-								:localdata="dictStatusOptions"
-								placeholder="请选择字典状态"
-							/>
-						</uni-forms-item>
+					<uni-forms-item label="字典状态" required>
+						<uni-data-select
+							v-model="formData.dictStatus"
+							:localdata="dictStatusOptions"
+							placeholder="请选择字典状态"
+						/>
+					</uni-forms-item>
+					<uni-forms-item v-if="isAdmin" label="同步所有用户">
+						<switch :checked="formData.isSyncAll === 1" @change="e => formData.isSyncAll = e.detail.value ? 1 : 0" />
+					</uni-forms-item>
 					</uni-forms>
 				</view>
                 <!-- 底部按钮 -->
@@ -58,13 +61,15 @@
 	const dictStore = useDictStore()
 	const form = ref(null)
 	const isEdit = ref(false)
+	const isAdmin = ref(false)
 
 	const formData = reactive({
 		id: '',
 		dictType: '',
 		dictName: '',
 		dictStatus: '1',
-		dictCode: ''
+		dictCode: '',
+		isSyncAll: 0
 	})
 
 	const dictTypeOptions = ref(dictStore.getDictTypeArray().map(item => ({
@@ -98,6 +103,7 @@
 	}
 
 	onLoad((option) => {
+		checkAdminPermission()
 		if (option.id) {
 			isEdit.value = true
 			getDictDetail(option.id)
@@ -113,6 +119,17 @@
 				formData.dictName = data.dictName
 				formData.dictStatus = data.dictStatus
 				formData.dictCode = data.dictCode
+				formData.isSyncAll = data.isSyncAll || 0
+			})
+	}
+
+	function checkAdminPermission() {
+		http.get('/auth-service/user/isAdminUser')
+			.then(res => {
+				isAdmin.value = res.data
+			})
+			.catch(err => {
+				isAdmin.value = false
 			})
 	}
 
