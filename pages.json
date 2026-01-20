@@ -248,6 +248,12 @@
                   "style": {
                     "navigationBarTitleText": "冰箱"
                   }
+                },
+                {
+                  "path": "eat/fridge/detail",
+                  "style": {
+                    "navigationBarTitleText": "食材详情"
+                  }
                 }
             ]
 		},
