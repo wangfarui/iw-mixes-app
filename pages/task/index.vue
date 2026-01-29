@@ -44,7 +44,10 @@
 							@tap="navigateToDetail(task)"
 						>
 							<view class="task-content">
-								<view class="task-name">{{ task.taskName }}</view>
+								<view class="task-name-container">
+									<view class="task-name">{{ task.taskName }}</view>
+									<view v-if="task.isTop === 1" class="task-top-badge">置顶</view>
+								</view>
 								<view class="task-info">
 									<view v-if="currentView === 'recent'" class="task-group">{{ task.taskGroupName }}</view>
 									<view v-if="currentView === 'done'" class="task-group">{{ task.taskGroupName }}</view>
@@ -75,7 +78,10 @@
 							@tap="navigateToDetail(task)"
 						>
 							<view class="task-content">
-								<view class="task-name">{{ task.taskName }}</view>
+								<view class="task-name-container">
+									<view class="task-name">{{ task.taskName }}</view>
+									<view v-if="task.isTop === 1" class="task-top-badge">置顶</view>
+								</view>
 								<view class="task-info">
 									<view v-if="currentView === 'recent'" class="task-group">{{ task.taskGroupName }}</view>
 									<view v-if="currentView === 'done'" class="task-group">{{ task.taskGroupName }}</view>
@@ -280,6 +286,12 @@ export default {
 				if (task.taskStatus === 0) {
 					itemList.push('完成')
 				}
+				// 根据task.isTop判断显示置顶或取消置顶
+				if (task.isTop === 1) {
+					itemList.push('取消置顶')
+				} else {
+					itemList.push('置顶')
+				}
 				itemList.push('设置积分')
 				itemList.push('设置截止日期')
 				itemList.push('删除')
@@ -296,8 +308,11 @@ export default {
 						} else if (res.tapIndex === itemList.length - 1) {
 							showDeleteConfirm(task)
 						} else if (res.tapIndex === 1) {
-							showPointsPopup(task)
+							// 置顶/取消置顶
+							toggleTaskTop(task)
 						} else if (res.tapIndex === 2) {
+							showPointsPopup(task)
+						} else if (res.tapIndex === 3) {
 							showDeadlinePopup(task)
 						}
 					}
@@ -585,6 +600,32 @@ export default {
 			deadlinePopup.value.close()
 		}
 
+		// 置顶/取消置顶任务
+		const toggleTaskTop = async (task) => {
+			try {
+				const isTop = task.isTop === 1 ? 0 : 1
+				await http.put('/points-service/points/task/basics/updateTaskParam', {
+					id: task.id,
+					isTop: isTop
+				})
+				const message = isTop === 1 ? '已置顶' : '已取消置顶'
+				uni.showToast({
+					title: message,
+					icon: 'success'
+				})
+				if (currentView.value === 'recent') {
+					fetchRecentTasks()
+				} else {
+					fetchInboxTasks()
+				}
+			} catch (error) {
+				uni.showToast({
+					title: '操作失败',
+					icon: 'none'
+				})
+			}
+		}
+
 		// 截止日期选择器变化
 		const onDeadlineDateChange = (e) => {
 			deadlineForm.value.deadlineDate = e.detail.value
@@ -627,6 +668,7 @@ export default {
 			closeDeletePopup,
 			saveDeadline,
 			closeDeadlinePopup,
+			toggleTaskTop,
 			navigateToDetail
 		}
 	}
@@ -697,6 +739,28 @@ export default {
 	margin-bottom: 20rpx;
 
 	.task-content {
+		.task-name-container {
+			display: flex;
+			align-items: center;
+			gap: 10rpx;
+			margin-bottom: 10rpx;
+
+			.task-name {
+				font-size: 28rpx;
+				color: #333;
+				flex: 1;
+			}
+
+			.task-top-badge {
+				font-size: 20rpx;
+				color: #fff;
+				background-color: #FF6B6B;
+				padding: 4rpx 12rpx;
+				border-radius: 4rpx;
+				font-weight: bold;
+			}
+		}
+
 		.task-name {
 			font-size: 28rpx;
 			color: #333;
