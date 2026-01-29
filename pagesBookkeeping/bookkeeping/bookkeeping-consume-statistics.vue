@@ -112,6 +112,54 @@
             </view>
         </view>
 
+        <!-- 支出标签占比 -->
+        <view class="chart-section tags-section">
+            <view class="chart-title-container">
+                <view class="chart-title">支出标签占比</view>
+                <view class="view-toggle-btn" @tap="switchTagViewType">
+                    <text>{{ tagViewType === 'count' ? '按次数' : '按金额' }}</text>
+                </view>
+            </view>
+            <l-echart ref="tagPieChartRef" style="width:100%;height:750rpx"></l-echart>
+
+            <view class="tag-list">
+                <view
+                    class="tag-item"
+                    v-for="item in getDisplayTags(consumeTags)"
+                    :key="item.name"
+                >
+                    <view class="tag-header">
+                        <view class="tag-name">{{ item.name }}</view>
+                        <view class="tag-info">
+                            <text class="tag-ratio" v-if="tagViewType === 'count'">
+                                {{ item.ratio }}% ({{ item.count }}次)
+                            </text>
+                            <text class="tag-ratio" v-else>
+                                {{ item.amountRatio }}% (¥{{ item.amount }})
+                            </text>
+                        </view>
+                    </view>
+                    <view class="progress-bar-bg">
+                        <view
+                            class="progress-bar"
+                            :style="{
+                                width: (tagViewType === 'count' ? item.ratio : item.amountRatio) + '%',
+                                backgroundColor: item.color
+                            }"
+                        ></view>
+                    </view>
+                </view>
+                <view
+                    v-if="consumeTags.length > 5"
+                    class="expand-btn"
+                    @tap="showAllTags = !showAllTags"
+                >
+                    <text>{{ showAllTags ? '收起' : '展开全部' }}</text>
+                    <text :class="['arrow', showAllTags ? 'up' : 'down']"></text>
+                </view>
+            </view>
+        </view>
+
         <!-- 年度趋势图 (仅在年度统计时显示) -->
         <view v-show="currentTab === 'year'" class="chart-section year-trend">
             <view class="chart-title-container">
@@ -165,6 +213,8 @@ const trendChartData = ref([])
 const monthlyDailyChartRef = ref(null)
 const monthlyDailyChart = ref(null)
 const monthlyDailyChartData = ref([])
+const tagPieChartRef = ref(null)
+const tagPieChart = ref(null)
 const echarts = require('../../uni_modules/lime-echart/static/echarts.min')
 
 // 忽略不计入统计数据开关状态
@@ -173,9 +223,15 @@ const ignoreNotStatistics = ref(false)
 const compareLastMonth = ref(false)
 // 是否已加载上个月数据 (用于对比)
 const loadedLastMonth = ref(false)
+// 标签视图类型 'count' or 'amount'
+const tagViewType = ref('count')
+// 是否显示全部标签
+const showAllTags = ref(false)
 
 // 用于存储图表实际数据
 const chartData = ref([]);
+// 标签数据
+const consumeTags = ref([]);
 
 // 当前选中的日期
 const selectedDate = ref(formatDate(new Date()))
@@ -538,6 +594,82 @@ const renderMonthlyDailyChart = () => {
     }
 };
 
+// 渲染支出标签饼图
+const renderTagPieChart = () => {
+    if (!tagPieChartRef.value || !tagPieChart.value) {
+        return;
+    }
+
+    try {
+        let pieData, tooltipFormatter, seriesName
+
+        if (tagViewType.value === 'count') {
+            pieData = consumeTags.value.map((item, index) => ({
+                value: item.count,
+                name: item.name,
+                itemStyle: {
+                    color: item.color
+                }
+            }))
+            tooltipFormatter = function(params) {
+                if (!params) return ''
+                return `${params.name} ${params.value}次\n占比 ${params.percent}%`
+            }
+            seriesName = '支出标签'
+        } else {
+            pieData = consumeTags.value.map((item, index) => ({
+                value: item.amount,
+                name: item.name,
+                itemStyle: {
+                    color: item.color
+                }
+            }))
+            tooltipFormatter = function(params) {
+                if (!params) return ''
+                return `${params.name} ¥${params.value}\n占比 ${params.percent}%`
+            }
+            seriesName = '支出标签金额'
+        }
+
+        const option = {
+            tooltip: {
+                trigger: 'item',
+                formatter: tooltipFormatter
+            },
+            series: [{
+                name: seriesName,
+                type: 'pie',
+                radius: ['30%', '60%'],
+                data: pieData,
+                label: {
+                    show: true,
+                    formatter: '{b} {d}%',
+                    fontSize: 12,
+                    color: '#333'
+                },
+                labelLine: {
+                    show: true,
+                    length: 10,
+                    length2: 5
+                },
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    },
+                    label: {
+                        show: true
+                    }
+                }
+            }]
+        }
+
+        tagPieChartRef.value.setOption(option, true)
+    } catch (e) {
+        console.error('标签饼图渲染失败:', e)
+    }
+}
+
 // 获取支出数据
 const fetchConsumeData = async () => {
     const params = getRequestParams();
@@ -547,12 +679,15 @@ const fetchConsumeData = async () => {
         const pieChartApi = '/bookkeeping-service/bookkeeping/consume/pieChartStatistics';
         // 获取柱状图数据的接口
         const barChartApi = '/bookkeeping-service/bookkeeping/consume/barChartStatistics';
+        // 获取标签数据的接口
+        const tagsApi = '/bookkeeping-service/bookkeeping/consume/tagsStatistics';
 
-        const [totalRes, pieChartRes, rankingRes, barChartRes] = await Promise.all([
+        const [totalRes, pieChartRes, rankingRes, barChartRes, tagsRes] = await Promise.all([
             http.post('/bookkeeping-service/bookkeeping/consume/totalStatistics', params),
             http.post(pieChartApi, params),
             http.post('/bookkeeping-service/bookkeeping/consume/rankStatistics', params),
-            http.post(barChartApi, params)
+            http.post(barChartApi, params),
+            http.post(tagsApi, params)
         ]);
 
         // 处理总支出结果
@@ -579,6 +714,23 @@ const fetchConsumeData = async () => {
         } else {
             chartData.value = [];
             renderChart();
+        }
+
+        // 处理标签数据
+        if (tagsRes.data && Array.isArray(tagsRes.data)) {
+            const chartColors = ['#5470c6', '#91419f', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc'];
+            consumeTags.value = tagsRes.data.map((item, index) => ({
+                ...item,
+                count: parseInt(item.count) || 0,
+                amount: parseFloat(item.amount) || 0,
+                ratio: parseInt(item.ratio) || 0,
+                amountRatio: parseInt(item.amountRatio) || 0,
+                color: chartColors[index % chartColors.length]
+            }));
+            renderTagPieChart();
+        } else {
+            consumeTags.value = [];
+            renderTagPieChart();
         }
 
         // 处理年度趋势图数据或月度每日消费数据
@@ -616,10 +768,12 @@ const fetchConsumeData = async () => {
         trendChartData.value = [];
         monthlyDailyChartData.value = [];
         consumeRanking.value = [];
+        consumeTags.value = [];
         // 渲染空图表
         renderChart();
         renderTrendChart();
         renderMonthlyDailyChart();
+        renderTagPieChart();
     }
 };
 
@@ -648,6 +802,13 @@ onReady(() => {
         });
     }
 
+    // 初始化标签饼图
+    if (tagPieChartRef.value) {
+        tagPieChartRef.value.init(echarts, chart => {
+            tagPieChart.value = chart;
+        });
+    }
+
     // 初始化饼图
     if (chartRef.value) {
         chartRef.value.init(echarts, chart => {
@@ -672,6 +833,10 @@ onUnmounted(() => {
         monthlyDailyChart.value.dispose();
         monthlyDailyChart.value = null;
     }
+    if (tagPieChart.value) {
+        tagPieChart.value.dispose();
+        tagPieChart.value = null;
+    }
 });
 
 // 在 script setup 中添加新的响应式变量和方法
@@ -679,6 +844,28 @@ const showAllCategory = ref(false)
 const getDisplayCategoryList = () => {
     if (!chartData.value) return []
     return showAllCategory.value ? chartData.value : chartData.value.slice(0, 3)
+}
+
+// 切换标签视图类型
+const switchTagViewType = () => {
+    tagViewType.value = tagViewType.value === 'count' ? 'amount' : 'count'
+    renderTagPieChart()
+}
+
+// 获取显示的标签 (按照当前视图类型排序，最多显示5个)
+const getDisplayTags = (tags) => {
+    let sortedTags = [...tags]
+    // 按照当前视图类型排序 (倒序)
+    if (tagViewType.value === 'count') {
+        sortedTags.sort((a, b) => b.count - a.count)
+    } else {
+        sortedTags.sort((a, b) => (b.amount || 0) - (a.amount || 0))
+    }
+
+    if (showAllTags.value) {
+        return sortedTags
+    }
+    return sortedTags.slice(0, 5)
 }
 
 // 跳转到账单详情
@@ -1027,6 +1214,101 @@ const goToRecords = (item) => {
             .chart-title {
                 font-size: 32rpx;
                 font-weight: bold;
+            }
+
+            .view-toggle-btn {
+                padding: 8rpx 16rpx;
+                background-color: #f0f0f0;
+                border-radius: 6rpx;
+                font-size: 22rpx;
+                color: #5470c6;
+                border: 1rpx solid #e0e0e0;
+                transition: all 0.3s ease;
+
+                &:active {
+                    background-color: #e8e8e8;
+                }
+            }
+        }
+
+        .tag-list {
+            margin-top: 20rpx;
+            padding-top: 20rpx;
+            border-top: 1rpx solid #eee;
+
+            .tag-item {
+                margin-bottom: 16rpx;
+                padding-bottom: 16rpx;
+                border-bottom: 1rpx solid #f0f0f0;
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                .tag-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 10rpx;
+
+                    .tag-name {
+                        font-size: 26rpx;
+                        color: #333;
+                        font-weight: 500;
+                    }
+
+                    .tag-info {
+                        display: flex;
+                        gap: 15rpx;
+                        font-size: 22rpx;
+                        color: #666;
+
+                        .tag-ratio {
+                            color: #999;
+                        }
+                    }
+                }
+
+                .progress-bar-bg {
+                    width: 100%;
+                    height: 8rpx;
+                    background-color: #e8e8e8;
+                    border-radius: 4rpx;
+                    overflow: hidden;
+
+                    .progress-bar {
+                        height: 100%;
+                        border-radius: 4rpx;
+                        transition: width 0.3s ease;
+                    }
+                }
+            }
+
+            .expand-btn {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 16rpx;
+                gap: 8rpx;
+                color: #5470c6;
+                font-size: 24rpx;
+                margin-top: 20rpx;
+
+                .arrow {
+                    display: inline-block;
+                    width: 20rpx;
+                    height: 20rpx;
+                    border-right: 2rpx solid #5470c6;
+                    border-bottom: 2rpx solid #5470c6;
+
+                    &.down {
+                        transform: rotate(-45deg);
+                    }
+
+                    &.up {
+                        transform: rotate(135deg);
+                    }
+                }
             }
         }
     }
