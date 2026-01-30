@@ -46,7 +46,15 @@
 							<view class="task-content">
 								<view class="task-name-container">
 									<view class="task-name">{{ task.taskName }}</view>
-									<view v-if="task.isTop === 1" class="task-top-badge">置顶</view>
+									<view class="task-badges">
+										<view v-if="task.isTop === 1" class="task-top-badge">置顶</view>
+										<view
+											v-if="getDeadlineStatus(task) !== 'normal'"
+											:class="['task-deadline-badge', 'deadline-' + getDeadlineStatus(task)]"
+										>
+											{{ getDeadlineLabel(task) }}
+										</view>
+									</view>
 								</view>
 								<view class="task-info">
 									<view v-if="currentView === 'recent'" class="task-group">{{ task.taskGroupName }}</view>
@@ -80,7 +88,15 @@
 							<view class="task-content">
 								<view class="task-name-container">
 									<view class="task-name">{{ task.taskName }}</view>
-									<view v-if="task.isTop === 1" class="task-top-badge">置顶</view>
+									<view class="task-badges">
+										<view v-if="task.isTop === 1" class="task-top-badge">置顶</view>
+										<view
+											v-if="getDeadlineStatus(task) !== 'normal'"
+											:class="['task-deadline-badge', 'deadline-' + getDeadlineStatus(task)]"
+										>
+											{{ getDeadlineLabel(task) }}
+										</view>
+									</view>
 								</view>
 								<view class="task-info">
 									<view v-if="currentView === 'recent'" class="task-group">{{ task.taskGroupName }}</view>
@@ -638,6 +654,39 @@ export default {
 			})
 		}
 
+		// 获取截止日期状态
+		const getDeadlineStatus = (task) => {
+			if (!task.deadlineDate) return 'normal'
+
+			const today = new Date()
+			today.setHours(0, 0, 0, 0)
+
+			const tomorrow = new Date(today)
+			tomorrow.setDate(tomorrow.getDate() + 1)
+
+			const deadlineDate = new Date(task.deadlineDate)
+			deadlineDate.setHours(0, 0, 0, 0)
+
+			if (deadlineDate < today) {
+				return 'overdue'
+			} else if (deadlineDate.getTime() === today.getTime() || deadlineDate.getTime() === tomorrow.getTime()) {
+				return 'urgent'
+			}
+
+			return 'normal'
+		}
+
+		// 获取截止日期标签文本
+		const getDeadlineLabel = (task) => {
+			const status = getDeadlineStatus(task)
+			if (status === 'overdue') {
+				return '已截止'
+			} else if (status === 'urgent') {
+				return '即将截止'
+			}
+			return ''
+		}
+
 		onMounted(() => {
 			fetchRecentTasks()
 		})
@@ -669,7 +718,9 @@ export default {
 			saveDeadline,
 			closeDeadlinePopup,
 			toggleTaskTop,
-			navigateToDetail
+			navigateToDetail,
+			getDeadlineStatus,
+			getDeadlineLabel
 		}
 	}
 }
@@ -732,34 +783,59 @@ export default {
 	padding-bottom: 20rpx;
 }
 
-.task-item {
-	background-color: #fff;
-	border-radius: 10rpx;
-	padding: 20rpx;
-	margin-bottom: 20rpx;
+	.task-item {
+		background-color: #fff;
+		border-radius: 10rpx;
+		padding: 20rpx;
+		margin-bottom: 20rpx;
 
-	.task-content {
-		.task-name-container {
-			display: flex;
-			align-items: center;
-			gap: 10rpx;
-			margin-bottom: 10rpx;
+		.task-content {
+			.task-name-container {
+				display: flex;
+				align-items: center;
+				gap: 10rpx;
+				margin-bottom: 10rpx;
+				justify-content: space-between;
 
-			.task-name {
-				font-size: 28rpx;
-				color: #333;
-				flex: 1;
+				.task-name {
+					font-size: 28rpx;
+					color: #333;
+					flex: 1;
+				}
+
+				.task-badges {
+					display: flex;
+					align-items: center;
+					gap: 8rpx;
+					flex-shrink: 0;
+
+					.task-top-badge {
+						font-size: 20rpx;
+						color: #fff;
+						background-color: #5DADE2;
+						padding: 6rpx 12rpx;
+						border-radius: 4rpx;
+						font-weight: bold;
+					}
+
+					.task-deadline-badge {
+						font-size: 20rpx;
+						padding: 6rpx 12rpx;
+						border-radius: 4rpx;
+						font-weight: bold;
+
+						&.deadline-overdue {
+							color: #fff;
+							background-color: #FF6B6B;
+						}
+
+						&.deadline-urgent {
+							color: #fff;
+							background-color: #FFA726;
+						}
+					}
+				}
 			}
-
-			.task-top-badge {
-				font-size: 20rpx;
-				color: #fff;
-				background-color: #FF6B6B;
-				padding: 4rpx 12rpx;
-				border-radius: 4rpx;
-				font-weight: bold;
-			}
-		}
 
 		.task-name {
 			font-size: 28rpx;
