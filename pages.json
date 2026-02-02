@@ -15,12 +15,6 @@
 			}
 		},
 		{
-			"path": "pages/login",
-			"style": {
-				"navigationBarTitleText": "登录"
-			}
-		},
-		{
 			"path": "pages/menu",
 			"style": {
 				"navigationBarTitleText": "菜单"
@@ -311,6 +305,17 @@
                     "navigationBarTitleText": "任务详情"
                   }
                 }
+			]
+		},
+		{
+			"root": "pagesAuth",
+			"pages": [
+				{
+					"path": "login/index",
+					"style": {
+						"navigationBarTitleText": "登录"
+					}
+				}
 			]
 		}
 	],

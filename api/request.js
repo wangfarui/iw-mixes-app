@@ -6,7 +6,7 @@ const http = (url, method, data) => {
 	// const iwtoken = getTokenValue()
 	// if (!iwtoken && !url.includes('login') && !url.includes('verificationCode')) {
 	// 	uni.reLaunch({
-	// 		url: '/pages/login'
+	// 		url: '/pagesAuth/login/index'
 	// 	});
 	// 	return
 	// }
@@ -36,7 +36,7 @@ const http = (url, method, data) => {
 					stopVersionPolling()
 					uni.removeStorageSync(token_key)
 					uni.reLaunch({
-						url: '/pages/login'
+						url: '/pagesAuth/login/index'
 					});
 					reject(new Error('未授权，请登录'));
 					return

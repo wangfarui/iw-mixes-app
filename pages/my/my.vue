@@ -138,7 +138,7 @@
 					uni.removeStorageSync('iwtoken')
 					uni.removeStorageSync('userInfo')
 					uni.reLaunch({
-						url: '/pages/login'
+						url: '/pagesAuth/login/index'
 					})
 				}
 			}
