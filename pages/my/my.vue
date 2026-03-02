@@ -1,313 +1,194 @@
 <template>
-	<view class="my-container">
-		<!-- 用户信息卡片 -->
-		<view class="user-card">
-			<view class="user-info">
-				<image :src="userInfo.avatar" class="avatar" @tap="openPopup" />
-				<view class="user-detail">
-					<text class="username">{{ userInfo.name }}</text>
-					<text class="user-id">ID: {{ userInfo.userId || '--' }}</text>
-				</view>
-			</view>
-		</view>
+  <view class="my-page">
+    <view class="profile-card" @tap="goProfile">
+      <image
+        :src="userInfo.avatar || defaultAvatar"
+        class="avatar"
+        mode="aspectFill"
+        @tap.stop="previewAvatar"
+      />
+      <view class="profile-main">
+        <text class="profile-name">{{ userInfo.name || '未登录' }}</text>
+        <text class="profile-sub">{{ profileSub }}</text>
+      </view>
+      <uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
+    </view>
 
-		<!-- 功能列表 -->
-		<view class="function-list">
-			<!-- 个人信息 -->
-			<view class="function-group">
-				<view class="function-item" @tap="navigateTo('/pagesBase/my/profile')">
-					<view class="function-item-left">
-						<uni-icons type="person" size="24" color="#666"></uni-icons>
-						<text>个人信息</text>
-					</view>
-					<uni-icons type="right" size="16" color="#999"></uni-icons>
-				</view>
-				
-				<view class="function-item" @tap="navigateTo('/pagesBase/my/security')">
-					<view class="function-item-left">
-						<uni-icons type="locked" size="24" color="#666"></uni-icons>
-						<text>账号安全</text>
-					</view>
-					<uni-icons type="right" size="16" color="#999"></uni-icons>
-				</view>
-			</view>
+    <view class="section-card">
+      <view class="list-row" @tap="navigateTo('/pagesBase/my/security')">
+        <text class="row-label">账号安全</text>
+        <uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
+      </view>
+      <view class="list-row" @tap="navigateTo('/pagesBase/my/settings')">
+        <text class="row-label">系统设置</text>
+        <uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
+      </view>
+    </view>
 
-			<!-- 系统设置 -->
-			<view class="function-group">
-				<view class="function-item" @tap="navigateTo('/pagesBase/my/settings')">
-					<view class="function-item-left">
-						<uni-icons type="gear" size="24" color="#666"></uni-icons>
-						<text>系统设置</text>
-					</view>
-					<uni-icons type="right" size="16" color="#999"></uni-icons>
-				</view>
-
-				<view class="function-item" @tap="refreshCache">
-					<view class="function-item-left">
-						<uni-icons type="refresh" size="24" color="#666"></uni-icons>
-						<text>刷新缓存</text>
-					</view>
-					<uni-icons type="right" size="16" color="#999"></uni-icons>
-				</view>
-			</view>
-
-			<!-- 其他功能 -->
-			<view class="function-group">
-				<view class="function-item" @tap="navigateTo('/pagesBase/my/about')">
-					<view class="function-item-left">
-						<uni-icons type="info" size="24" color="#666"></uni-icons>
-						<text>关于我们</text>
-					</view>
-					<uni-icons type="right" size="16" color="#999"></uni-icons>
-				</view>
-
-				<view class="function-item" @tap="navigateTo('/pagesBase/my/feedback')">
-					<view class="function-item-left">
-						<uni-icons type="chat" size="24" color="#666"></uni-icons>
-						<text>意见反馈</text>
-					</view>
-					<uni-icons type="right" size="16" color="#999"></uni-icons>
-				</view>
-			</view>
-		</view>
-
-		<!-- 退出登录按钮 -->
-		<view class="logout-section">
-			<button class="logout-button" @click="clickLogout">退出登录</button>
-		</view>
-
-		<!-- 头像选择弹窗 -->
-		<uni-popup ref="avatarPopup" type="bottom" :animation="true">
-			<view class="popup-content">
-				<button class="popup-button" @click="takePhoto">拍照</button>
-				<button class="popup-button" @click="chooseFromAlbum">从相册选择</button>
-				<button class="popup-button cancel" @click="closePopup">取消</button>
-			</view>
-		</uni-popup>
-	</view>
+    <view class="section-card logout-card">
+      <view class="list-row logout-row" @tap="clickLogout">
+        <text class="row-label logout-text">退出登录</text>
+      </view>
+    </view>
+  </view>
 </template>
 
 <script setup>
-	import {
-		ref
-	} from 'vue'
+import { ref, computed } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import http from '@/api/request.js'
+import { logout, stopVersionPolling } from '@/api/login.js'
 
-	import {
-		onShow
-	} from '@dcloudio/uni-app'
+const defaultAvatar = 'https://cdn.uviewui.com/uview/common/avatar.png'
+const userInfo = ref({})
+const isLoading = ref(false)
 
-	import http from '@/api/request.js'
-	import {
-		logout,
-		refreshDictCache,
-		stopVersionPolling
-	} from "@/api/login.js";
-	import { uploadFile } from "@/stores/file.js"
+const profileSub = computed(() => {
+  if (userInfo.value?.phoneNumber) return userInfo.value.phoneNumber
+  if (userInfo.value?.emailAddress) return userInfo.value.emailAddress
+  return '点击完善个人资料'
+})
 
-	const userInfo = ref({})
-	const avatarPopup = ref(null)
+async function fetchUserInfo() {
+  if (isLoading.value) return
+  isLoading.value = true
+  try {
+    const res = await http.get('/auth-service/user/getUserInfo')
+    userInfo.value = res.data || {}
+    uni.setStorageSync('userInfo', userInfo.value)
+  } catch (e) {
+    const cached = uni.getStorageSync('userInfo')
+    if (cached) {
+      userInfo.value = cached
+    }
+  } finally {
+    isLoading.value = false
+  }
+}
 
-	onShow(() => {
-		setUserInfo(uni.getStorageSync('userInfo'))
-	})
+onShow(() => {
+  fetchUserInfo()
+})
 
-	function setUserInfo(info) {
-		userInfo.value = info
-	}
+function goProfile() {
+  navigateTo('/pagesBase/my/profile')
+}
 
-	function navigateTo(url) {
-		uni.navigateTo({ url })
-	}
+function navigateTo(url) {
+  uni.navigateTo({ url })
+}
 
-	function refreshCache() {
-		uni.showLoading({ title: '刷新中...' })
-		refreshDictCache(true)
-		uni.hideLoading()
-		uni.showToast({ title: '刷新成功', icon: 'success' })
-	}
+function clickLogout() {
+  uni.showModal({
+    title: '提示',
+    content: '确定要退出登录吗？',
+    success: (res) => {
+      if (res.confirm) {
+        stopVersionPolling()
+        logout()
+        uni.removeStorageSync('iwtoken')
+        uni.removeStorageSync('userInfo')
+        uni.reLaunch({ url: '/pagesAuth/login/index' })
+      }
+    }
+  })
+}
 
-	function clickLogout() {
-		uni.showModal({
-			title: '提示',
-			content: '确定要退出登录吗？',
-			success: (res) => {
-				if (res.confirm) {
-					stopVersionPolling()
-					
-					logout()
-					uni.removeStorageSync('iwtoken')
-					uni.removeStorageSync('userInfo')
-					uni.reLaunch({
-						url: '/pagesAuth/login/index'
-					})
-				}
-			}
-		})
-	}
-
-	function openPopup() {
-		avatarPopup.value.open()
-	}
-
-	function closePopup() {
-		avatarPopup.value.close()
-	}
-
-	function takePhoto() {
-		closePopup()
-		uni.chooseImage({
-			count: 1,
-			sizeType: ['original', 'compressed'],
-			sourceType: ['camera'],
-			success: (res) => {
-				const tempFilePaths = res.tempFilePaths
-				uploadFileForAvatar(tempFilePaths[0])
-			}
-		})
-	}
-
-	function chooseFromAlbum() {
-		closePopup()
-		uni.chooseImage({
-			count: 1,
-			sizeType: ['original', 'compressed'],
-			sourceType: ['album'],
-			success: (res) => {
-				const tempFilePaths = res.tempFilePaths
-				uploadFileForAvatar(tempFilePaths[0])
-			}
-		})
-	}
-
-	async function uploadFileForAvatar(filePath) {
-		uni.showLoading({ title: '上传中...' })
-		try {
-			const fileRes = await uploadFile(filePath)
-			const avatarUrl = fileRes.fileUrl
-			
-			await http.post('/auth-service/user/editAvatar', {
-				'avatar': avatarUrl
-			})
-			
-			userInfo.value.avatar = avatarUrl
-			uni.setStorageSync('userInfo', userInfo.value)
-			uni.showToast({ title: '更新成功', icon: 'success' })
-		} catch (error) {
-			uni.showToast({ title: '更新失败', icon: 'error' })
-		} finally {
-			uni.hideLoading()
-		}
-	}
+function previewAvatar() {
+  const avatarUrl = userInfo.value?.avatar || defaultAvatar
+  uni.previewImage({
+    current: avatarUrl,
+    urls: [avatarUrl]
+  })
+}
 </script>
 
 <style>
-	.my-container {
-		min-height: 100vh;
-		background-color: #f5f5f5;
-		padding-bottom: 40rpx;
-	}
+.my-page {
+  min-height: 100vh;
+  background-color: #f7f8fa;
+  padding: 24rpx;
+  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
 
-	.user-card {
-		background-color: #ffffff;
-		padding: 40rpx 30rpx;
-		margin-bottom: 20rpx;
-	}
+.profile-card {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
 
-	.user-info {
-		display: flex;
-		align-items: center;
-	}
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  border: 4rpx solid #f0f0f0;
+  background-color: #ffffff;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
 
-	.avatar {
-		width: 120rpx;
-		height: 120rpx;
-		border-radius: 60rpx;
-		border: 2rpx solid #eee;
-	}
+.profile-main {
+  flex: 1;
+  margin-left: 24rpx;
+}
 
-	.user-detail {
-		margin-left: 30rpx;
-	}
+.profile-name {
+  display: block;
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 6rpx;
+}
 
-	.username {
-		font-size: 36rpx;
-		font-weight: bold;
-		color: #333;
-		margin-bottom: 10rpx;
-		display: block;
-	}
+.profile-sub {
+  font-size: 24rpx;
+  color: #999;
+}
 
-	.user-id {
-		font-size: 24rpx;
-		color: #999;
-	}
+.section-card {
+  background: #ffffff;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  margin-bottom: 20rpx;
+  overflow: hidden;
+}
 
-	.function-list {
-		padding: 0 20rpx;
-	}
+.list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 24rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
 
-	.function-group {
-		background-color: #ffffff;
-		border-radius: 12rpx;
-		margin-bottom: 20rpx;
-		overflow: hidden;
-	}
+.list-row:last-child {
+  border-bottom: none;
+}
 
-	.function-item {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 30rpx 20rpx;
-		border-bottom: 1rpx solid #f5f5f5;
-	}
+.list-row:active {
+  background-color: #f7f8fa;
+}
 
-	.function-item:last-child {
-		border-bottom: none;
-	}
+.row-label {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: 500;
+}
 
-	.function-item-left {
-		display: flex;
-		align-items: center;
-	}
+.logout-card {
+  margin-bottom: 0;
+}
 
-	.function-item-left text {
-		margin-left: 20rpx;
-		font-size: 28rpx;
-		color: #333;
-	}
+.logout-row {
+  justify-content: center;
+}
 
-	.logout-section {
-		padding: 40rpx 20rpx;
-	}
-
-	.logout-button {
-		width: 100%;
-		height: 88rpx;
-		line-height: 88rpx;
-		text-align: center;
-		background-color: #ffffff;
-		color: #ff4d4f;
-		font-size: 32rpx;
-		border-radius: 12rpx;
-	}
-
-	.popup-content {
-		background-color: #ffffff;
-		border-radius: 24rpx 24rpx 0 0;
-		padding: 20rpx;
-	}
-
-	.popup-button {
-		height: 100rpx;
-		line-height: 100rpx;
-		text-align: center;
-		font-size: 32rpx;
-		border-bottom: 1rpx solid #f5f5f5;
-	}
-
-	.popup-button.cancel {
-		color: #999;
-		margin-top: 20rpx;
-		border-bottom: none;
-	}
+.logout-text {
+  color: #f56c6c;
+  font-weight: 600;
+}
 </style>
