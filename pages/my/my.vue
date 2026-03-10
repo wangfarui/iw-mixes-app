@@ -15,6 +15,13 @@
     </view>
 
     <view class="section-card">
+      <view class="list-row" @tap="goFamilyGroup">
+        <text class="row-label">我的家庭组</text>
+        <view class="row-right">
+          <text class="row-value">{{ familyDesc }}</text>
+          <uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
+        </view>
+      </view>
       <view class="list-row" @tap="navigateTo('/pagesBase/my/security')">
         <text class="row-label">账号安全</text>
         <uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
@@ -38,15 +45,24 @@ import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import http from '@/api/request.js'
 import { logout, stopVersionPolling } from '@/api/login.js'
+import { useFamilyStore } from '@/stores/family.js'
 
 const defaultAvatar = 'https://cdn.uviewui.com/uview/common/avatar.png'
 const userInfo = ref({})
 const isLoading = ref(false)
+const familyStore = useFamilyStore()
 
 const profileSub = computed(() => {
   if (userInfo.value?.phoneNumber) return userInfo.value.phoneNumber
   if (userInfo.value?.emailAddress) return userInfo.value.emailAddress
   return '点击完善个人资料'
+})
+
+const familyDesc = computed(() => {
+  if (familyStore.hasGroup) {
+    return familyStore.groupName
+  }
+  return '未加入家庭组'
 })
 
 async function fetchUserInfo() {
@@ -68,10 +84,19 @@ async function fetchUserInfo() {
 
 onShow(() => {
   fetchUserInfo()
+  familyStore.fetchMyGroup()
 })
 
 function goProfile() {
   navigateTo('/pagesBase/my/profile')
+}
+
+function goFamilyGroup() {
+  if (familyStore.hasGroup) {
+    navigateTo('/pagesBase/family/detail')
+  } else {
+    navigateTo('/pagesBase/family/index')
+  }
 }
 
 function navigateTo(url) {
@@ -88,6 +113,7 @@ function clickLogout() {
         logout()
         uni.removeStorageSync('iwtoken')
         uni.removeStorageSync('userInfo')
+        familyStore.clearGroup()
         uni.reLaunch({ url: '/pagesAuth/login/index' })
       }
     }
@@ -177,6 +203,17 @@ function previewAvatar() {
   font-size: 30rpx;
   color: #333;
   font-weight: 500;
+}
+
+.row-right {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.row-value {
+  font-size: 26rpx;
+  color: #999;
 }
 
 .logout-card {

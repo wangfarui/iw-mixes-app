@@ -63,17 +63,31 @@ const http = (url, method, data) => {
 };
 
 class Request {
-	async get(url) {
+	async get(url, params) {
 		try {
+			// 如果有参数，拼接到 URL 上
+			if (params) {
+				const queryString = Object.keys(params)
+					.map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+					.join('&');
+				url = `${url}?${queryString}`;
+			}
 			const response = await http(url, 'get', {});
 			return response;
 		} catch (error) {
 			throw error;
 		}
 	}
-	
-	async delete(url) {
+
+	async delete(url, params) {
 		try {
+			// 如果有参数，拼接到 URL 上
+			if (params) {
+				const queryString = Object.keys(params)
+					.map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+					.join('&');
+				url = `${url}?${queryString}`;
+			}
 			const response = await http(url, 'delete', {});
 			return response;
 		} catch (error) {
@@ -89,7 +103,7 @@ class Request {
 			throw error;
 		}
 	}
-	
+
 	async put(url, data) {
 		try {
 			const response = await http(url, 'put', data);
@@ -98,7 +112,7 @@ class Request {
 			throw error;
 		}
 	}
-	
+
 	async request(url, method, data) {
 		try {
 			const response = await http(url, method, data);

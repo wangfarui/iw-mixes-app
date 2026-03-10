@@ -188,6 +188,60 @@
 					"style": {
 						"navigationBarTitleText": "意见反馈"
 					}
+				},
+				{
+					"path": "family/index",
+					"style": {
+						"navigationBarTitleText": "家庭组"
+					}
+				},
+				{
+					"path": "family/create",
+					"style": {
+						"navigationBarTitleText": "创建家庭组"
+					}
+				},
+				{
+					"path": "family/join",
+					"style": {
+						"navigationBarTitleText": "加入家庭组"
+					}
+				},
+				{
+					"path": "family/detail",
+					"style": {
+						"navigationBarTitleText": "家庭组"
+					}
+				},
+				{
+					"path": "family/invite",
+					"style": {
+						"navigationBarTitleText": "邀请成员"
+					}
+				},
+				{
+					"path": "family/manage",
+					"style": {
+						"navigationBarTitleText": "管理家庭组"
+					}
+				},
+				{
+					"path": "family/edit",
+					"style": {
+						"navigationBarTitleText": "编辑家庭组"
+					}
+				},
+				{
+					"path": "family/inviteList",
+					"style": {
+						"navigationBarTitleText": "邀请记录"
+					}
+				},
+				{
+					"path": "family/transfer",
+					"style": {
+						"navigationBarTitleText": "转让群主"
+					}
 				}
 			]
 		},
