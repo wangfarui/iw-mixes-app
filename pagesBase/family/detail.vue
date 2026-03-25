@@ -19,20 +19,55 @@
               <text class="member-name">{{ member.name || member.username }}</text>
               <text class="member-role">{{ getRoleText(member.role) }}</text>
             </view>
-            <view v-if="isOwner && member.role !== 1" class="member-action" @tap="handleRemoveMember(member)">
-              <text class="action-text">移除</text>
+            <view class="member-actions">
+              <view v-if="canShowRoleAction(member)" class="member-action role" @tap="handleAssignRole(member)">
+                <text class="member-action-text">角色</text>
+              </view>
+              <view v-if="isOwner && member.role !== ROLE.OWNER" class="member-action danger" @tap="handleRemoveMember(member)">
+                <text class="member-action-text">移除</text>
+              </view>
             </view>
           </view>
         </view>
       </view>
 
-      <view v-if="isOwner" class="action-section">
+      <view class="action-section">
+        <view class="action-btn" @tap="handleQueryScopeChange">
+          <text class="action-text">查看范围</text>
+          <view class="action-right">
+            <text class="action-value">{{ queryScopeText }}</text>
+            <uni-icons v-if="!isChildRole" type="right" size="16" color="#c0c4cc"></uni-icons>
+          </view>
+        </view>
+        <view class="setting-tip">
+          <text v-if="isChildRole">儿童固定为仅自己</text>
+          <text v-else>共享功能会按此范围展示</text>
+        </view>
+      </view>
+
+      <view class="action-section">
+        <view class="action-btn setting">
+          <text class="action-text">新建自动共享</text>
+          <switch
+            :checked="defaultShared"
+            :disabled="isChildRole || isUpdatingDefaultShared"
+            color="#4cd964"
+            @change="handleDefaultSharedChange"
+          />
+        </view>
+        <view class="setting-tip">
+          <text v-if="isChildRole">儿童固定为开启</text>
+          <text v-else>新建内容时会自动共享给家庭</text>
+        </view>
+      </view>
+
+      <view v-if="canInvite" class="action-section">
         <view class="action-btn" @tap="goInvite">
           <text class="action-icon">📨</text>
           <text class="action-text">邀请成员</text>
           <uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
         </view>
-        <view class="action-btn" @tap="goManage">
+        <view v-if="isOwner" class="action-btn" @tap="goManage">
           <text class="action-icon">⚙️</text>
           <text class="action-text">管理家庭组</text>
           <uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
@@ -54,18 +89,47 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { getMyGroup, getMemberList, quitGroup, removeMember } from '@/api/family.js'
+import {
+  getMyGroup,
+  getMemberList,
+  quitGroup,
+  removeMember,
+  assignMemberRole,
+  updateMyDefaultShared,
+  updateMyQueryScope
+} from '@/api/family.js'
 import { useFamilyStore } from '@/stores/family.js'
+import { useFamilySharedScopeStore } from '@/stores/family-shared-scope.js'
+
+const ROLE = {
+  OWNER: 1,
+  PARENT: 2,
+  MEMBER: 3,
+  CHILD: 4
+}
 
 const familyStore = useFamilyStore()
+const sharedScopeStore = useFamilySharedScopeStore()
 const groupInfo = ref(null)
 const memberList = ref([])
+const defaultShared = ref(false)
+const queryOnlyMyself = ref(0)
+const isUpdatingDefaultShared = ref(false)
 
-const isOwner = computed(() => {
-  if (!groupInfo.value) return false
-  const userInfo = uni.getStorageSync('userInfo')
-  return groupInfo.value.ownerUserId === userInfo?.id
+const currentUserId = computed(() => uni.getStorageSync('userInfo')?.id)
+const currentMemberRole = computed(() => {
+  if (groupInfo.value?.currentUserRole != null) {
+    return Number(groupInfo.value.currentUserRole)
+  }
+  const currentMember = memberList.value.find(member => member.userId === currentUserId.value)
+  return currentMember?.role || null
 })
+const isOwner = computed(() => {
+  return groupInfo.value?.ownerUserId === currentUserId.value
+})
+const canInvite = computed(() => isOwner.value || currentMemberRole.value === ROLE.PARENT)
+const isChildRole = computed(() => currentMemberRole.value === ROLE.CHILD)
+const queryScopeText = computed(() => queryOnlyMyself.value === 1 ? '仅自己' : '家庭共享')
 
 onMounted(() => {
   fetchData()
@@ -76,6 +140,11 @@ async function fetchData() {
     // 先获取家庭组信息
     const groupRes = await getMyGroup()
     groupInfo.value = groupRes.data
+    if (groupInfo.value) {
+      familyStore.updateGroup(groupInfo.value)
+      defaultShared.value = isChildRole.value ? true : Number(groupInfo.value.defaultShared) === 1
+      queryOnlyMyself.value = isChildRole.value ? 1 : Number(groupInfo.value.queryOnlyMyself) === 1 ? 1 : 0
+    }
 
     // 使用获取到的家庭组ID查询成员列表
     if (groupInfo.value?.id) {
@@ -88,7 +157,13 @@ async function fetchData() {
 }
 
 function getRoleText(role) {
-  return role === 1 ? '群主' : '成员'
+  const roleMap = {
+    [ROLE.OWNER]: '群主',
+    [ROLE.MEMBER]: '成员',
+    [ROLE.PARENT]: '家长',
+    [ROLE.CHILD]: '儿童'
+  }
+  return roleMap[role] || '未知角色'
 }
 
 function goInvite() {
@@ -97,6 +172,66 @@ function goInvite() {
 
 function goManage() {
   uni.navigateTo({ url: '/pagesBase/family/manage' })
+}
+
+function canShowRoleAction(member) {
+  if (member.userId === currentUserId.value) return false
+  if (member.role === ROLE.OWNER) return false
+  if (currentMemberRole.value === ROLE.OWNER) return true
+  if (currentMemberRole.value === ROLE.PARENT) {
+    return member.role === ROLE.MEMBER || member.role === ROLE.CHILD
+  }
+  return false
+}
+
+function getRoleOptions(member) {
+  if (currentMemberRole.value === ROLE.OWNER) {
+    return [
+      { label: '设为家长', role: ROLE.PARENT },
+      { label: '设为成员', role: ROLE.MEMBER },
+      { label: '设为儿童', role: ROLE.CHILD }
+    ].filter(option => option.role !== member.role)
+  }
+  if (currentMemberRole.value === ROLE.PARENT) {
+    return [
+      { label: '设为成员', role: ROLE.MEMBER },
+      { label: '设为儿童', role: ROLE.CHILD }
+    ].filter(option => option.role !== member.role)
+  }
+  return []
+}
+
+function handleAssignRole(member) {
+  const roleOptions = getRoleOptions(member)
+  if (roleOptions.length === 0) {
+    uni.showToast({
+      title: '当前角色无需调整',
+      icon: 'none'
+    })
+    return
+  }
+
+  uni.showActionSheet({
+    itemList: roleOptions.map(option => option.label),
+    success: async (res) => {
+      const selectedOption = roleOptions[res.tapIndex]
+      if (!selectedOption) return
+      try {
+        await assignMemberRole({
+          groupId: groupInfo.value.id,
+          userId: member.userId,
+          role: selectedOption.role
+        })
+        uni.showToast({
+          title: '角色调整成功',
+          icon: 'success'
+        })
+        fetchData()
+      } catch (e) {
+        // 失败后的业务处理：不做任何操作，错误提示已在 request.js 中统一处理
+      }
+    }
+  })
 }
 
 function handleRemoveMember(member) {
@@ -142,6 +277,91 @@ function handleQuit() {
         } catch (e) {
           // 失败后的业务处理：不做任何操作，错误提示已在 request.js 中统一处理
         }
+      }
+    }
+  })
+}
+
+async function handleDefaultSharedChange(e) {
+  if (!groupInfo.value?.id) {
+    return
+  }
+  if (isChildRole.value) {
+    defaultShared.value = true
+    uni.showToast({
+      title: '儿童角色不可修改',
+      icon: 'none'
+    })
+    return
+  }
+  if (isUpdatingDefaultShared.value) {
+    return
+  }
+
+  const previousValue = defaultShared.value
+  const currentValue = !!e.detail.value
+  defaultShared.value = currentValue
+  isUpdatingDefaultShared.value = true
+  try {
+    await updateMyDefaultShared({
+      groupId: groupInfo.value.id,
+      defaultShared: currentValue ? 1 : 0
+    })
+    groupInfo.value = {
+      ...groupInfo.value,
+      defaultShared: currentValue ? 1 : 0
+    }
+    familyStore.updateGroup(groupInfo.value)
+    sharedScopeStore.setDefaultShared(currentValue)
+    uni.showToast({
+      title: '设置成功',
+      icon: 'success'
+    })
+  } catch (err) {
+    defaultShared.value = previousValue
+  } finally {
+    isUpdatingDefaultShared.value = false
+  }
+}
+
+function handleQueryScopeChange() {
+  if (!groupInfo.value?.id) {
+    return
+  }
+  if (isChildRole.value) {
+    uni.showToast({
+      title: '儿童固定为仅自己',
+      icon: 'none'
+    })
+    return
+  }
+
+  uni.showActionSheet({
+    itemList: ['家庭共享', '仅自己'],
+    success: async (res) => {
+      const nextValue = res.tapIndex === 1 ? 1 : 0
+      if (nextValue === queryOnlyMyself.value) {
+        return
+      }
+      const previousValue = queryOnlyMyself.value
+      queryOnlyMyself.value = nextValue
+      try {
+        await updateMyQueryScope({
+          groupId: groupInfo.value.id,
+          queryOnlyMyself: nextValue
+        })
+        groupInfo.value = {
+          ...groupInfo.value,
+          queryOnlyMyself: nextValue
+        }
+        familyStore.updateGroup(groupInfo.value)
+        sharedScopeStore.setScope(nextValue === 1 ? 'myself' : 'shared')
+        uni.showToast({
+          title: '设置成功',
+          icon: 'success'
+        })
+      } catch (e) {
+        queryOnlyMyself.value = previousValue
       }
     }
   })
@@ -272,19 +492,39 @@ function handleQuit() {
   color: #999;
 }
 
-.member-action {
-  padding: 8rpx 20rpx;
+.member-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
 }
 
-.action-text {
-  font-size: 26rpx;
+.member-action {
+  padding: 8rpx 16rpx;
+  border-radius: 24rpx;
+  background: #f7f8fa;
+}
+
+.member-action.role .member-action-text {
+  color: #667eea;
+}
+
+.member-action.danger .member-action-text {
   color: #f56c6c;
+}
+
+.member-action-text {
+  font-size: 24rpx;
+  font-weight: 500;
 }
 
 .action-section {
   background: #ffffff;
   border-radius: 16rpx;
   overflow: hidden;
+}
+
+.action-section + .action-section {
+  margin-top: 24rpx;
 }
 
 .action-btn {
@@ -302,6 +542,17 @@ function handleQuit() {
   background-color: #f7f8fa;
 }
 
+.action-right {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.action-value {
+  font-size: 26rpx;
+  color: #999;
+}
+
 .action-btn.danger {
   justify-content: center;
 }
@@ -309,6 +560,10 @@ function handleQuit() {
 .action-btn.danger .action-text {
   color: #f56c6c;
   font-weight: 600;
+}
+
+.action-btn.setting {
+  justify-content: space-between;
 }
 
 .action-icon {
@@ -321,6 +576,15 @@ function handleQuit() {
   font-size: 30rpx;
   color: #333;
   font-weight: 500;
+}
+
+.setting-tip {
+  padding: 0 32rpx 24rpx 32rpx;
+}
+
+.setting-tip text {
+  font-size: 24rpx;
+  color: #999;
 }
 
 .loading {

@@ -68,3 +68,23 @@ export const getMemberList = (groupId) => {
 export const transferOwner = (data) => {
   return http.post('/auth-service/family/group/transferOwner', data)
 }
+
+// 分配成员角色
+export const assignMemberRole = (data) => {
+  return http.post('/auth-service/family/group/assignRole', data)
+}
+
+// 查询我的默认共享开关
+export const getMyDefaultShared = (groupId) => {
+  return http.get('/auth-service/family/group/myDefaultShared', { groupId })
+}
+
+// 更新我的默认共享开关
+export const updateMyDefaultShared = (data) => {
+  return http.post('/auth-service/family/group/updateMyDefaultShared', data)
+}
+
+// 更新我的共享数据查看范围
+export const updateMyQueryScope = (data) => {
+  return http.post('/auth-service/family/group/updateMyQueryScope', data)
+}

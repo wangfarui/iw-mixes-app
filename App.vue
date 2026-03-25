@@ -13,11 +13,14 @@
 	} from '@dcloudio/uni-app'
 
 	import http from '@/api/request.js'
+	import { useFamilyStore } from '@/stores/family.js'
 
 	import {
 		refreshDictCache,
 		startVersionPolling
 	} from "@/api/login.js";
+
+	const familyStore = useFamilyStore()
 
 	onLaunch(() => {
 		// 确保 pinia 挂载之后再调用 API
@@ -29,6 +32,9 @@
 			if (token && userInfo) {
 				// 用户已登录，启动版本号轮询
 				startVersionPolling()
+				familyStore.fetchMyGroup()
+			} else {
+				familyStore.clearGroup()
 			}
 			
 			// 加载字典缓存

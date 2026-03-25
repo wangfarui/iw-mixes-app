@@ -116,6 +116,11 @@
 					<text class="more-label">不计入统计:</text>
 					<switch :checked="formData.isStatistics === 0" @change="switchStatistics" />
 				</view>
+
+				<view v-if="showSharedSwitch" class="more-item">
+					<text class="more-label">共享给家人:</text>
+					<switch :checked="isShared" @change="switchShared" />
+				</view>
 				
 				<!-- 汇率转换 -->
 				<view class="more-item">
@@ -163,6 +168,8 @@ import { onShow } from '@dcloudio/uni-app'
 import http from '@/api/request.js'
 import { getIconUrl } from '@/utils/icon.js'
 import { uploadFile } from "@/stores/file.js"
+import { useFamilyStore } from '@/stores/family.js'
+import { useFamilySharedScopeStore } from '@/stores/family-shared-scope.js'
 
 const selectedCategory = ref(1)
 const actions = ref([])
@@ -177,15 +184,20 @@ const formData = ref({
 	isExcitationRecord: 0,
 	isStatistics: 1,
 	fromCurrency: '',
-	fileList: []
+	fileList: [],
+	shared: 0
 })
 const dictStore = useDictStore()
+const familyStore = useFamilyStore()
+const sharedScopeStore = useFamilySharedScopeStore()
 const bookkeepingPopup = ref(null)
 const selectedDate = ref(new Date())
 const tagsPopup = ref(null)
 const morePopup = ref(null)
 const selectedAction = ref(null)
 const uploadPopup = ref(null)
+const showSharedSwitch = computed(() => sharedScopeStore.canControlRecordShared)
+const isShared = computed(() => Number(formData.value.shared) === 1)
 
 const numberRows = ref([
 	[7, 8, 9, '今天'],
@@ -243,7 +255,19 @@ function openSettings() {
 	})
 }
 
-function openBookkeepingPopup(action) {
+async function ensureFamilyGroupLoaded() {
+	if (familyStore.myGroup || uni.getStorageSync('myGroup')) {
+		return
+	}
+	await familyStore.fetchMyGroup()
+}
+
+function getDefaultSharedValue() {
+	return sharedScopeStore.defaultRecordShared
+}
+
+async function openBookkeepingPopup(action) {
+	await ensureFamilyGroupLoaded()
 	selectedAction.value = action.id
 	formData.value = {
 		...formData.value,
@@ -251,7 +275,8 @@ function openBookkeepingPopup(action) {
 		recordIcon: action.recordIcon,
 		recordSource: action.recordSource,
 		recordTags: action.recordTags || [],
-		recordType: action.recordType
+		recordType: action.recordType,
+		shared: getDefaultSharedValue()
 	}
 	bookkeepingPopup.value.open()
 }
@@ -334,6 +359,10 @@ function switchStatistics(e) {
 	formData.value.isStatistics = e.detail.value ? 0 : 1
 }
 
+function switchShared(e) {
+	formData.value.shared = e.detail.value ? 1 : 0
+}
+
 function submitBookkeeping() {
 	// 验证必填字段
 	if (!formData.value.recordCategory) {
@@ -369,6 +398,7 @@ function submitBookkeeping() {
 		recordTags: formData.value.recordTags,
 		isExcitationRecord: formData.value.isExcitationRecord,
 		isStatistics: formData.value.isStatistics,
+		shared: formData.value.shared,
 		fromCurrency: formData.value.fromCurrency,
 		fileList: formData.value.fileList
 	}
@@ -490,7 +520,9 @@ function resetFormData() {
 		recordType: null,
 		isExcitationRecord: 0,
 		isStatistics: 1,
-		fileList: []
+		fromCurrency: '',
+		fileList: [],
+		shared: getDefaultSharedValue()
 	}
 	selectedDate.value = formatDate(new Date()) // 重置为今天
 	selectedAction.value = null // 重置选中状态

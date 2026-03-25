@@ -33,7 +33,10 @@
 							<image class="card-icon-img" src="/static/tabbar/bill-active.png" mode="aspectFill" />
 						</view>
 						<view class="card-content">
-							<text class="card-title">今日记账</text>
+							<view class="bill-title-row">
+								<text class="card-title">今日记账</text>
+								<text v-if="scopeStore.hasGroup" class="scope-badge">{{ scopeStore.scopeText }}</text>
+							</view>
 							<text class="card-value">¥ {{ billTotalAmount }}</text>
 						</view>
 					</view>
@@ -123,6 +126,7 @@
 import { ref, onMounted } from 'vue'
 import http from '@/api/request.js'
 import { onPullDownRefresh, onShow } from '@dcloudio/uni-app'
+import { useBookkeepingQueryScopeStore } from '@/stores/bookkeeping-query-scope.js'
 
 const currentDate = ref('')
 const billTotalAmount = ref('0.00')
@@ -145,6 +149,7 @@ const weatherInfo = ref({
 })
 
 const pointsBalance = ref(0)
+const scopeStore = useBookkeepingQueryScopeStore()
 
 const fetchWeather = async () => {
 	try {
@@ -181,7 +186,8 @@ const fetchBillTotalAmount = async () => {
 		const res = await http.post('/bookkeeping-service/bookkeeping/consume/totalStatistics', {
 			recordCategory: 1,
 			currentStartMonth: today,
-			currentEndMonth: today
+			currentEndMonth: today,
+			queryOnlyMyself: scopeStore.queryOnlyMyself
 		})
 		billTotalAmount.value = res?.data?.totalAmount || '0.00'
 	} catch (e) {
@@ -197,13 +203,14 @@ const fetchBillRecords = async () => {
 			recordStartDate: today,
 			recordEndDate: today,
 			recordCategory: 1,
-			pageSize: 4
+			pageSize: 4,
+			queryOnlyMyself: scopeStore.queryOnlyMyself
 		})
 		let records = res?.data?.records || []
 		showBillMore.value = records.length > 3
 		billRecords.value = records.slice(0, 3).map(item => ({
 			time: (item.recordTime || '').slice(11, 16),
-			desc: item.recordSource,
+			desc: formatBillRecordDesc(item),
 			amount: item.amount
 		}))
 	} catch (e) {
@@ -273,11 +280,19 @@ const navigateToRecipes = () => {
 	})
 }
 
-const navigateToQuickBookkeep = () => {
-	uni.navigateTo({
-		url: '/pagesBookkeeping/bookkeeping/bookkeeping-quick'
-	})
-}
+	const navigateToQuickBookkeep = () => {
+		uni.navigateTo({
+			url: '/pagesBookkeeping/bookkeeping/bookkeeping-quick'
+		})
+	}
+
+	const formatBillRecordDesc = (item) => {
+		const desc = item.recordSource || (item.recordCategory === 2 ? '收入' : '消费')
+		if (scopeStore.effectiveScope === 'shared' && item.userName && !item.canEdit) {
+			return `${item.userName} · ${desc}`
+		}
+		return desc
+	}
 
 const navigateToDishesDetail = (id) => {
 	uni.navigateTo({
@@ -540,6 +555,21 @@ onPullDownRefresh(() => {
 			}
 		}
 	}
+}
+
+.bill-title-row {
+	display: flex;
+	align-items: center;
+	gap: 12rpx;
+}
+
+.scope-badge {
+	padding: 4rpx 14rpx;
+	border-radius: 999rpx;
+	background-color: #eaf3ff;
+	color: #007aff;
+	font-size: 20rpx;
+	line-height: 1.4;
 }
 
 .recipe-section {

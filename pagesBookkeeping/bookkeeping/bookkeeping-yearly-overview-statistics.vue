@@ -108,6 +108,10 @@ const props = defineProps({
         type: String,
         default: new Date().getFullYear() + '年'
     },
+    queryOnlyMyself: {
+        type: Number,
+        default: null
+    },
     echarts: {
           type: Object,
           required: true
@@ -173,13 +177,18 @@ watch(() => props.selectedYear, () => {
     fetchYearStatistics()
 })
 
+watch(() => props.queryOnlyMyself, () => {
+    fetchYearStatistics()
+})
+
 // 获取年度统计数据
 const fetchYearStatistics = async () => {
     try {
         const year = props.selectedYear.replace('年', '')
         const params = {
             year: parseInt(year),
-            ignoreNotStatistics: ignoreNotStatistics.value ? 0 : 1
+            ignoreNotStatistics: ignoreNotStatistics.value ? 0 : 1,
+            queryOnlyMyself: props.queryOnlyMyself
         }
 
         const response = await http.post('/bookkeeping-service/bookkeeping/records/yearStatistics/overview', params)
@@ -201,46 +210,33 @@ const fetchYearStatistics = async () => {
         }, 300)
     } catch (error) {
         console.error('获取年度统计数据失败:', error)
-        // 失败时使用模拟数据
-        mockYearStatistics()
+        yearStatistics.value = {
+            totalConsume: 0,
+            consumeCount: 0,
+            totalIncome: 0,
+            incomeCount: 0,
+            netIncome: 0
+        }
+        consumeTrendData.value = Array(12).fill(0)
+        incomeTrendData.value = Array(12).fill(0)
+        netIncomeTrendData.value = Array(12).fill(0)
+        recordingHabits.value = {
+            recordingDays: 0,
+            maxContinuousDays: 0,
+            maxContinuousStartDate: '',
+            maxContinuousEndDate: '',
+            peakMonth: '',
+            peakCount: 0,
+            missingCount: 0,
+            missingRate: 0,
+            recordingCount: 0,
+            avgPerDay: 0,
+            evaluation: ''
+        }
+        setTimeout(() => {
+            renderTrendChart()
+        }, 300)
     }
-}
-
-// 模拟数据生成
-const mockYearStatistics = () => {
-    // 年度统计
-    yearStatistics.value = {
-        totalConsume: 15234.56,
-        consumeCount: 128,
-        totalIncome: 20000.00,
-        incomeCount: 24,
-        netIncome: 4765.44
-    }
-
-    // 月度趋势
-    consumeTrendData.value = [1200, 1400, 1100, 1300, 1500, 1600, 1400, 1200, 1800, 1900, 1700, 1300]
-    incomeTrendData.value = [1500, 1600, 1400, 1700, 1800, 2000, 1900, 1700, 2100, 2200, 2000, 1600]
-    netIncomeTrendData.value = [100, 100, 100, 100, 180, 200, 100, 170, 210, 220, 200, 100]
-
-    // 记账习惯数据
-    recordingHabits.value = {
-        recordingDays: 287,
-        maxContinuousDays: 45,
-        maxContinuousStartDate: '2024-03-01',
-        maxContinuousEndDate: '2024-04-14',
-        peakMonth: '12月',
-        peakCount: 28,
-        missingCount: 78,
-        missingRate: 21.4,
-		recordingCount: 300,
-        avgPerDay: 2.1,
-        evaluation: '坚持记账的好习惯！连续记账超过40天是值得表扬的成就。保持这个节奏，你会更好地掌握自己的财务状况。💪'
-    }
-
-    // 延迟渲染图表
-    setTimeout(() => {
-        renderTrendChart()
-    }, 300)
 }
 
 // 渲染年度趋势图 (支出、收入、净收入)
@@ -574,4 +570,3 @@ const renderTrendChart = () => {
     color: #333;
 }
 </style>
-

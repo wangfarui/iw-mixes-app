@@ -28,7 +28,6 @@
 						</view>
 					</view>
 				</view>
-
 				<!-- 功能按钮区域 -->
 				<view class="function-section">
 					<view class="function-item" v-for="(item, index) in functionButtons" :key="index" @click="handleFunctionClick(item)">
@@ -47,8 +46,11 @@
 						</template>
 						<template v-slot:body>
 							<view class="record-info">
-								<text class="record-source">{{item.recordSource}}</text>
-								<text class="record-type">{{item.recordTypeName}}</text>
+								<text class="record-source">{{ formatRecordSource(item) }}</text>
+								<text class="record-type">
+									{{ item.recordTypeName }}
+									<text v-if="shouldShowOwner(item)" class="record-owner"> · 来自{{ item.userName }}</text>
+								</text>
 								<text class="record-time">{{item.recordTimeStr}}</text>
 							</view>
 						</template>
@@ -66,14 +68,16 @@
 </template>
 
 <script setup>
-	import { ref, reactive, onMounted } from 'vue'
+	import { ref, reactive, watch } from 'vue'
 	import { onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-app'
 	import http from '@/api/request.js'
+	import { useBookkeepingQueryScopeStore } from '@/stores/bookkeeping-query-scope.js'
 	import {
 		useDictStore
 	} from "@/stores/dict.ts";
 
 	const dictStore = useDictStore()
+	const scopeStore = useBookkeepingQueryScopeStore()
 
 	// 当前选择的日期
 	const currentDate = ref(new Date().toISOString().split('T')[0])
@@ -135,7 +139,8 @@
 		const dateRange = getMonthRange(currentDate.value)
 		http.post('/bookkeeping-service/bookkeeping/records/statistics', {
 			recordStartDate: dateRange.start,
-			recordEndDate: dateRange.end
+			recordEndDate: dateRange.end,
+			queryOnlyMyself: scopeStore.queryOnlyMyself
 		}).then(res => {
 			const data = res.data
 			statistics.income = parseFloat(data.income || 0).toFixed(2)
@@ -151,7 +156,8 @@
 			currentPage: page.currentPage,
 			pageSize: page.pageSize,
 			recordStartDate: dateRange.start,
-			recordEndDate: dateRange.end
+			recordEndDate: dateRange.end,
+			queryOnlyMyself: scopeStore.queryOnlyMyself
 		}).then(res => {
 			let data = res.data.records.map(item => ({
 				recordTypeName: dictStore.getDictNameByCode(dictStore.dictTypeEnum.BOOKKEEPING_RECORD_TYPE, item.recordType, "未知"),
@@ -214,12 +220,27 @@
 		});
 	}
 
+	function shouldShowOwner(item) {
+		return scopeStore.effectiveScope === 'shared' && item.userName && !item.canEdit
+	}
+
+	function formatRecordSource(item) {
+		if (item.recordSource) {
+			return item.recordSource
+		}
+		return item.recordCategory === 2 ? '收入' : '消费'
+	}
+
 	// 初始化页面
 	function initPage() {
 		page.currentPage = 1
 		getStatistics()
 		getBillList()
 	}
+
+	watch(() => scopeStore.effectiveScope, () => {
+		initPage()
+	})
 
 	// 处理滚动到底部
 	function handleScrollToLower() {
@@ -271,6 +292,10 @@
 		z-index: 1;
 		background-color: #f8f8f8;
 		padding: 10px;
+	}
+
+	.scope-section {
+		margin-top: 10px;
 	}
 
 	/* 统计区域样式 */
@@ -379,6 +404,9 @@
 		font-size: 12px;
 		color: #999;
 		margin-bottom: 2px;
+	}
+	.record-owner {
+		color: #007aff;
 	}
 	.record-time {
 		font-size: 12px;

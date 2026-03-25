@@ -56,13 +56,13 @@
 										</view>
 									</uni-col>
 								</view>
-							</uni-row>
-							<uni-row>
-								<view style="color: #8c8c8c; font-size: 13px;">
-									<view>{{item.recordTypeName}}</view>
-									<view>{{item.recordTimeStr}}</view>
-								</view>
-							</uni-row>
+								</uni-row>
+								<uni-row>
+									<view style="color: #8c8c8c; font-size: 13px;">
+										<view>{{ formatRecordMeta(item) }}</view>
+										<view>{{item.recordTimeStr}}</view>
+									</view>
+								</uni-row>
 						</view>
 					</template>
 				</uni-list-item>
@@ -161,7 +161,8 @@
 <script setup>
 	import {
 		ref,
-		reactive
+		reactive,
+		watch
 	} from 'vue'
 	import {
 		onPullDownRefresh,
@@ -171,11 +172,13 @@
 	} from '@dcloudio/uni-app'
 	import http from '@/api/request.js'
 	import {getMonthStartAndEnd, getYearStartAndEnd, formatDate} from'@/stores/date-utils.js'
+	import { useBookkeepingQueryScopeStore } from '@/stores/bookkeeping-query-scope.js'
 	import {
 		useDictStore
 	} from "@/stores/dict.ts";
 
 	const dictStore = useDictStore()
+	const scopeStore = useBookkeepingQueryScopeStore()
 
 	const mealListStatus = ref('more')
 
@@ -204,6 +207,7 @@
 			recordCategory: '', // 记录类型
 			sortType: 0, // 排序类型
 			sortWay: 0, // 排序方式
+			queryOnlyMyself: null
 		},
 		list: [],
 		statistics: {}
@@ -237,6 +241,7 @@
 		page.dto.recordCategory = ''; // 记录类型
 		page.dto.sortType = 0; // 排序类型
 		page.dto.sortWay = 0; // 排序方式
+		page.dto.queryOnlyMyself = scopeStore.queryOnlyMyself
 	}
 	
 	function initFormPageDto() {
@@ -244,6 +249,7 @@
 		page.dto.currentPage = 1;
 		page.dto.pageSize = 20;
 		page.dto.isSearchAll = ignoreNotStatistics.value ? 0 : 1;
+		page.dto.queryOnlyMyself = scopeStore.queryOnlyMyself
 	}
 	
 	onLoad((option) => {
@@ -360,6 +366,13 @@
 		return item.recordCategory == 2 ? '收入' : '消费';
 	}
 
+	function formatRecordMeta(item) {
+		if (scopeStore.effectiveScope === 'shared' && item.userName && !item.canEdit) {
+			return `${item.recordTypeName} · 来自${item.userName}`
+		}
+		return item.recordTypeName
+	}
+
 	/**
 	 * 日期选择的change⌚事件
 	 */
@@ -451,6 +464,7 @@
 		page.dto.recordEndDate = endDate.value
 		// 记录分类
 		page.dto.recordType = selectedButtonCode.value == -1 ? '' : selectedButtonCode.value
+		page.dto.queryOnlyMyself = scopeStore.queryOnlyMyself
 		
 		mealListStatus.value = 'loading'
 		Promise.all([searchStatistics(), searchPage()])
@@ -490,12 +504,20 @@
 		page.statistics = {consume: 0, income: 0};
 		initPage();
 	}
+
+	watch(() => scopeStore.effectiveScope, () => {
+		initPage()
+	})
 </script>
 
 <style>
 	/* 主容器布局 */
 	.container {
 		padding: 10px;
+	}
+
+	.scope-container {
+		padding-top: 0;
 	}
 
 	/* 筛选容器布局 */

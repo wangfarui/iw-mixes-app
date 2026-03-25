@@ -185,7 +185,10 @@
                     @tap="goToDetail(item)"
                 >
                     <text class="rank">{{ index + 1 }}</text>
-                    <text class="name">{{ item.recordSource }}</text>
+                    <view class="ranking-content">
+                        <text class="name">{{ formatRankSource(item) }}</text>
+                        <text v-if="shouldShowOwner(item)" class="owner">来自{{ item.userName }}</text>
+                    </view>
                     <text class="amount">¥{{ item.amount }}</text>
                 </view>
             </view>
@@ -197,10 +200,12 @@
 import { ref, watch, onUnmounted } from 'vue'
 import { onReady } from '@dcloudio/uni-app'
 import http from '@/api/request.js'
+import { useBookkeepingQueryScopeStore } from '@/stores/bookkeeping-query-scope.js'
 
 import { useDictStore } from "@/stores/dict.ts";
 
 const dictStore = useDictStore()
+const scopeStore = useBookkeepingQueryScopeStore()
 const currentTab = ref('month')
 const totalConsume = ref(0)
 const consumeRanking = ref([])
@@ -280,7 +285,8 @@ const getRequestParams = () => {
         currentMonth: currentMonthParam,
         statisticsType: statisticsTypeParam,
         isSearchAll: ignoreNotStatistics.value ? 0 : 1, // 根据开关设置参数
-        isQueryLastMonth: compareLastMonth.value // 根据开关设置参数
+        isQueryLastMonth: compareLastMonth.value, // 根据开关设置参数
+        queryOnlyMyself: scopeStore.queryOnlyMyself
     };
 };
 
@@ -786,6 +792,10 @@ watch([currentTab, selectedDate], () => {
     fetchConsumeData();
 });
 
+watch(() => scopeStore.effectiveScope, () => {
+    fetchConsumeData();
+});
+
 // 修改 onReady 方法
 onReady(() => {
      // 初始化趋势图
@@ -892,11 +902,23 @@ const goToRecords = (item) => {
     
     uni.navigateTo({ url });
 };
+
+const shouldShowOwner = (item) => {
+    return scopeStore.effectiveScope === 'shared' && item.userName && !item.canEdit
+}
+
+const formatRankSource = (item) => {
+    return item.recordSource || '消费'
+}
 </script>
 
 <style lang="scss">
 .consume-statistics {
     padding: 20rpx;
+
+    .scope-panel {
+        margin-bottom: 20rpx;
+    }
     
     .header {
         display: flex;
@@ -1065,9 +1087,20 @@ const goToRecords = (item) => {
                     margin-right: 20rpx;
                 }
                 
-                .name {
+                .ranking-content {
                     flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .name {
                     font-size: 28rpx;
+                }
+
+                .owner {
+                    margin-top: 6rpx;
+                    font-size: 22rpx;
+                    color: #007aff;
                 }
                 
                 .amount {

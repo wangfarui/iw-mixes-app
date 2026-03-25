@@ -11,6 +11,10 @@
 		        <text class="label">类型</text>
 		        <text class="value">{{ detail.recordCategory == '2' ? '收入' : '支出' }}</text>
 		      </view>
+		      <view class="item" v-if="detail.userName">
+		        <text class="label">记账人</text>
+		        <text class="value">{{ detail.userName }}</text>
+		      </view>
 			  <view class="item">
 			    <text class="label">来源</text>
 			    <text class="value">{{ detail.recordSource }}</text>
@@ -58,9 +62,12 @@
 		    </view>
 		
 		    <!-- 操作按钮 -->
-		    <view class="bottom-actions">
+		    <view v-if="detail.canEdit" class="bottom-actions">
 		      <button class="edit-btn" @click="clickUpdateButton()">编辑</button>
 		      <button class="delete-btn" @click="dialogToggle()">删除</button>
+		    </view>
+		    <view v-else-if="detail.id" class="readonly-tip">
+		      共享记录仅支持查看，不能编辑或删除
 		    </view>
 		</view>
 
@@ -112,12 +119,18 @@
 	})
 	
 	function clickUpdateButton() {
+		if (!detail.value.canEdit) {
+			return
+		}
 		uni.navigateTo({
 			url: '/pagesBookkeeping/bookkeeping/bookkeeping-action?id=' + detail.value.id
 		});
 	}
 	
 	function deleteRecord() {
+		if (!detail.value.canEdit) {
+			return
+		}
 		http.delete('/bookkeeping-service/bookkeeping/records/delete?id=' + detail.value.id)
 			.then(res => {
 				uni.navigateBack({});
@@ -126,6 +139,9 @@
 	}
 
 	function dialogToggle() {
+		if (!detail.value.canEdit) {
+			return
+		}
 		alertDialog.value.open();
 	}
 
@@ -177,6 +193,14 @@
 	  display: flex;
 	  justify-content: space-around;
 	  padding: 12px;
+	}
+
+	.readonly-tip {
+	  margin: 0 16px;
+	  padding: 12px 16px 24px;
+	  color: #007aff;
+	  font-size: 14px;
+	  text-align: center;
 	}
 	
 	.edit-btn,

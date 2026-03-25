@@ -48,6 +48,11 @@
       <switch :checked="isNotStatistics" @change="switchNotStatistics" size="20px" />
     </view>
 
+    <view v-if="showSharedSwitch" class="form-item">
+      <view class="label">共享给家人:</view>
+      <switch :checked="isShared" @change="switchShared" size="20px" />
+    </view>
+
     <!-- 分类 -->
     <view class="form-item full-width">
       <view class="label">分类:</view>
@@ -160,25 +165,28 @@
 
 <script setup>
 	import {
+		computed,
 		ref,
-		reactive,
 		onMounted
 	} from 'vue'
 
 	import http from '@/api/request.js'
 
 	import {
-		onLoad,
-		onShow
+		onLoad
 	} from '@dcloudio/uni-app'
 
 	import {
 		useDictStore
 	} from "@/stores/dict.ts";
+	import { useFamilyStore } from '@/stores/family.js'
+	import { useFamilySharedScopeStore } from '@/stores/family-shared-scope.js'
 	import { getIconUrl, getIconList} from '@/utils/icon.js'
 	import { uploadFile } from "@/stores/file.js"
 
 	const dictStore = useDictStore()
+	const familyStore = useFamilyStore()
+	const sharedScopeStore = useFamilySharedScopeStore()
 	const items = ['支出', '收入']
 	const formData = ref({
 		fileList: [], // 初始化文件列表
@@ -189,7 +197,8 @@
 		recordType: '',
 		remark: '',
 		recordTags: [],
-		isStatistics: ''
+		isStatistics: '',
+		shared: 0
 	}) // 记账表单数据
 	const current = ref(0) // 当前所选的记录类型 对应items下表
 	const toDayRecords = ref([]) // 今日记账记录列表
@@ -201,13 +210,15 @@
 	const iconList = ref([])
 	const iconPopup = ref(null)
 	const uploadPopup = ref(null)
+	const showSharedSwitch = computed(() => sharedScopeStore.canControlRecordShared)
+	const isShared = computed(() => Number(formData.value.shared) === 1)
 	
 	onLoad((option) => {
 		if (option.id) {
 			isUpdateForm.value = true
 			updateFormId.value = option.id
 		}
-		initFormData()
+		initPage()
 		loadTodayConsume()
 	})
 
@@ -217,13 +228,46 @@
 
 	
 
+	async function initPage() {
+		await ensureFamilyGroupLoaded()
+		initFormData()
+	}
+
+	async function ensureFamilyGroupLoaded() {
+		if (familyStore.myGroup || uni.getStorageSync('myGroup')) {
+			return
+		}
+		await familyStore.fetchMyGroup()
+	}
+
+	function getDefaultSharedValue() {
+		return sharedScopeStore.defaultRecordShared
+	}
+
+	function normalizeShared(value) {
+		return Number(value) === 1 ? 1 : 0
+	}
+
 	function initFormData() {
 		if (isUpdateForm.value) {
 			http.get('/bookkeeping-service/bookkeeping/records/detail?id=' + updateFormId.value)
 				.then(res => {
+					if (res.data && res.data.canEdit === false) {
+						uni.showToast({
+							icon: 'none',
+							title: '不能修改他人记账记录'
+						})
+						setTimeout(() => {
+							uni.navigateBack({})
+						}, 600)
+						return
+					}
 					isExcitationRecord.value = res.data.isExcitationRecord == 1
 					isNotStatistics.value = res.data.isStatistics == 0
-					formData.value = res.data
+					formData.value = {
+						...res.data,
+						shared: normalizeShared(res.data.shared)
+					}
           current.value = res.data.recordCategory - 1
 				})
 		} else {
@@ -244,13 +288,16 @@
 				remark: '',
 				recordTags: [],
 				isStatistics: '',
-				fileList: []
+				fileList: [],
+				shared: getDefaultSharedValue()
 			}
 		}
 	}
 
 	function loadTodayConsume() {
-		http.post('/bookkeeping-service/bookkeeping/records/list', {})
+		http.post('/bookkeeping-service/bookkeeping/records/list', {
+			queryOnlyMyself: 1
+		})
 			.then(res => {
 				toDayRecords.value = res.data
 				if (res.data != null) {
@@ -293,6 +340,10 @@
 
 	function switchNotStatistics() {
 		isNotStatistics.value = !isNotStatistics.value
+	}
+
+	function switchShared(e) {
+		formData.value.shared = e.detail.value ? 1 : 0
 	}
 
 	function onClickItem(e) {

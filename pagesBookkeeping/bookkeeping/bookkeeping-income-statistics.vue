@@ -71,7 +71,10 @@
                     @tap="goToDetail(item)"
                 >
                     <text class="rank">{{ index + 1 }}</text>
-                    <text class="name">{{ item.recordSource }}</text>
+                    <view class="ranking-content">
+                        <text class="name">{{ formatRankSource(item) }}</text>
+                        <text v-if="shouldShowOwner(item)" class="owner">来自{{ item.userName }}</text>
+                    </view>
                     <text class="amount">¥{{ item.amount }}</text>
                 </view>
             </view>
@@ -83,6 +86,7 @@
 import { ref, watch, onUnmounted } from 'vue'
 import { onReady } from '@dcloudio/uni-app'
 import http from '@/api/request.js'
+import { useBookkeepingQueryScopeStore } from '@/stores/bookkeeping-query-scope.js'
 
 const currentTab = ref('month')
 const totalIncome = ref(0)
@@ -91,6 +95,7 @@ const totalRecordNum = ref(0)
 const chartRef = ref(null)
 const myChart = ref(null)
 const echarts = require('../../uni_modules/lime-echart/static/echarts.min')
+const scopeStore = useBookkeepingQueryScopeStore()
 
 // 用于存储图表实际数据
 const chartData = ref([]);
@@ -132,7 +137,8 @@ const getRequestParams = () => {
 
     return {
         currentMonth: currentMonthParam,
-        statisticsType: statisticsTypeParam
+        statisticsType: statisticsTypeParam,
+        queryOnlyMyself: scopeStore.queryOnlyMyself
     };
 };
 
@@ -318,8 +324,20 @@ const goToDetail = (item) => {
     });
 };
 
+const shouldShowOwner = (item) => {
+    return scopeStore.effectiveScope === 'shared' && item.userName && !item.canEdit
+}
+
+const formatRankSource = (item) => {
+    return item.recordSource || '收入'
+}
+
 // 监听统计维度和日期变化，自动刷新数据和图表
 watch([currentTab, selectedDate], () => {
+    fetchIncomeData()
+})
+
+watch(() => scopeStore.effectiveScope, () => {
     fetchIncomeData()
 })
 
@@ -342,6 +360,10 @@ onUnmounted(() => {
 <style lang="scss">
 .income-statistics {
     padding: 20rpx;
+
+    .scope-panel {
+        margin-bottom: 20rpx;
+    }
     
     .header {
         display: flex;
@@ -476,9 +498,20 @@ onUnmounted(() => {
                     margin-right: 20rpx;
                 }
                 
-                .name {
+                .ranking-content {
                     flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .name {
                     font-size: 28rpx;
+                }
+
+                .owner {
+                    margin-top: 6rpx;
+                    font-size: 22rpx;
+                    color: #007aff;
                 }
                 
                 .amount {

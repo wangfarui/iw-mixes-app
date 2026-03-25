@@ -112,6 +112,7 @@
                             <text class="top-date">{{ item.date }}</text>
                         </view>
                         <view class="top-desc">{{ item.description }}</view>
+                        <view v-if="props.queryOnlyMyself !== 1 && item.userName" class="top-user">记账人：{{ item.userName }}</view>
                     </view>
                     <view class="top-amount">¥{{ item.amount }}</view>
                 </view>
@@ -180,6 +181,10 @@ const props = defineProps({
     selectedYear: {
         type: String,
         default: new Date().getFullYear() + '年'
+    },
+    queryOnlyMyself: {
+        type: Number,
+        default: null
     },
     echarts: {
         type: Object,
@@ -285,13 +290,18 @@ watch(() => props.selectedYear, () => {
     fetchConsumeData()
 })
 
+watch(() => props.queryOnlyMyself, () => {
+    fetchConsumeData()
+})
+
 // 获取支出统计数据
 const fetchConsumeData = async () => {
     try {
         const year = props.selectedYear.replace('年', '')
         const params = {
             year: parseInt(year),
-            ignoreNotStatistics: ignoreNotStatistics.value ? 0 : 1
+            ignoreNotStatistics: ignoreNotStatistics.value ? 0 : 1,
+            queryOnlyMyself: props.queryOnlyMyself
         }
 
         const response = await http.post('/bookkeeping-service/bookkeeping/records/yearStatistics/consume', params)
@@ -351,73 +361,32 @@ const fetchConsumeData = async () => {
         }, 300)
     } catch (error) {
         console.error('获取支出数据失败:', error)
-        // 失败时使用模拟数据
-        mockConsumeData()
+        yearStatistics.value = {
+            totalConsume: 0,
+            consumeCount: 0
+        }
+        monthlyData.value = Array(12).fill(0)
+        consumeCategories.value = []
+        consumeTags.value = []
+        topConsumeList.value = []
+        insights.value = {
+            maxDayAmount: 0,
+            maxDayDate: '',
+            maxMonthAmount: 0,
+            maxMonthName: '',
+            topTag: '',
+            topTagCount: 0,
+            bottomTag: '',
+            bottomTagCount: 0,
+            largeExpenseRatio: 0,
+            avgMonthAmount: 0
+        }
+        setTimeout(() => {
+            renderMonthChart()
+            renderCategoryPieChart()
+            renderTagPieChart()
+        }, 300)
     }
-}
-
-// 模拟数据生成
-const mockConsumeData = () => {
-    // 年度统计
-    yearStatistics.value = {
-        totalConsume: 15234.56,
-        consumeCount: 287
-    }
-
-    // 每月支出数据
-    monthlyData.value = [1200, 1400, 1100, 1300, 1500, 1600, 1400, 1200, 1800, 1900, 1700, 1300]
-
-    // 支出分类
-    consumeCategories.value = [
-        { name: '食物', amount: 3500, ratio: 23, color: chartColors[0] },
-        { name: '交通', amount: 2800, ratio: 18, color: chartColors[1] },
-        { name: '娱乐', amount: 2500, ratio: 16, color: chartColors[2] },
-        { name: '购物', amount: 3200, ratio: 21, color: chartColors[3] },
-        { name: '居住', amount: 2000, ratio: 13, color: chartColors[4] },
-        { name: '其他', amount: 234.56, ratio: 9, color: chartColors[5] }
-    ].sort((a, b) => b.amount - a.amount)
-
-    // 支出标签
-    consumeTags.value = [
-        { name: '必需', count: 156, amount: 5200, ratio: 54, amountRatio: 34, color: chartColors[0] },
-        { name: '娱乐', count: 89, amount: 3800, ratio: 31, amountRatio: 25, color: chartColors[1] },
-        { name: '投资', count: 42, amount: 6234.56, ratio: 15, amountRatio: 41, color: chartColors[2] }
-    ]
-
-    // 支出Top10
-    topConsumeList.value = [
-        { rank: 1, category: '购物', date: '2025-12-15', description: '衣服', amount: 580 },
-        { rank: 2, category: '娱乐', date: '2025-11-20', description: '电影票', amount: 520 },
-        { rank: 3, category: '食物', date: '2025-10-10', description: '大餐', amount: 450 },
-        { rank: 4, category: '交通', date: '2025-09-05', description: '高铁', amount: 420 },
-        { rank: 5, category: '购物', date: '2025-08-12', description: '手机壳', amount: 350 },
-        { rank: 6, category: '食物', date: '2025-07-18', description: '超市购物', amount: 320 },
-        { rank: 7, category: '居住', date: '2025-06-01', description: '房租', amount: 3000 },
-        { rank: 8, category: '娱乐', date: '2025-05-22', description: '游戏充值', amount: 280 },
-        { rank: 9, category: '交通', date: '2025-04-15', description: '打车', amount: 250 },
-        { rank: 10, category: '购物', date: '2025-03-08', description: '书籍', amount: 220 }
-    ]
-
-    // 支出洞察
-    insights.value = {
-        maxDayAmount: 580,
-        maxDayDate: '2025-12-15',
-        maxMonthAmount: 1900,
-        maxMonthName: '10月',
-        topTag: '必需',
-        topTagCount: 156,
-        bottomTag: '投资',
-        bottomTagCount: 42,
-        largeExpenseRatio: 28,
-        avgMonthAmount: 1269.5
-    }
-
-    // 延迟渲染图表
-    setTimeout(() => {
-        renderMonthChart()
-        renderCategoryPieChart()
-        renderTagPieChart()
-    }, 300)
 }
 
 // 渲染每月支出柱状图
@@ -860,6 +829,11 @@ const renderTagPieChart = () => {
     color: #666;
 }
 
+.top-user {
+    font-size: 20rpx;
+    color: #007aff;
+}
+
 .top-amount {
     font-size: 28rpx;
     font-weight: bold;
@@ -967,4 +941,3 @@ const renderTagPieChart = () => {
     color: #333;
 }
 </style>
-

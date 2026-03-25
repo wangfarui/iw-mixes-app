@@ -69,6 +69,7 @@
                             <text class="top-date">{{ item.date }}</text>
                         </view>
                         <view class="top-desc">{{ item.description }}</view>
+                        <view v-if="props.queryOnlyMyself !== 1 && item.userName" class="top-user">记账人：{{ item.userName }}</view>
                     </view>
                     <view class="top-amount">¥{{ item.amount }}</view>
                 </view>
@@ -125,6 +126,10 @@ const props = defineProps({
     selectedYear: {
         type: String,
         default: new Date().getFullYear() + '年'
+    },
+    queryOnlyMyself: {
+        type: Number,
+        default: null
     },
     echarts: {
         type: Object,
@@ -195,13 +200,18 @@ watch(() => props.selectedYear, () => {
     fetchIncomeData()
 })
 
+watch(() => props.queryOnlyMyself, () => {
+    fetchIncomeData()
+})
+
 // 获取收入统计数据
 const fetchIncomeData = async () => {
     try {
         const year = props.selectedYear.replace('年', '')
         const params = {
             year: parseInt(year),
-            ignoreNotStatistics: ignoreNotStatistics.value ? 0 : 1
+            ignoreNotStatistics: ignoreNotStatistics.value ? 0 : 1,
+            queryOnlyMyself: props.queryOnlyMyself
         }
 
         const response = await http.post('/bookkeeping-service/bookkeeping/records/yearStatistics/income', params)
@@ -246,58 +256,26 @@ const fetchIncomeData = async () => {
         }, 300)
     } catch (error) {
         console.error('获取收入数据失败:', error)
-        // 失败时使用模拟数据
-        mockIncomeData()
+        yearStatistics.value = {
+            totalIncome: 0,
+            incomeCount: 0
+        }
+        monthlyData.value = Array(12).fill(0)
+        incomeCategories.value = []
+        topIncomeList.value = []
+        insights.value = {
+            maxDayAmount: 0,
+            maxDayDate: '',
+            maxMonthAmount: 0,
+            maxMonthName: '',
+            largeIncomeRatio: 0,
+            avgMonthAmount: 0
+        }
+        setTimeout(() => {
+            renderMonthChart()
+            renderIncomePieChart()
+        }, 300)
     }
-}
-
-// 模拟数据生成
-const mockIncomeData = () => {
-    // 年度统计
-    yearStatistics.value = {
-        totalIncome: 20000.00,
-        incomeCount: 24
-    }
-
-    // 每月收入数据
-    monthlyData.value = [1500, 1600, 1400, 1700, 1800, 2000, 1900, 1700, 2100, 2200, 2000, 1600]
-
-    // 收入分类
-    incomeCategories.value = [
-        { name: '工资', amount: 15000, ratio: 75, color: chartColors[0] },
-        { name: '兼职', amount: 3000, ratio: 15, color: chartColors[1] },
-        { name: '其他', amount: 2000, ratio: 10, color: chartColors[2] }
-    ].sort((a, b) => b.amount - a.amount)
-
-    // 收入Top10
-    topIncomeList.value = [
-        { rank: 1, category: '工资', date: '2025-12-10', description: '12月工资', amount: 5000 },
-        { rank: 2, category: '工资', date: '2025-11-10', description: '11月工资', amount: 5000 },
-        { rank: 3, category: '工资', date: '2025-10-10', description: '10月工资', amount: 5000 },
-        { rank: 4, category: '兼职', date: '2025-12-05', description: '设计兼职', amount: 1000 },
-        { rank: 5, category: '工资', date: '2025-09-10', description: '9月工资', amount: 5000 },
-        { rank: 6, category: '其他', date: '2025-08-15', description: '投资回报', amount: 800 },
-        { rank: 7, category: '兼职', date: '2025-07-20', description: '写作兼职', amount: 600 },
-        { rank: 8, category: '其他', date: '2025-06-10', description: '礼物', amount: 500 },
-        { rank: 9, category: '兼职', date: '2025-05-12', description: '翻译兼职', amount: 400 },
-        { rank: 10, category: '其他', date: '2025-04-08', description: '红包', amount: 300 }
-    ]
-
-    // 收入洞察
-    insights.value = {
-        maxDayAmount: 5000,
-        maxDayDate: '2025-12-10',
-        maxMonthAmount: 2200,
-        maxMonthName: '10月',
-        largeIncomeRatio: 75,
-        avgMonthAmount: 1666.67
-    }
-
-    // 延迟渲染图表
-    setTimeout(() => {
-        renderMonthChart()
-        renderIncomePieChart()
-    }, 300)
 }
 
 // 渲染每月收入柱状图
@@ -605,6 +583,11 @@ const renderIncomePieChart = () => {
     color: #666;
 }
 
+.top-user {
+    font-size: 20rpx;
+    color: #007aff;
+}
+
 .top-amount {
     font-size: 28rpx;
     font-weight: bold;
@@ -712,4 +695,3 @@ const renderIncomePieChart = () => {
     color: #333;
 }
 </style>
-

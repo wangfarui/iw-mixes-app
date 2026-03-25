@@ -29,8 +29,12 @@ export const useFamilyStore = defineStore('family', {
       this.isLoading = true
       try {
         const res = await getMyGroup()
-        this.myGroup = res.data
-        uni.setStorageSync('myGroup', this.myGroup)
+        if (res.data) {
+          this.myGroup = res.data
+          uni.setStorageSync('myGroup', this.myGroup)
+        } else {
+          this.clearGroup()
+        }
       } catch (e) {
         // 未加入家庭组或请求失败
         this.myGroup = null
@@ -51,6 +55,10 @@ export const useFamilyStore = defineStore('family', {
 
     // 更新家庭组信息
     updateGroup(groupData) {
+      if (!groupData) {
+        this.clearGroup()
+        return
+      }
       this.myGroup = groupData
       uni.setStorageSync('myGroup', this.myGroup)
     }

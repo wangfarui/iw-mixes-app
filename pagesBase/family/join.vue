@@ -39,7 +39,7 @@
 
       <view v-if="hasCurrentGroup" class="warning-tip">
         <text class="warning-icon">⚠️</text>
-        <text class="warning-text">加入后将自动退出当前家庭组</text>
+        <text class="warning-text">您已加入家庭组，请先退出当前家庭组后再加入新组</text>
       </view>
     </view>
 
@@ -108,6 +108,14 @@ async function handleValidate() {
 }
 
 async function handleJoin() {
+  if (hasCurrentGroup.value) {
+    uni.showToast({
+      title: '请先退出当前家庭组',
+      icon: 'none'
+    })
+    return
+  }
+
   if (isJoining.value) return
   isJoining.value = true
 

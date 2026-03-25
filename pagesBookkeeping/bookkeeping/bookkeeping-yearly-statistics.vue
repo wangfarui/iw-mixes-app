@@ -43,18 +43,21 @@
             <bookkeeping-yearly-overview-statistics
                 :selectedYear="selectedYear"
                 :echarts="echarts"
+                :queryOnlyMyself="scopeStore.queryOnlyMyself"
             />
         </view>
         <view v-if="statisticsType === 'consume'" class="tab-content">
             <bookkeeping-yearly-consume-statistics
                 :selectedYear="selectedYear"
                 :echarts="echarts"
+                :queryOnlyMyself="scopeStore.queryOnlyMyself"
             />
         </view>
         <view v-if="statisticsType === 'income'" class="tab-content">
             <bookkeeping-yearly-income-statistics
                 :selectedYear="selectedYear"
                 :echarts="echarts"
+                :queryOnlyMyself="scopeStore.queryOnlyMyself"
             />
         </view>
     </view>
@@ -65,11 +68,13 @@ import { ref } from 'vue'
 import BookkeepingYearlyOverviewStatistics from './bookkeeping-yearly-overview-statistics.vue'
 import BookkeepingYearlyConsumeStatistics from './bookkeeping-yearly-consume-statistics.vue'
 import BookkeepingYearlyIncomeStatistics from './bookkeeping-yearly-income-statistics.vue'
+import { useBookkeepingQueryScopeStore } from '@/stores/bookkeeping-query-scope.js'
 
 const echarts = require('../../uni_modules/lime-echart/static/echarts.min')
 
 const selectedYear = ref(new Date().getFullYear() + '年')
 const statisticsType = ref('all')
+const scopeStore = useBookkeepingQueryScopeStore()
 
 // 格式化日期
 const formatDateForPicker = (dateStr) => {
@@ -155,4 +160,3 @@ const onYearChange = (e) => {
     }
 }
 </style>
-
