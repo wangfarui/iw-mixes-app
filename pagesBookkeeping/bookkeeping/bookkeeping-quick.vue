@@ -6,6 +6,14 @@
 			<text :class="{'active-text': selectedCategory === 2}" @click="selectCategory(2)">收入</text>
 		</view>
 
+		<view v-if="selectedCategory === 1" class="voice-section">
+			<button class="voice-btn" :disabled="isParsingVoice" @click="toggleVoiceRecording">{{ voiceButtonText }}</button>
+			<view v-if="voiceRecognizedText || voiceMessage" class="voice-result">
+				<text v-if="voiceRecognizedText" class="voice-text">{{ voiceRecognizedText }}</text>
+				<text v-if="voiceMessage" class="voice-message">{{ voiceMessage }}</text>
+			</view>
+		</view>
+
 		<!-- 记账行为列表 -->
 		<view class="actions-list">
 			<view class="action-item" 
@@ -162,10 +170,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, onUnmounted } from 'vue'
 import { useDictStore } from '@/stores/dict'
 import { onShow } from '@dcloudio/uni-app'
 import http from '@/api/request.js'
+import { baseUrl, tokenHeader } from '@/api/env.js'
 import { getIconUrl } from '@/utils/icon.js'
 import { uploadFile } from "@/stores/file.js"
 import { useFamilyStore } from '@/stores/family.js'
@@ -196,8 +205,20 @@ const tagsPopup = ref(null)
 const morePopup = ref(null)
 const selectedAction = ref(null)
 const uploadPopup = ref(null)
+const voiceLogId = ref(null)
+const voiceRecognizedText = ref('')
+const voiceMessage = ref('')
+const isRecording = ref(false)
+const isParsingVoice = ref(false)
+const recorderManager = typeof uni.getRecorderManager === 'function' ? uni.getRecorderManager() : null
 const showSharedSwitch = computed(() => sharedScopeStore.canControlRecordShared)
 const isShared = computed(() => Number(formData.value.shared) === 1)
+const voiceButtonText = computed(() => {
+	if (isParsingVoice.value) {
+		return '解析中'
+	}
+	return isRecording.value ? '停止录音' : '语音记账'
+})
 
 const numberRows = ref([
 	[7, 8, 9, '今天'],
@@ -231,10 +252,17 @@ const currencyTypes = ref([
 
 onMounted(() => {
 	fetchActions()
+	initRecorder()
 })
 
 onShow(() => {
 	fetchActions()
+})
+
+onUnmounted(() => {
+	if (isRecording.value && recorderManager) {
+		recorderManager.stop()
+	}
 })
 
 function selectCategory(category) {
@@ -268,6 +296,7 @@ function getDefaultSharedValue() {
 
 async function openBookkeepingPopup(action) {
 	await ensureFamilyGroupLoaded()
+	voiceLogId.value = null
 	selectedAction.value = action.id
 	formData.value = {
 		...formData.value,
@@ -279,6 +308,162 @@ async function openBookkeepingPopup(action) {
 		shared: getDefaultSharedValue()
 	}
 	bookkeepingPopup.value.open()
+}
+
+function initRecorder() {
+	if (!recorderManager) {
+		return
+	}
+	recorderManager.onStop((res) => {
+		isRecording.value = false
+		if (res && res.tempFilePath) {
+			uploadVoiceAudio(res.tempFilePath, res.duration)
+		}
+	})
+	recorderManager.onError((err) => {
+		isRecording.value = false
+		isParsingVoice.value = false
+		uni.showToast({
+			title: err.errMsg || '录音失败',
+			icon: 'none'
+		})
+	})
+}
+
+function toggleVoiceRecording() {
+	if (!recorderManager) {
+		uni.showToast({
+			title: '当前环境不支持录音',
+			icon: 'none'
+		})
+		return
+	}
+	if (isParsingVoice.value) {
+		return
+	}
+	if (isRecording.value) {
+		recorderManager.stop()
+		return
+	}
+	voiceMessage.value = ''
+	voiceRecognizedText.value = ''
+	recorderManager.start({
+		duration: 60000,
+		sampleRate: 16000,
+		numberOfChannels: 1,
+		encodeBitRate: 48000,
+		format: 'mp3'
+	})
+	isRecording.value = true
+}
+
+function uploadVoiceAudio(filePath, durationMs) {
+	isParsingVoice.value = true
+	uni.uploadFile({
+		url: baseUrl + '/bookkeeping-service/bookkeeping/assistant/expense/parseAudio?autoSave=true',
+		filePath,
+		name: 'file',
+		formData: {
+			durationMs: durationMs || 0,
+			format: resolveFileFormat(filePath),
+			sampleRate: 16000
+		},
+		header: {
+			'Content-Type': 'multipart/form-data',
+			...tokenHeader()
+		},
+		success: (uploadFileRes) => {
+			let result = {}
+			try {
+				result = JSON.parse(uploadFileRes.data || '{}')
+			} catch (error) {
+				uni.showToast({
+					title: '语音解析失败',
+					icon: 'none'
+				})
+				isParsingVoice.value = false
+				return
+			}
+			if (uploadFileRes.statusCode !== 200 || result.code !== 200) {
+				uni.showToast({
+					title: result.message || '语音解析失败',
+					icon: 'none'
+				})
+				isParsingVoice.value = false
+				return
+			}
+			handleVoiceParseResult(result.data || {})
+				.catch(error => {
+					uni.showToast({
+						title: error.message || '语音解析失败',
+						icon: 'none'
+					})
+				})
+				.finally(() => {
+					isParsingVoice.value = false
+				})
+		},
+		fail: (err) => {
+			uni.showToast({
+				title: err.errMsg || '语音上传失败',
+				icon: 'none'
+			})
+			isParsingVoice.value = false
+		}
+	})
+}
+
+async function handleVoiceParseResult(data) {
+	voiceLogId.value = data.logId || null
+	voiceRecognizedText.value = data.recognizedText || ''
+	voiceMessage.value = data.message || ''
+	if (data.autoSaved) {
+		uni.showToast({
+			title: '记账成功',
+			icon: 'success'
+		})
+		voiceLogId.value = null
+		uni.navigateBack()
+		return
+	}
+	if (data.draft) {
+		await applyVoiceDraft(data.draft)
+		bookkeepingPopup.value.open()
+		return
+	}
+	uni.showToast({
+		title: data.message || '请重新录音',
+		icon: 'none'
+	})
+}
+
+async function applyVoiceDraft(draft) {
+	await ensureFamilyGroupLoaded()
+	selectedCategory.value = 1
+	selectedAction.value = null
+	selectedDate.value = draft.recordDate || formatDate(new Date())
+	amount.value = draft.amount == null ? '0' : String(draft.amount)
+	remark.value = draft.recordSource || ''
+	formData.value = {
+		...formData.value,
+		recordCategory: 1,
+		recordIcon: draft.recordIcon || '',
+		recordSource: draft.recordSource || '',
+		recordTags: draft.recordTags || [],
+		recordType: draft.recordType || null,
+		isExcitationRecord: 0,
+		isStatistics: draft.isStatistics == null ? 1 : draft.isStatistics,
+		fromCurrency: '',
+		fileList: [],
+		shared: draft.shared == null ? getDefaultSharedValue() : draft.shared
+	}
+}
+
+function resolveFileFormat(filePath) {
+	if (!filePath || !filePath.includes('.')) {
+		return 'mp3'
+	}
+	return filePath.substring(filePath.lastIndexOf('.') + 1).toLowerCase()
 }
 
 function addNumber(num) {
@@ -403,7 +588,13 @@ function submitBookkeeping() {
 		fileList: formData.value.fileList
 	}
 
-	http.post('/bookkeeping-service/bookkeeping/records/add', submitData)
+	const request = voiceLogId.value
+		? http.post('/bookkeeping-service/bookkeeping/assistant/expense/confirm', {
+			...submitData,
+			logId: voiceLogId.value
+		})
+		: http.post('/bookkeeping-service/bookkeeping/records/add', submitData)
+	request
 		.then(() => {
 			uni.showToast({
 				title: '保存成功',
@@ -512,6 +703,7 @@ function resetFormData() {
 	// 重置所有表单数据
 	amount.value = '0'
 	remark.value = ''
+	voiceLogId.value = null
 	formData.value = {
 		recordCategory: null,
 		recordIcon: '',
@@ -622,6 +814,45 @@ function deleteFile(index) {
 .active-text {
 	font-weight: bold;
 	border-bottom: 2px solid #333;
+}
+
+.voice-section {
+	margin-top: 12px;
+	padding: 12px;
+	background-color: #fff;
+	border-radius: 6px;
+	border: 1px solid #eee;
+}
+
+.voice-btn {
+	height: 44px;
+	line-height: 44px;
+	background-color: #333;
+	color: #ffd700;
+	border-radius: 4px;
+	font-size: 16px;
+}
+
+.voice-btn[disabled] {
+	background-color: #999;
+	color: #fff;
+}
+
+.voice-result {
+	margin-top: 10px;
+	display: flex;
+	flex-direction: column;
+}
+
+.voice-text {
+	font-size: 14px;
+	color: #333;
+}
+
+.voice-message {
+	margin-top: 4px;
+	font-size: 13px;
+	color: #666;
 }
 
 .actions-list {
