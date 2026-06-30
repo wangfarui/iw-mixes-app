@@ -2,7 +2,7 @@
 
 ## 项目定位
 
-`iw-mixes-app` 是 IW 系统的移动端项目，目前主要用于微信小程序。项目覆盖首页、账单、菜单、任务、我的、登录认证、家庭组、记账、餐食、积分等移动端场景，并通过后端网关访问 `../iw-mixes` 服务。
+`iw-mixes-app` 是 IW 系统的移动端项目，目前主要用于微信小程序。项目覆盖首页、账单、菜单、任务、我的、登录认证、家庭组、记账、餐食、积分等移动端场景，并通过后端兼容入口访问 `../iw-mixes-server` 服务。
 
 该项目是面向用户日常使用的端，开发时优先保证页面路径、分包、请求封装、登录态、微信小程序兼容性和移动端体验。
 
@@ -59,13 +59,13 @@
 ## 请求与登录态
 
 - 请求统一封装在 `api/request.js`。
-- 后端基础地址在 `api/env.js`，本地默认是 `http://localhost:18000`，生产可切换到 `https://api.itwray.com`。
+- 后端基础地址在 `api/env.js`，本地默认是 `http://localhost:18000`，生产可切换到 `https://api.itwray.com`。本地 `18000` 由 `iw-mixes-server` 的 `iw-core` dev profile 兼容旧入口前缀，生产由 Nginx 兼容旧入口前缀。
 - token key 是 `iwtoken`，请求 header 也是 `iwtoken`。
 - 响应约定：`code == 200` 成功，`code == 401` 登录失效并跳转 `pagesAuth/login/index`，其他 code 统一 toast。
 - 登录、注册、字典刷新和字典版本轮询主要在 `api/login.js`。
 - 文件上传等需要直接使用 `baseUrl` 的能力，先查看 `stores/file.js`。
 
-后端网关路径约定：
+后端兼容入口路径约定：
 
 - 认证/用户/字典/家庭组/文件：`/auth-service/...`
 - 记账：`/bookkeeping-service/...`
@@ -87,7 +87,7 @@
 
 新增或调整接口联调：
 
-1. 先确认后端 Controller 的完整网关路径。
+1. 先确认后端 Controller 对应的完整兼容入口路径。
 2. 检查请求方法、query/body 参数、返回 `data` 结构。
 3. 页面中只依赖 `res.data`，错误提示交给 `request.js` 统一处理，除非页面需要额外恢复 UI 状态。
 4. 涉及列表分页、下拉刷新、统计图表时，注意小程序端性能和空状态。
@@ -126,8 +126,7 @@ npm run update-icons
 - 先读本文件，再读根目录 `../AGENTS.md` 了解三端关系。
 - 不要修改 `node_modules/`、`unpackage/`、构建缓存、真实本地配置。
 - 新增页面必须检查 `pages.json`，否则小程序无法访问。
-- 新增接口调用必须和 `../iw-mixes` 的网关路径一致。
+- 新增接口调用必须和 `../iw-mixes-server` 的兼容入口路径一致。
 - 涉及 Web 平台也有相同业务能力时，检查 `../iw-mixes-web-platform/src/api` 和 `src/views`，保持字段语义一致。
 - 页面改动后，至少做语法和路径检查；能启动时再用 HBuilderX 或微信开发者工具验证。
 - 不要把后端返回结构猜死，先看同模块已有页面如何读取 `res.data`。
-
